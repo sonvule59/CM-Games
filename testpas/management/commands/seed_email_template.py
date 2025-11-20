@@ -74,8 +74,8 @@ EMAIL_TEMPLATES = [
         "body": "Hi {username},\n\nWe recommend that you maintain your usual daily routines. We will email you again in approximately 4 weeks for the next task (i.e., completing an online survey set). Please regularly check your inbox. You will receive the accrued incentives after this study ends.\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (\"Seung\") Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
     },
     {
-        "name": "intervention_access_immediate",  # NEW DOUBLE BLIND RANDOMIZATION MECHANICS
-        "subject": "Group Assignment - Intervention Group", # NEW DOUBLE BLIND RANDOMIZATION MECHANICS
+        "name": "intervention_access_immediate",  # Information 17
+        "subject": "Intervention Access Immediately",  # Information 17
         "body": (
             "Hi {username},\n\n"
             "You have been assigned to Group 1 (intervention group). Your access to the online physical activity intervention will begin immediately."

@@ -41,7 +41,7 @@ def get_study_day(start_date, now=None, compressed=False, seconds_per_day=86400,
             study_day = (now.date() - start_date.date()).days + 1
     
     # Cap study day at 150 to prevent infinite counting
-    return min(study_day, 113)
+    return min(study_day, 150)
 def get_day_difference_compressed(start_time, now=None, seconds_per_day=86400):
     """86400 seconds = 1 real-world day (24 hours * 60 minutes * 60 seconds). We can adjust this for testing purposes. We will do this
     this way to make sure it works."""

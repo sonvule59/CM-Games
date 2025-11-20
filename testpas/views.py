@@ -51,6 +51,7 @@ def home(request):
     return redirect('dashboard')
 
 """Information 2: Create Account"""
+@csrf_exempt
 def create_account(request):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -609,7 +610,7 @@ def dashboard(request):
             print(f"[DEBUG] Days until end wave 1: {days_until_end_wave1}")
 
             # ----  Study progress percentage ----
-            total_study_days = 113  # Set this to your full study duration
+            total_study_days = 134  # Set this to your full study duration (Day 134 is when Information 27 is sent)
             progress_percentage = min(int((study_day / total_study_days) * 100), 100)
             print(f"[DEBUG] Progress percentage: {progress_percentage}")
 
@@ -653,11 +654,13 @@ def dashboard(request):
             )
 
     # Check if Information 16 should be shown for Group 0 (Days 29-56)
+    # Information 16: Control group sees this message from Day 29 to Day 56, removed on Day 57
     show_information_16 = False
     information_16_content = None
     if (study_day and 29 <= study_day <= 56 and 
         participant and participant.randomized_group == 0):
         show_information_16 = True
+        print(f"[DEBUG] Showing Information 16 for Group 0 participant on Day {study_day}")
         try:
             information_16_content = Content.objects.get(content_type='information_16')
         except Content.DoesNotExist:
@@ -757,6 +760,28 @@ def dashboard(request):
                     '</div>'
                 )
             )
+    
+    # Information 25: Show message after Wave 3 code entry (same as email)
+    show_information_25 = False
+    information_25_content = None
+    if participant and participant.wave3_code_entered and participant.wave3_code_entry_date:
+        show_information_25 = True
+        # Format dates for display
+        from datetime import timedelta
+        code_date = participant.wave3_code_entry_date
+        start_date = code_date + timedelta(days=1)
+        end_date = code_date + timedelta(days=7)
+        information_25_content = {
+            'code_date': code_date.strftime('%m/%d/%Y'),
+            'start_date': start_date.strftime('%m/%d/%Y'),
+            'end_date': end_date.strftime('%m/%d/%Y'),
+        }
+    
+    # Information 27: Show message on Day 134 if code not entered
+    show_information_27 = False
+    information_27_content = None
+    if study_day and study_day >= 134 and participant and not participant.wave3_code_entered:
+        show_information_27 = True
 
     context = {
         'user': request.user,  # Explicitly pass the current user
@@ -790,7 +815,11 @@ def dashboard(request):
         'show_information_20': show_information_20,
         'information_20_content': information_20_content,
         'show_wave3_survey': show_wave3_survey,
-        'wave3_survey_content': wave3_survey_content
+        'wave3_survey_content': wave3_survey_content,
+        'show_information_25': show_information_25,
+        'information_25_content': information_25_content,
+        'show_information_27': show_information_27,
+        'information_27_content': information_27_content
     }
     return render(request, "dashboard.html", context)
 # INFORMATION 11 & 22: Enter Code
@@ -895,7 +924,7 @@ def enter_code(request, wave):
                         participant.wave3_code_entry_day = 1
                     participant.save()
                     
-                    # Send Information 23 email - use participant.id (database ID)
+                    # Send Information 25 email - use participant.id (database ID)
                     send_wave3_code_entry_email(participant.id)
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
@@ -1002,14 +1031,16 @@ def intervention_access(request):
             user_progress.day_1,
             now=get_current_time(),
             compressed=settings.TIME_COMPRESSION,
-            seconds_per_day=settings.SECONDS_PER_DAY
+            seconds_per_day=settings.SECONDS_PER_DAY,
+            reference_timestamp=user_progress.timeline_reference_timestamp
         )
         
         # Check if participant should have access
+        # Information 16: Group 0 (control group) does NOT get intervention access during the study period.
+        # Information 17: Only Group 1 (intervention group) gets access during Days 29-56
         has_access = False
         access_message = ""
-        
-        if participant.randomized_group == 1:  # Intervention group
+        if participant.randomized_group == 1:  # Intervention group (Information 17)
             if 29 <= study_day <= 56:
                 has_access = True
                 access_message = "You have access to the intervention from Day 29 to Day 56."
@@ -1017,11 +1048,14 @@ def intervention_access(request):
                     participant.intervention_access_granted = True
                     participant.intervention_access_date = get_current_time()
                     participant.save()
+            elif study_day < 29:
+                access_message = "Intervention access will be available starting on Day 29."
             else:
                 access_message = "Your intervention access period has ended (Days 29-56)."
-        elif participant.randomized_group == 0:  # Control group - NO ACCESS
+        elif participant.randomized_group == 0:  # Control group (Information 16)
+            # Control group does NOT get intervention access
             has_access = False
-            access_message = "You are in the control group and do not have access to the intervention during the study period."
+            access_message = "You are in the control group (Group 0). You do not have access to the intervention during the study period. Please maintain your usual daily routines. We will email you again in approximately 4 weeks for the next task."
         else:
             access_message = "You have not been assigned to a group yet."
         

@@ -184,49 +184,127 @@ def daily_timeline_check(user):
             first_participant = pair_participants[0]
             second_participant = pair_participants[1]
             
-            # Fair coin flip for first participant
-            first_group = random.choice([0, 1])
-            second_group = 1 - first_group  # Opposite group
+            # Check if first participant is already randomized (from when they were alone)
+            if first_participant.randomization_completed:
+                # First participant already randomized, assign second participant to opposite group
+                first_group = first_participant.randomized_group
+                second_group = 1 - first_group  # Opposite group
+                
+                second_participant.randomized_group = second_group
+                second_participant.group = second_group
+                second_participant.group_assigned = True
+                second_participant.randomization_completed = True
+                second_participant.save()
+                
+                print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id}: "
+                      f"First participant (ID {first_participant.id}) already in Group {first_group}, "
+                      f"Second participant (ID {second_participant.id}) -> Group {second_group}")
+                
+                # Send email to second participant only (first already received theirs)
+                try:
+                    if second_participant.randomized_group == 0:
+                        second_participant.send_email("intervention_access_later", extra_context={
+                            "username": second_participant.user.username
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {second_participant.participant_id}")
+                    elif second_participant.randomized_group == 1:
+                        second_participant.send_email("intervention_access_immediate", extra_context={
+                            "username": second_participant.user.username,
+                            "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
+                except Exception as e:
+                    print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
+                    logger.error(f"Failed to send randomization email to {second_participant.participant_id}: {str(e)}")
+            else:
+                # Neither participant is randomized yet - do full 2-block randomization
+                # Fair coin flip for first participant
+                first_group = random.choice([0, 1])
+                second_group = 1 - first_group  # Opposite group
+                
+                # Assign groups
+                first_participant.randomized_group = first_group
+                first_participant.group = first_group
+                first_participant.group_assigned = True
+                first_participant.randomization_completed = True
+                first_participant.save()
+                
+                second_participant.randomized_group = second_group
+                second_participant.group = second_group
+                second_participant.group_assigned = True
+                second_participant.randomization_completed = True
+                second_participant.save()
+                
+                print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id}: "
+                      f"First participant (ID {first_participant.id}) -> Group {first_group}, "
+                      f"Second participant (ID {second_participant.id}) -> Group {second_group}")
+                
+                # Send notification emails to both
+                try:
+                    if first_participant.randomized_group == 0:
+                        first_participant.send_email("intervention_access_later", extra_context={
+                            "username": first_participant.user.username
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {first_participant.participant_id}")
+                    elif first_participant.randomized_group == 1:
+                        first_participant.send_email("intervention_access_immediate", extra_context={
+                            "username": first_participant.user.username,
+                            "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {first_participant.participant_id}")
+                except Exception as e:
+                    print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to first participant {first_participant.participant_id}: {str(e)}")
+                    logger.error(f"Failed to send randomization email to {first_participant.participant_id}: {str(e)}")
+                
+                try:
+                    if second_participant.randomized_group == 0:
+                        second_participant.send_email("intervention_access_later", extra_context={
+                            "username": second_participant.user.username
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {second_participant.participant_id}")
+                    elif second_participant.randomized_group == 1:
+                        second_participant.send_email("intervention_access_immediate", extra_context={
+                            "username": second_participant.user.username,
+                            "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
+                        })
+                        print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
+                except Exception as e:
+                    print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
+                    logger.error(f"Failed to send randomization email to {second_participant.participant_id}: {str(e)}")
+        elif len(pair_participants) == 1:
+            # Only one participant in pair - randomize them now, second participant will get opposite when they join
+            import random
+            single_participant = pair_participants[0]
             
-            # Assign groups
-            first_participant.randomized_group = first_group
-            first_participant.group = first_group
-            first_participant.group_assigned = True
-            first_participant.randomization_completed = True
-            first_participant.save()
+            # Random assignment for the single participant
+            assigned_group = random.choice([0, 1])
+            single_participant.randomized_group = assigned_group
+            single_participant.group = assigned_group
+            single_participant.group_assigned = True
+            single_participant.randomization_completed = True
+            single_participant.save()
             
-            second_participant.randomized_group = second_group
-            second_participant.group = second_group
-            second_participant.group_assigned = True
-            second_participant.randomization_completed = True
-            second_participant.save()
+            print(f"[2-BLOCK RANDOMIZE] Single participant in Pair {participant.randomization_pair_id}: "
+                  f"Participant (ID {single_participant.id}) -> Group {assigned_group} (waiting for pair)")
             
-            print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id}: "
-                  f"First participant (ID {first_participant.id}) -> Group {first_group}, "
-                  f"Second participant (ID {second_participant.id}) -> Group {second_group}")
-            
-            # Send notification emails
-            if first_participant.randomized_group == 0:
-                first_participant.send_email("intervention_access_later", extra_context={
-                    "username": first_participant.user.username
-                })
-            elif first_participant.randomized_group == 1:
-                first_participant.send_email("intervention_access_immediate", extra_context={
-                    "username": first_participant.user.username,
-                    "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                })
-            
-            if second_participant.randomized_group == 0:
-                second_participant.send_email("intervention_access_later", extra_context={
-                    "username": second_participant.user.username
-                })
-            elif second_participant.randomized_group == 1:
-                second_participant.send_email("intervention_access_immediate", extra_context={
-                    "username": second_participant.user.username,
-                    "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                })
+            # Send notification email to the single participant
+            try:
+                if single_participant.randomized_group == 0:
+                    single_participant.send_email("intervention_access_later", extra_context={
+                        "username": single_participant.user.username
+                    })
+                    print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {single_participant.participant_id}")
+                elif single_participant.randomized_group == 1:
+                    single_participant.send_email("intervention_access_immediate", extra_context={
+                        "username": single_participant.user.username,
+                        "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
+                    })
+                    print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {single_participant.participant_id}")
+            except Exception as e:
+                print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to single participant {single_participant.participant_id}: {str(e)}")
+                logger.error(f"Failed to send randomization email to {single_participant.participant_id}: {str(e)}")
         else:
-            print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id} waiting for second participant")
+            print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id} has unexpected number of participants: {len(pair_participants)}")
     ############### NEW DOUBLE BLIND RANDOMIZATION MECHANICS ENDS HERE ######################
     """
     Information 18: Day 57: Wave 2 Survey Ready
@@ -244,11 +322,12 @@ def daily_timeline_check(user):
         participant.save()
 
     """
-    Information 21: Day 67 – Send No Wave 2 Monitoring Email
-    (Email) Wave 2 No Monitoring Email – Ready. On Day 67, send this email to every participant from any group.  
+    Information 20: Day 64 – No Wave 2 Physical Activity Monitoring
+    (Email) From Day 64 to Day 112, send this email to every participant from any group (i.e., both control and intervention group).
+    Same information should appear on the website.
     """
-    # Day 67 – Send No Wave 2 Monitoring Email
-    if today and 67 <= today <= 68 and not participant.wave2_monitoring_notice_sent:
+    # Information 20: Send No Wave 2 Monitoring Email on Day 64
+    if today and today == 64 and not participant.wave2_monitoring_notice_sent:
         participant.send_email(
             "wave2_no_monitoring",
             extra_context={
@@ -383,7 +462,7 @@ def send_wave1_monitoring_email(participant_id):
 
 @shared_task
 def send_wave3_code_entry_email(participant_id):
-    """Information 23: Physical Activity Monitoring Tomorrow (Wave 3)"""
+    """Information 25: Physical Activity Monitoring Tomorrow (Wave 3)"""
     try:
         participant = Participant.objects.get(id=participant_id)
         
@@ -392,7 +471,7 @@ def send_wave3_code_entry_email(participant_id):
         if not code_date:
             logger.error(f"No Wave 3 code entry date for participant {participant_id}")
             return
-            
+        # Plus 1 day since it is tomorrow
         start_date = code_date + timedelta(days=1)
         end_date = code_date + timedelta(days=7)
         
@@ -430,7 +509,7 @@ def send_study_end_email(participant_id):
 
 @shared_task
 def send_wave3_missing_code_email(participant_id):
-    """Information 25: Missing Code Entry Email (Study End)"""
+    """Information 27: Missing Code Entry Email (Study End)"""
     try:
         participant = Participant.objects.get(id=participant_id)
         
