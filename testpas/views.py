@@ -501,6 +501,10 @@ def daily_log_view(request, wave):
 
 @login_required
 def dashboard(request):
+    # Clear any stored messages to prevent them from showing on dashboard
+    storage = messages.get_messages(request)
+    storage.used = True
+    
     # Add debugging information
     print(f"[DEBUG] Dashboard accessed by user: {request.user.username}")
     print(f"[DEBUG] User ID: {request.user.id}")
