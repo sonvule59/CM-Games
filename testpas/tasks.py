@@ -17,8 +17,16 @@ from .timeline import get_timeline_day
 ### Jun 11: Add in run_daily_timeline_checks task among other tasks
 @shared_task
 def run_daily_timeline_checks():
-    for user in User.objects.all():
-        daily_timeline_check(user)
+    print(f"[CELERY TASK] run_daily_timeline_checks started")
+    users = User.objects.all()
+    print(f"[CELERY TASK] Processing {users.count()} users")
+    for user in users:
+        try:
+            daily_timeline_check(user)
+        except Exception as e:
+            print(f"[CELERY TASK] ERROR processing user {user.id}: {str(e)}")
+            logger.error(f"Error in daily_timeline_check for user {user.id}: {str(e)}")
+    print(f"[CELERY TASK] run_daily_timeline_checks completed")
 
 ## Jun 11: Add in run_daily_timeline_checks task among other tasks. 
 ## This is rewritten send_scheduled_emails() function.
@@ -61,21 +69,25 @@ def daily_timeline_check(user):
         print(f"[SKIP] No participant for user {user.id}")
         return
     
-    # Skip participants who have completed the study (Day 112+)
-    if today and today > 112:
-        print(f"[SKIP] User {user.id} completed study (Day {today} > 112)")
+    # Skip participants who have completed the study (Day 134+)
+    # Note: Information 24 is sent on Day 120, Information 27 is sent on Day 134
+    if today and today > 134:
+        print(f"[SKIP] User {user.id} completed study (Day {today} > 134)")
         return
         
     # study_day = get_timeline_day(user, compressed=settings.TIME_COMPRESSION, seconds_per_day=settings.SECONDS_PER_DAY)
     print(f"[CHECK] User {user.id}, Day {today}, Status: {participant.email_status}")
 
     # Info 9 – Day 1: Wave 1 Online Survey Ready
-    if today and today == 1 and participant.email_status != 'sent_wave1_survey':
+    # Allow catch-up if missed (send if on Day 1 or later but not sent yet)
+    if today and today >= 1 and participant.email_status != 'sent_wave1_survey':
+        print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
         participant.send_email("wave1_survey_ready", mark_as='sent_wave1_survey')
 
     # Info 10 – Day 8: Wave 1 Physical Activity Monitoring – Ready
-    # Send at 7 AM CT in real-time mode; in time-compression, send immediately when day==8
-    if today and today == 8 and not participant.code_entry_date and participant.email_status != 'sent_wave1_monitor':
+    # Send at 7 AM CT in real-time mode; in time-compression, send immediately when day>=8
+    # Allow catch-up if missed (send if on Day 8 or later but not sent yet)
+    if today and today >= 8 and not participant.code_entry_date and participant.email_status != 'sent_wave1_monitor':
         if not settings.TIME_COMPRESSION:
             # Enforce 7 AM Central Time (CT) for real-time mode
             from pytz import timezone as tz
@@ -87,7 +99,9 @@ def daily_timeline_check(user):
             participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
 
     # Info 14 – Day 22: Missing Code Entry (Wave 1)
-    if today and today == 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
+    # Allow catch-up if missed (send if on Day 22 or later but not sent yet)
+    if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
+        print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
         participant.send_email("wave1_missing_code")
         participant.email_status = 'sent_wave1_missing'
         participant.save()
@@ -138,9 +152,18 @@ def daily_timeline_check(user):
     #Pair 1: TEST001 (Position 1) + TEST002 (Position 2)
     #Pair 2: TEST003 (Position 1) + TEST004 (Position 2) #########################################
     
+    # Fix data inconsistency: if randomization_completed is True but randomized_group is None
+    # This can happen if there was a bug or manual data change
+    if participant.randomization_completed and participant.randomized_group is None:
+        print(f"[FIX] Participant {participant.participant_id} has randomization_completed=True but randomized_group=None. Resetting randomization_completed.")
+        participant.randomization_completed = False
+        participant.save()
+    
     # Info 15 – Day 29: 2-Block Randomization
     # On Day 29, randomize participants using 2-block randomization procedure
-    if today and today == 29 and not participant.randomization_completed:
+    # Also allow randomization if participant hasn't been randomized yet and it's past Day 29 (to catch up if missed)
+    if today and today >= 29 and not participant.randomization_completed:
+        print(f"[RANDOMIZATION] Participant {participant.participant_id} on Day {today}, checking for randomization...")
         # Check if we need to assign this participant to a pair
         if participant.randomization_pair_id is None:
             # Find the next available pair or create a new one
@@ -185,7 +208,7 @@ def daily_timeline_check(user):
             second_participant = pair_participants[1]
             
             # Check if first participant is already randomized (from when they were alone)
-            if first_participant.randomization_completed:
+            if first_participant.randomization_completed and first_participant.randomized_group is not None:
                 # First participant already randomized, assign second participant to opposite group
                 first_group = first_participant.randomized_group
                 second_group = 1 - first_group  # Opposite group
@@ -308,18 +331,27 @@ def daily_timeline_check(user):
     ############### NEW DOUBLE BLIND RANDOMIZATION MECHANICS ENDS HERE ######################
     """
     Information 18: Day 57: Wave 2 Survey Ready
-    (Email) Wave 2 Online Survey Set – Ready. On Day 57, send this email to every participant from any group.  
+    (Email) Wave 2 Online Survey Set – Ready. On Day 57, send this email to every participant from any group.
+    Allow catch-up if missed (send if on Day 57 or later but not sent yet).
     """
-    if today and today == 57 and not participant.wave2_survey_email_sent:
-        participant.send_email(
-            "wave2_survey_ready",
-            extra_context={
-                # "participant_id": participant.participant_id,
-                "username": participant.user.username,
-            }
-        )
-        participant.wave2_survey_email_sent = True
-        participant.save()
+    if today and today >= 57 and not participant.wave2_survey_email_sent:
+        try:
+            print(f"[INFO 18] Sending Wave 2 survey email to {participant.participant_id} (Day {today})")
+            participant.send_email(
+                "wave2_survey_ready",
+                extra_context={
+                    # "participant_id": participant.participant_id,
+                    "username": participant.user.username,
+                }
+            )
+            participant.wave2_survey_email_sent = True
+            participant.save()
+            print(f"[INFO 18] Successfully sent Wave 2 survey email to {participant.participant_id}")
+            logger.info(f"Sent Wave 2 survey email to {participant.participant_id}")
+        except Exception as e:
+            print(f"[INFO 18] ERROR: Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
+            logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
+            # Don't set wave2_survey_email_sent = True if email failed, so it can be retried
 
     """
     Information 20: Day 64 – No Wave 2 Physical Activity Monitoring
@@ -365,14 +397,23 @@ def daily_timeline_check(user):
         participant.wave3_missing_code_sent = True
         participant.save()
 
-    # Info 24 – 8 days after Wave 3 code entry: Study End Survey & Monitor Return
-    if hasattr(participant, 'wave3_code_entry_day') and participant.wave3_code_entry_day is not None:
-        wave3_code_day = participant.wave3_code_entry_day
-        if today and today >= wave3_code_day + 8 and not participant.wave3_survey_monitor_return_sent:
-            participant.send_email("study_end")
+    """
+    Information 24: Day 120: Study End Survey & Monitor Return
+    (Email) On Day 120, send this email to every participant from any group (i.e., both control and intervention group).
+    """
+    if today and today == 120 and not participant.wave3_survey_monitor_return_sent:
+        try:
+            print(f"[INFO 24] Sending Study End Survey & Monitor Return email to {participant.participant_id} (Day {today})")
+            participant.send_email("study_end", extra_context={"username": user.username})
             participant.wave3_survey_monitor_return_sent = True
             participant.wave3_survey_monitor_return_date = timezone.now().date()
-        participant.save()
+            participant.save()
+            print(f"[INFO 24] Successfully sent Study End Survey & Monitor Return email to {participant.participant_id}")
+            logger.info(f"Sent Study End Survey & Monitor Return email to {participant.participant_id}")
+        except Exception as e:
+            print(f"[INFO 24] ERROR: Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
+            logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
+            # Don't set wave3_survey_monitor_return_sent = True if email failed, so it can be retried
 
 @shared_task
 def send_wave1_survey_return_email(participant_id):

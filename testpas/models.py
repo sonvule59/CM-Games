@@ -173,7 +173,7 @@ class Participant(models.Model):
         context = {'participant_id': self.participant_id, 'username': self.user.username}
         
         # Add survey links for survey-related emails
-        if 'survey' in template_name:
+        if 'survey' in template_name or 'study_end' in template_name:
             if 'wave1' in template_name:
                 context['survey_link'] = f"{settings.BASE_URL}/survey/wave1/"
             elif 'wave2' in template_name:
