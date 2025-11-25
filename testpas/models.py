@@ -95,7 +95,7 @@ def generate_confirmation_token():
 class Participant(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    age = models.IntegerField(null=True, blank=True)
+    # age = models.IntegerField(null=True, blank=True)
     enrollment_date = models.DateField(default=timezone.now)
     code_entered = models.BooleanField(default=False)
     code_entry_date = models.DateField(null=True, blank=True)
