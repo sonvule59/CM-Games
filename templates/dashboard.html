@@ -356,6 +356,22 @@
                 </div>
             {% endif %}
 
+            <!-- Information 17 - Intervention Group Message (Days 29-56) -->
+            {% if show_information_17 %}
+                <div class="card">
+                    <div class="alert alert-success">
+                        <h3>🎯 Intervention Access Available</h3>
+                        {% if information_17_content %}
+                            {{ information_17_content.content|safe }}
+                        {% else %}
+                            <p>Congratulations! You have been assigned to the intervention group (Group 1).</p>
+                            <p>You now have access to the physical activity intervention from Day 29 to Day 56.</p>
+                        {% endif %}
+                        <a href="{% url 'intervention_access' %}" class="btn btn-success" style="margin-top: 1rem;">Access Intervention</a>
+                    </div>
+                </div>
+            {% endif %}
+
             <!-- Wave 2 Online Survey (Days 57-63) -->
             {% if show_wave2_survey %}
                 <div class="card">
@@ -378,16 +394,14 @@
                 </div>
             {% endif %}
 
-            <!-- Intervention Access Buttons (Only for Group 1, Days 29-56) -->
-            {% if participant and participant.randomized_group == 1 and 29 <= study_day and study_day <= 56 %}
-                <div class="card">
-                    <div class="alert alert-info">
-                        <h3>🎯 Intervention</h3>
-                        <a href="{% url 'intervention_access' %}" class="btn btn-primary btn-large">Open Intervention</a>
-                        {% if show_test_intervention_button and request.user.is_staff %}
-                            <a href="{% url 'intervention_access_test' %}" class="btn btn-primary btn-large">Open Test Intervention</a>
-                        {% endif %}
-                    </div>
+            <!-- Debug info for intervention button (only shown if Information 17 is not showing) -->
+            {% if debug_intervention and not show_information_17 %}
+                <div class="card" style="background-color: #fff3cd; border: 1px solid #ffc107;">
+                    <p><strong>Debug - Intervention Button:</strong></p>
+                    <p>Randomized Group: {{ debug_intervention.randomized_group|default:"None" }}</p>
+                    <p>Study Day: {{ debug_intervention.study_day }}</p>
+                    <p>Randomization Completed: {{ debug_intervention.randomization_completed }}</p>
+                    <p>Should Show: {{ debug_intervention.should_show }}</p>
                 </div>
             {% endif %}
 
@@ -434,36 +448,6 @@
                 {% endif %}
             {% endif %}
 
-            <!-- Wave 2 Survey Status -->
-            {% if progress.day_1 %}
-                {% if wave2_survey_status == 'Available - Complete within 7 days' %}
-                    <div class="card">
-                        <div class="alert alert-success">
-                            <h3>📋 Wave 2 Online Survey</h3>
-                            <p>Your Wave 2 survey is now available! Complete it within 7 days to receive a $5 Amazon gift card.</p>
-                            <p><strong>Status:</strong> {{ wave2_survey_status }}</p>
-                            <p><strong>Your ID:</strong> {{ participant.participant_id }}</p>
-                            <p><strong>Link:</strong> TBD (will be updated by researchers)</p>
-                        </div>
-                    </div>
-                {% elif wave2_survey_status == 'Not Yet Available' %}
-                    <div class="card">
-                        <div class="alert alert-warning">
-                            <h3>⏳ Wave 2 Survey</h3>
-                            <p>Wave 2 survey will be available starting on Day 57.</p>
-                            <p><strong>Status:</strong> {{ wave2_survey_status }}</p>
-                        </div>
-                    </div>
-                {% elif wave2_survey_status == 'Window Expired' %}
-                    <div class="card">
-                        <div class="alert alert-secondary">
-                            <h3>✅ Wave 2 Survey</h3>
-                            <p>Wave 2 survey window has ended.</p>
-                            <p><strong>Status:</strong> {{ wave2_survey_status }}</p>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endif %}
 
             <!-- Information 20 - No Wave 2 Physical Activity Monitoring (Days 64-112) -->
             {% if show_information_20 %}
@@ -576,16 +560,6 @@
                 </div>
             {% endif %}
 
-            <!-- Intervention Access (Information 17: Only Group 1 gets access Days 29-56) -->
-            {% if participant and participant.randomized_group == 1 and 29 <= study_day and study_day <= 56 %}
-                <div class="card">
-                    <div class="alert alert-success">
-                        <h3>🎯 Intervention Access Available</h3>
-                        <p>You now have access to the physical activity intervention (Days 29-56).</p>
-                        <a href="{% url 'intervention_access' %}" class="btn btn-success">Access Intervention</a>
-                    </div>
-                </div>
-            {% endif %}
 
         {% else %}
             <!-- Not Enrolled -->

@@ -518,6 +518,7 @@ def dashboard(request):
     if participant:
         print(f"[DEBUG] Participant found: {participant.participant_id}")
         print(f"[DEBUG] Participant user: {participant.user.username}")
+        print(f"[DEBUG] Participant randomized_group: {participant.randomized_group} (type: {type(participant.randomized_group)})")
     else:
         print(f"[DEBUG] No participant found for user {request.user.username}")
     
@@ -559,6 +560,9 @@ def dashboard(request):
                 seconds_per_day=settings.SECONDS_PER_DAY,
                 reference_timestamp=user_progress.timeline_reference_timestamp
             )
+            print(f"[DEBUG] Study day calculated: {study_day}")
+            if participant:
+                print(f"[DEBUG] Intervention button check: participant.randomized_group={participant.randomized_group}, study_day={study_day}, should_show={participant.randomized_group == 1 and 29 <= study_day <= 56}")
             
             # Calculate compressed timeline milestones
             # In compressed mode, these are study days, not calendar dates
@@ -671,6 +675,32 @@ def dashboard(request):
                 content=(
                     '<div>'
                     '<p>We recommend that you maintain your usual daily routines. We will email you again in approximately 4 weeks for the next task (i.e., completing an online survey set). Please regularly check your inbox. You will receive the accrued incentives after this study ends.</p>'
+                    '<p>If you need any assistance or have any questions at any time, please contact Seungmin ("Seung") Lee (Principal Investigator) at <a href="mailto:seunglee@iastate.edu">seunglee@iastate.edu</a> or <a href="tel:517-898-0020">517-898-0020</a>.</p>'
+                    '<p><strong>Sincerely,</strong><br>The Confident Moves Research Team</p>'
+                    '</div>'
+                )
+            )
+
+    # Check if Information 17 should be shown for Group 1 (Days 29-56)
+    # Information 17: Intervention group sees this message from Day 29 to Day 56, removed on Day 57
+    show_information_17 = False
+    information_17_content = None
+    if (study_day and 29 <= study_day <= 56 and 
+        participant and participant.randomized_group is not None and participant.randomized_group == 1):
+        show_information_17 = True
+        print(f"[DEBUG] Showing Information 17 for Group 1 participant on Day {study_day}")
+        try:
+            information_17_content = Content.objects.get(content_type='information_17')
+        except Content.DoesNotExist:
+            # Create default content if it doesn't exist
+            information_17_content = Content.objects.create(
+                content_type='information_17',
+                title='Information 17 - Intervention Group Message',
+                content=(
+                    '<div>'
+                    '<p>Congratulations! You have been assigned to the intervention group (Group 1).</p>'
+                    '<p>You now have access to the physical activity intervention from Day 29 to Day 56. You can access the intervention by clicking the button below.</p>'
+                    '<p>If you complete 24 or more challenges within 4 weeks, you will receive a $20 Amazon gift card.</p>'
                     '<p>If you need any assistance or have any questions at any time, please contact Seungmin ("Seung") Lee (Principal Investigator) at <a href="mailto:seunglee@iastate.edu">seunglee@iastate.edu</a> or <a href="tel:517-898-0020">517-898-0020</a>.</p>'
                     '<p><strong>Sincerely,</strong><br>The Confident Moves Research Team</p>'
                     '</div>'
@@ -807,6 +837,8 @@ def dashboard(request):
         'wave1_survey_content': wave1_survey_content,
         'show_information_16': show_information_16,
         'information_16_content': information_16_content,
+        'show_information_17': show_information_17,
+        'information_17_content': information_17_content,
         'show_wave2_survey': show_wave2_survey,
         'wave2_survey_content': wave2_survey_content,
         'wave2_survey_status': wave2_survey_status,
@@ -819,7 +851,14 @@ def dashboard(request):
         'show_information_25': show_information_25,
         'information_25_content': information_25_content,
         'show_information_27': show_information_27,
-        'information_27_content': information_27_content
+        'information_27_content': information_27_content,
+        # Debug info for intervention button visibility
+        'debug_intervention': {
+            'randomized_group': participant.randomized_group if participant else None,
+            'study_day': study_day if user_progress else 0,
+            'randomization_completed': participant.randomization_completed if participant else False,
+            'should_show': participant and participant.randomized_group == 1 and 29 <= study_day <= 56 if (participant and user_progress) else False,
+        } if participant else None,
     }
     return render(request, "dashboard.html", context)
 # INFORMATION 11 & 22: Enter Code
