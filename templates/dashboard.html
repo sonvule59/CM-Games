@@ -496,6 +496,15 @@
                             <h3>📱 Wave 3 Physical Activity Code Entry</h3>
                             <p>You need to enter a code on the website within 14 days to complete the physical activity monitoring. The code can be found in the mail package that will arrive at your address (the one you provided) in a few days.</p>
                             <p>Please enter the code:</p>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if message.tags == 'error' %}
+                                        <div class="alert alert-danger" style="margin-top: 1rem; margin-bottom: 1rem;">
+                                            {{ message }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                             <form method="POST" action="{% url 'enter_code' wave=3 %}">
                                 {% csrf_token %}
                                 <div class="form-group">

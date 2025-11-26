@@ -384,12 +384,21 @@ def daily_timeline_check(user):
 
     """
     Information 23: Day 120: Wave 3 Monitoring Ready
-    (Email) Wave 3 Physical Activity Monitoring Ready. On Day 120, send this email to every participant from any group.  
+    (Email) Wave 3 Physical Activity Monitoring Ready. On Day 120, send this email to every participant from any group.
+    Allow catch-up if missed (send if on Day 120 or later but not sent yet).
     """
-    if today and today == 120 and not participant.wave3_monitor_ready_sent:
-        participant.send_email("wave3_monitoring_ready", extra_context={"username": user.username})
-        participant.wave3_monitor_ready_sent = True
-        participant.save()
+    if today and today >= 120 and not participant.wave3_monitor_ready_sent:
+        try:
+            print(f"[INFO 23] Sending Wave 3 Monitoring Ready email to {participant.participant_id} (Day {today})")
+            participant.send_email("wave3_monitoring_ready", extra_context={"username": user.username})
+            participant.wave3_monitor_ready_sent = True
+            participant.save()
+            print(f"[INFO 23] Successfully sent Wave 3 Monitoring Ready email to {participant.participant_id}")
+            logger.info(f"Sent Wave 3 Monitoring Ready email to {participant.participant_id}")
+        except Exception as e:
+            print(f"[INFO 23] ERROR: Failed to send Wave 3 Monitoring Ready email to {participant.participant_id}: {str(e)}")
+            logger.error(f"Failed to send Wave 3 Monitoring Ready email to {participant.participant_id}: {str(e)}")
+            # Don't set wave3_monitor_ready_sent = True if email failed, so it can be retried
 
     # Info 27 – Day 134: Missed Wave 3 Code Entry (Study End)
     if today and today == 134 and not participant.wave3_code_entered and not participant.wave3_missing_code_sent:
@@ -398,22 +407,26 @@ def daily_timeline_check(user):
         participant.save()
 
     """
-    Information 24: Day 120: Study End Survey & Monitor Return
-    (Email) On Day 120, send this email to every participant from any group (i.e., both control and intervention group).
+    Study End Survey & Monitor Return Email
+    Send 8 days after Wave 3 code entry (if code was entered).
+    Note: Information 24 is the website display for Wave 3 code entry (Days 120-133), not an email.
     """
-    if today and today == 120 and not participant.wave3_survey_monitor_return_sent:
-        try:
-            print(f"[INFO 24] Sending Study End Survey & Monitor Return email to {participant.participant_id} (Day {today})")
-            participant.send_email("study_end", extra_context={"username": user.username})
-            participant.wave3_survey_monitor_return_sent = True
-            participant.wave3_survey_monitor_return_date = timezone.now().date()
-            participant.save()
-            print(f"[INFO 24] Successfully sent Study End Survey & Monitor Return email to {participant.participant_id}")
-            logger.info(f"Sent Study End Survey & Monitor Return email to {participant.participant_id}")
-        except Exception as e:
-            print(f"[INFO 24] ERROR: Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
-            logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
-            # Don't set wave3_survey_monitor_return_sent = True if email failed, so it can be retried
+    if participant.wave3_code_entered and participant.wave3_code_entry_day:
+        # Calculate target day: code entry day + 8 days
+        target_day = participant.wave3_code_entry_day + 8
+        if today and today >= target_day and not participant.wave3_survey_monitor_return_sent:
+            try:
+                print(f"[STUDY END] Sending Study End Survey & Monitor Return email to {participant.participant_id} (Day {today}, code entered on Day {participant.wave3_code_entry_day})")
+                participant.send_email("study_end", extra_context={"username": user.username})
+                participant.wave3_survey_monitor_return_sent = True
+                participant.wave3_survey_monitor_return_date = timezone.now().date()
+                participant.save()
+                print(f"[STUDY END] Successfully sent Study End Survey & Monitor Return email to {participant.participant_id}")
+                logger.info(f"Sent Study End Survey & Monitor Return email to {participant.participant_id}")
+            except Exception as e:
+                print(f"[STUDY END] ERROR: Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
+                logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
+                # Don't set wave3_survey_monitor_return_sent = True if email failed, so it can be retried
 
 @shared_task
 def send_wave1_survey_return_email(participant_id):

@@ -971,9 +971,9 @@ def enter_code(request, wave):
                 messages.success(request, "Code entered successfully!")
                 return redirect('code_success', wave=wave)
             else:
-                return render(request, "dashboard.html", { "form": form,  "code_error": "Incorrect code. Please try again.",
-   # Include other context vars needed on the dashboard
-})
+                # Incorrect code - redirect to dashboard with error message
+                messages.error(request, "Incorrect code. Please try again.")
+                return redirect('home')
     else:
         form = CodeEntryForm()
     context = {
