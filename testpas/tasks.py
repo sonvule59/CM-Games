@@ -46,7 +46,9 @@ def daily_timeline_check(user):
         user=user, 
         survey__title="Eligibility Criteria"
     ).first()
-    
+    ##
+    ## Commented out previous code
+    """
     if user_progress and user_progress.day_1:
         today = get_study_day(
             user_progress.day_1,
@@ -62,7 +64,32 @@ def daily_timeline_check(user):
             now=now,
             compressed=compressed,
             seconds_per_day=seconds_per_day,
-            )
+            )"""
+    # CRITICAL: Only proceed if user has completed eligibility and consent
+    if not user_progress:
+        print(f"[SKIP] User {user.id} has no UserSurveyProgress (not completed eligibility)")
+        return
+    
+    if not user_progress.eligible:
+        print(f"[SKIP] User {user.id} is not eligible")
+        return
+    
+    if not user_progress.consent_given:
+        print(f"[SKIP] User {user.id} has not given consent")
+        return
+    
+    if not user_progress.day_1:
+        print(f"[SKIP] User {user.id} has no day_1 set (consent not completed)")
+        return
+    
+    # Calculate study day based on day_1 (which is set when consent is given)
+    today = get_study_day(
+        user_progress.day_1,
+        now=now,
+        compressed=compressed,
+        seconds_per_day=seconds_per_day,
+        reference_timestamp=user_progress.timeline_reference_timestamp
+    )
     """---------------------------------------------------------------------------------------------------------"""
     participant = getattr(user, 'participant', None)
     if not participant:
