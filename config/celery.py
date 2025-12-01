@@ -78,10 +78,25 @@ if redis_url:
 app.autodiscover_tasks()
 
 # Configure Celery Beat schedule
+# Use settings from testpas.settings (which checks TIME_COMPRESSION)
+# This allows different schedules for testing vs production
+from django.conf import settings as django_settings
+
+# Check if TIME_COMPRESSION is enabled (for testing)
+# Set TIME_COMPRESSION = True in testpas/settings.py for testing
+# Set TIME_COMPRESSION = False in testpas/settings.py for production
+TIME_COMPRESSION = getattr(django_settings, 'TIME_COMPRESSION', False)
+if TIME_COMPRESSION:
+    # For testing: run every 15 seconds
+    schedule_seconds = 15.0
+else:
+    # For production: run every 6 hours (21600 seconds) to catch up if missed
+    schedule_seconds = 21600.0  # Every 6 hours
+
 app.conf.beat_schedule = {
     'run-daily-timeline-checks': {
         'task': 'testpas.tasks.run_daily_timeline_checks',
-        'schedule': 10.0,  # Run every 10 seconds for time compression testing
+        'schedule': schedule_seconds,
     },
 }
 

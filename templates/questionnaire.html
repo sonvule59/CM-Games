@@ -4,245 +4,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eligibility Questionnaire</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Eligibility Questionnaire - Confident Moves Intervention</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h1 {
+            color: #333;
+            margin: 0 0 1.5rem 0;
+            font-size: 2rem;
+            font-weight: 300;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+        .card h2 {
+            color: #555;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            background: white;
+            cursor: pointer;
+        }
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group input[type="radio"] {
+            margin-right: 0.75rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .radio-group {
+            margin-top: 0.5rem;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-weight: 400;
+            cursor: pointer;
+        }
+        .radio-group label:hover {
+            background-color: #f8f9fa;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        #dominant-hand-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Eligibility Questionnaire</h1>
-    </header>
-    
-    <main>
-        <section id="questionnaire">
+    <div class="container">
+        <div class="card">
+            <h1>Eligibility Questionnaire</h1>
             <h2>Please answer the following questions to determine eligibility</h2>
             <form id="questionnaire-form" action="" method="POST">
                 {% csrf_token %}
-                <!-- <input type="hidden" id="user-id" name="user-id" value="{{ user_id }}">
-                <input type="hidden" id="token" name="token" value="{{ token }}">
-                <input type="hidden" id="email" name="email" value="{{ email }}">
-                <input type="hidden" id="first-name" name="first-name" value="{{ first_name }}">
-                <input type="hidden" id="last-name" name="last-name" value="{{ last_name }}">
-                <input type="hidden">
-                <input type="hidden" id="phone-number" name="phone-number" value="{{ phone_number }}">  
-                <input type="hidden" id="registration-code" name="registration-code" value="{{ registration_code }}">
-                <input type="hidden" id="password" name="password" value="{{ password }}">
-                <input type="hidden" id="password-confirmation" name="password-confirmation" value="{{ password_confirmation }}"> -->
 
-                <label for="age">1. What is your age?</label><br>
-                <select id="age" name="age" required>
-                    <option value="">Select your age</option>
-                    <option value="lt18">Less than 18</option>
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:17 }}">{{ forloop.counter|add:17 }}</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:26 }}">{{ forloop.counter|add:26 }}</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:35 }}">{{ forloop.counter|add:35 }}</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:44 }}">{{ forloop.counter|add:44 }}</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:53 }}">{{ forloop.counter|add:53 }}</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:62 }}">{{ forloop.counter|add:62 }}</option>
-                    {% endfor %}
-                    <option value="64">64</option>
-                    <option value="gt64">More than 64</option>
-                </select><br><br>
-
-                <label for="height">2. Height in Inches</label><br>
-                <select id="height" name="height" required>
-                    <option value="">Select your height</option>
-                    <option value="lt48">Less than 4 feet 0 inches</option>
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:47 }}">{{ forloop.counter|add:47 }} inches</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:56 }}">{{ forloop.counter|add:56 }} inches</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:65 }}">{{ forloop.counter|add:65 }} inches</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:74 }}">{{ forloop.counter|add:74 }} inches</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:83 }}">{{ forloop.counter|add:83 }} inches</option>
-                    {% endfor %}
-                    <option value="gt83">More than 6 feet 11 inches</option>
-                </select><br><br>
-
-                <label for="weight">3. Weight in lbs.</label><br>
-                <select id="weight" name="weight" required>
-                    <option value="">Select your weight</option>
-                    <option value="lt120">Less than 120 lbs</option>
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:119 }}">{{ forloop.counter|add:119 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:128 }}">{{ forloop.counter|add:128 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:137 }}">{{ forloop.counter|add:137 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:146 }}">{{ forloop.counter|add:146 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:155 }}">{{ forloop.counter|add:155 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:164 }}">{{ forloop.counter|add:164 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:173 }}">{{ forloop.counter|add:173 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:182 }}">{{ forloop.counter|add:182 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:191 }}">{{ forloop.counter|add:191 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:200 }}">{{ forloop.counter|add:200 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:209 }}">{{ forloop.counter|add:209 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:218 }}">{{ forloop.counter|add:218 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:227 }}">{{ forloop.counter|add:227 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:236 }}">{{ forloop.counter|add:236 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:245 }}">{{ forloop.counter|add:245 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:254 }}">{{ forloop.counter|add:254 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:263 }}">{{ forloop.counter|add:263 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:272 }}">{{ forloop.counter|add:272 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:281 }}">{{ forloop.counter|add:281 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:290 }}">{{ forloop.counter|add:290 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:299 }}">{{ forloop.counter|add:299 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:308 }}">{{ forloop.counter|add:308 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:317 }}">{{ forloop.counter|add:317 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:326 }}">{{ forloop.counter|add:326 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:335 }}">{{ forloop.counter|add:335 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:344 }}">{{ forloop.counter|add:344 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:353 }}">{{ forloop.counter|add:353 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:362 }}">{{ forloop.counter|add:362 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:371 }}">{{ forloop.counter|add:371 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:380 }}">{{ forloop.counter|add:380 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:389 }}">{{ forloop.counter|add:389 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:398 }}">{{ forloop.counter|add:398 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:407 }}">{{ forloop.counter|add:407 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:416 }}">{{ forloop.counter|add:416 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:425 }}">{{ forloop.counter|add:425 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:434 }}">{{ forloop.counter|add:434 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:443 }}">{{ forloop.counter|add:443 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:452 }}">{{ forloop.counter|add:452 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:461 }}">{{ forloop.counter|add:461 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:470 }}">{{ forloop.counter|add:470 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:479 }}">{{ forloop.counter|add:479 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:488 }}">{{ forloop.counter|add:488 }} lbs</option>
-                    {% endfor %}
-                    {% for i in "123456789"|make_list %}
-                        <option value="{{ forloop.counter|add:497 }}">{{ forloop.counter|add:497 }} lbs</option>
-                    {% endfor %}
-                    <option value="gt500">More than 500 lbs</option>
-                </select><br><br>
-
-                <label>4. Will you have access to a technological device (e.g., computer, smart phone) that can access the online intervention via a web browser throughout this study?</label><br>
-                <input type="radio" name="has_device" value="yes" required> Yes<br>
-                <input type="radio" name="has_device" value="no" required> No<br><br>
-
-                <label>5. Do you agree not to enroll in another research-based intervention program promoting physical activity while participating in this study?</label><br>
-                <input type="radio" name="not_enroll_other" value="yes" required> Yes<br>
-                <input type="radio" name="not_enroll_other" value="no" required> No<br><br>
-
-                <label>6-1. You will be asked to wear a physical activity monitor (like a watch) on your non-dominant wrist for a total of 2 weeks. This includes 1 week at the beginning of the study and another week at the end. The monitor will be mailed to your address, and you will return it to us via mail after each wear period.<br><br>
-                Do you agree to comply with instructions for physical activity monitoring in this study?</label><br>
-                <input type="radio" name="comply_monitoring" value="yes" required onchange="toggleDominantHand()"> Yes<br>
-                <input type="radio" name="comply_monitoring" value="no" required onchange="toggleDominantHand()"> No<br><br>
-
-                <div id="dominant-hand-section" style="display: none;">
-                    <label>6-2. Which is your non-dominant hand (the hand you use less often)?</label><br>
-                    <input type="radio" name="dominant_hand" value="left"> My non-dominant hand is left.<br>
-                    <input type="radio" name="dominant_hand" value="right"> My non-dominant hand is right.<br><br>
+                <div class="form-group">
+                    <label for="age">1. What is your age?</label>
+                    <select id="age" name="age" required>
+                        <option value="">Select your age</option>
+                        <option value="lt18">Less than 18</option>
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:17 }}">{{ forloop.counter|add:17 }}</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:26 }}">{{ forloop.counter|add:26 }}</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:35 }}">{{ forloop.counter|add:35 }}</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:44 }}">{{ forloop.counter|add:44 }}</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:53 }}">{{ forloop.counter|add:53 }}</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:62 }}">{{ forloop.counter|add:62 }}</option>
+                        {% endfor %}
+                        <option value="64">64</option>
+                        <option value="gt64">More than 64</option>
+                    </select>
                 </div>
 
-                <label>7. Do you agree to respond to our contacts during the study?</label><br>
-                <input type="radio" name="respond_contacts" value="yes" required> Yes<br>
-                <input type="radio" name="respond_contacts" value="no" required> No<br><br>
+                <div class="form-group">
+                    <label for="height">2. Height in Inches</label>
+                    <select id="height" name="height" required>
+                        <option value="">Select your height</option>
+                        <option value="lt48">Less than 4 feet 0 inches</option>
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:47 }}">{{ forloop.counter|add:47 }} inches</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:56 }}">{{ forloop.counter|add:56 }} inches</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:65 }}">{{ forloop.counter|add:65 }} inches</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:74 }}">{{ forloop.counter|add:74 }} inches</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:83 }}">{{ forloop.counter|add:83 }} inches</option>
+                        {% endfor %}
+                        <option value="gt83">More than 6 feet 11 inches</option>
+                    </select>
+                </div>
 
-                <button type="submit">Submit</button>
+                <div class="form-group">
+                    <label for="weight">3. Weight in lbs.</label>
+                    <select id="weight" name="weight" required>
+                        <option value="">Select your weight</option>
+                        <option value="lt120">Less than 120 lbs</option>
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:119 }}">{{ forloop.counter|add:119 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:128 }}">{{ forloop.counter|add:128 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:137 }}">{{ forloop.counter|add:137 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:146 }}">{{ forloop.counter|add:146 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:155 }}">{{ forloop.counter|add:155 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:164 }}">{{ forloop.counter|add:164 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:173 }}">{{ forloop.counter|add:173 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:182 }}">{{ forloop.counter|add:182 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:191 }}">{{ forloop.counter|add:191 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:200 }}">{{ forloop.counter|add:200 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:209 }}">{{ forloop.counter|add:209 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:218 }}">{{ forloop.counter|add:218 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:227 }}">{{ forloop.counter|add:227 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:236 }}">{{ forloop.counter|add:236 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:245 }}">{{ forloop.counter|add:245 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:254 }}">{{ forloop.counter|add:254 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:263 }}">{{ forloop.counter|add:263 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:272 }}">{{ forloop.counter|add:272 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:281 }}">{{ forloop.counter|add:281 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:290 }}">{{ forloop.counter|add:290 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:299 }}">{{ forloop.counter|add:299 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:308 }}">{{ forloop.counter|add:308 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:317 }}">{{ forloop.counter|add:317 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:326 }}">{{ forloop.counter|add:326 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:335 }}">{{ forloop.counter|add:335 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:344 }}">{{ forloop.counter|add:344 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:353 }}">{{ forloop.counter|add:353 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:362 }}">{{ forloop.counter|add:362 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:371 }}">{{ forloop.counter|add:371 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:380 }}">{{ forloop.counter|add:380 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:389 }}">{{ forloop.counter|add:389 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:398 }}">{{ forloop.counter|add:398 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:407 }}">{{ forloop.counter|add:407 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:416 }}">{{ forloop.counter|add:416 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:425 }}">{{ forloop.counter|add:425 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:434 }}">{{ forloop.counter|add:434 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:443 }}">{{ forloop.counter|add:443 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:452 }}">{{ forloop.counter|add:452 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:461 }}">{{ forloop.counter|add:461 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:470 }}">{{ forloop.counter|add:470 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:479 }}">{{ forloop.counter|add:479 }} lbs</option>
+                        {% endfor %}
+                        {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter|add:488 }}">{{ forloop.counter|add:488 }} lbs</option>
+                        {% endfor %}
+                        <option value="gt500">More than 500 lbs</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>4. Will you have access to a technological device (e.g., computer, smart phone) that can access the online intervention via a web browser throughout this study?</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="has_device" value="yes" required> 
+                            <span>Yes</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="has_device" value="no" required> 
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>5. Do you agree not to enroll in another research-based intervention program promoting physical activity while participating in this study?</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="not_enroll_other" value="yes" required> 
+                            <span>Yes</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="not_enroll_other" value="no" required> 
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>6-1. You will be asked to wear a physical activity monitor (like a watch) on your non-dominant wrist for a total of 2 weeks. This includes 1 week at the beginning of the study and another week at the end. The monitor will be mailed to your address, and you will return it to us via mail after each wear period.<br><br>
+                    Do you agree to comply with instructions for physical activity monitoring in this study?</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="comply_monitoring" value="yes" required onchange="toggleDominantHand()"> 
+                            <span>Yes</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="comply_monitoring" value="no" required onchange="toggleDominantHand()"> 
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="dominant-hand-section" style="display: none;">
+                    <div class="form-group">
+                        <label>6-2. Which is your non-dominant hand (the hand you use less often)?</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="dominant_hand" value="left"> 
+                                <span>My non-dominant hand is left.</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="dominant_hand" value="right"> 
+                                <span>My non-dominant hand is right.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>7. Do you agree to respond to our contacts during the study?</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="respond_contacts" value="yes" required> 
+                            <span>Yes</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="respond_contacts" value="no" required> 
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Submit</button>
             </form>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; Confident Moves Intervention. All rights reserved.</p>
-    </footer>
+        </div>
+    </div>
 
     <script>
         function toggleDominantHand() {

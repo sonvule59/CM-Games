@@ -514,6 +514,13 @@ def dashboard(request):
     user_progress = UserSurveyProgress.objects.filter(user=request.user, survey__title="Eligibility Criteria").first()
     participant = Participant.objects.filter(user=request.user).first()
     progress_percentage = 0  # Default if not eligible or study_day not set
+    
+    # Fix data inconsistency: if randomization_completed is True but randomized_group is None
+    if participant and participant.randomization_completed and participant.randomized_group is None:
+        print(f"[FIX] Participant {participant.participant_id} has randomization_completed=True but randomized_group=None. Resetting randomization_completed.")
+        participant.randomization_completed = False
+        participant.save()
+    
     # Add more debugging
     if participant:
         print(f"[DEBUG] Participant found: {participant.participant_id}")
@@ -570,14 +577,18 @@ def dashboard(request):
                 # For compressed timeline, we work with study days directly
                 day_11_study_day = 8
                 day_21_study_day = 21
-                day_95_study_day = 95
-                day_104_study_day = 104
+                day_120_study_day = 120  # Wave 3 code entry starts on Day 120
+                day_133_study_day = 133  # Wave 3 code entry ends on Day 133
+                
+                # Set day_120 and day_133 for display (using study day numbers as strings for TIME_COMPRESSION)
+                day_120 = day_120_study_day
+                day_133 = day_133_study_day
                 
                 # Calculate days until milestones based on study day difference
                 days_until_start_wave1 = max(0, day_11_study_day - study_day)
                 days_until_end_wave1 = max(0, day_21_study_day - study_day)
-                days_until_start_wave3 = max(0, day_95_study_day - study_day)
-                days_until_end_wave3 = max(0, day_104_study_day - study_day)
+                days_until_start_wave3 = max(0, day_120_study_day - study_day)
+                days_until_end_wave3 = max(0, day_133_study_day - study_day)
                 
                 # For display purposes, convert to approximate real time
                 seconds_until_start_wave1 = days_until_start_wave1 * settings.SECONDS_PER_DAY
@@ -619,11 +630,11 @@ def dashboard(request):
             print(f"[DEBUG] Progress percentage: {progress_percentage}")
 
             # Wave 1 code entry window: Days 8-21 inclusive
-            within_wave1_period = study_day is not None and 8 <= study_day <= 21 and not participant.code_entered
+            within_wave1_period = study_day is not None and 8 <= study_day <= 21 and participant and not participant.code_entered
             print(f"[DEBUG] Within wave 1 period: {within_wave1_period}")
-            # within_wave3_period = study_day is not None and 95 <= study_day <= 104 and not participant.wave3_code_entered
-            within_wave3_period = study_day is not None and 120 <= study_day <= 133 and not participant.wave3_code_entered
-            print(f"[DEBUG] Within wave 3 period: {within_wave3_period}")
+            # Wave 3 code entry window: Days 120-133 inclusive
+            within_wave3_period = study_day is not None and 120 <= study_day <= 133 and participant and not participant.wave3_code_entered
+            print(f"[DEBUG] Within wave 3 period: {within_wave3_period} (study_day={study_day}, participant={participant is not None}, wave3_code_entered={participant.wave3_code_entered if participant else 'N/A'})")
             
             # Set display dates for template
             if settings.TIME_COMPRESSION:
