@@ -115,15 +115,33 @@ def daily_timeline_check(user):
     # Send at 7 AM CT in real-time mode; in time-compression, send immediately when day>=8
     # Allow catch-up if missed (send if on Day 8 or later but not sent yet)
     if today and today >= 8 and not participant.code_entry_date and participant.email_status != 'sent_wave1_monitor':
+        print(f"[INFO 10] Checking Wave 1 monitoring email for {participant.participant_id} (Day {today})")
+        print(f"[INFO 10] Conditions: today={today}, code_entry_date={participant.code_entry_date}, email_status={participant.email_status}")
         if not settings.TIME_COMPRESSION:
             # Enforce 7 AM Central Time (CT) for real-time mode
             from pytz import timezone as tz
             ct = tz('US/Central')
             now_ct = timezone.now().astimezone(ct)
             if now_ct.hour == 7:
+                print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today}, 7 AM CT)")
                 participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
+                print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
+            else:
+                print(f"[INFO 10] Not 7 AM CT yet (current hour: {now_ct.hour}), waiting...")
         else:
-            participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
+            print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today}, time compression mode)")
+            try:
+                participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
+                print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
+            except Exception as e:
+                print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
+                logger.error(f"Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
+    elif today and today >= 8:
+        # Debug why email wasn't sent
+        if participant.code_entry_date:
+            print(f"[INFO 10] Skipped for {participant.participant_id}: code already entered on {participant.code_entry_date}")
+        elif participant.email_status == 'sent_wave1_monitor':
+            print(f"[INFO 10] Skipped for {participant.participant_id}: email already sent (status: {participant.email_status})")
 
     # Info 14 – Day 22: Missing Code Entry (Wave 1)
     # Allow catch-up if missed (send if on Day 22 or later but not sent yet)
@@ -256,12 +274,18 @@ def daily_timeline_check(user):
                         second_participant.send_email("intervention_access_later", extra_context={
                             "username": second_participant.user.username
                         })
+                        second_participant.randomization_email_sent = True
+                        second_participant.randomization_email_sent_date = timezone.now().date()
+                        second_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {second_participant.participant_id}")
                     elif second_participant.randomized_group == 1:
                         second_participant.send_email("intervention_access_immediate", extra_context={
                             "username": second_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
                         })
+                        second_participant.randomization_email_sent = True
+                        second_participant.randomization_email_sent_date = timezone.now().date()
+                        second_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
@@ -295,12 +319,18 @@ def daily_timeline_check(user):
                         first_participant.send_email("intervention_access_later", extra_context={
                             "username": first_participant.user.username
                         })
+                        first_participant.randomization_email_sent = True
+                        first_participant.randomization_email_sent_date = timezone.now().date()
+                        first_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {first_participant.participant_id}")
                     elif first_participant.randomized_group == 1:
                         first_participant.send_email("intervention_access_immediate", extra_context={
                             "username": first_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
                         })
+                        first_participant.randomization_email_sent = True
+                        first_participant.randomization_email_sent_date = timezone.now().date()
+                        first_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {first_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to first participant {first_participant.participant_id}: {str(e)}")
@@ -311,12 +341,18 @@ def daily_timeline_check(user):
                         second_participant.send_email("intervention_access_later", extra_context={
                             "username": second_participant.user.username
                         })
+                        second_participant.randomization_email_sent = True
+                        second_participant.randomization_email_sent_date = timezone.now().date()
+                        second_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {second_participant.participant_id}")
                     elif second_participant.randomized_group == 1:
                         second_participant.send_email("intervention_access_immediate", extra_context={
                             "username": second_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
                         })
+                        second_participant.randomization_email_sent = True
+                        second_participant.randomization_email_sent_date = timezone.now().date()
+                        second_participant.save()
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
@@ -343,12 +379,18 @@ def daily_timeline_check(user):
                     single_participant.send_email("intervention_access_later", extra_context={
                         "username": single_participant.user.username
                     })
+                    single_participant.randomization_email_sent = True
+                    single_participant.randomization_email_sent_date = timezone.now().date()
+                    single_participant.save()
                     print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_later email to {single_participant.participant_id}")
                 elif single_participant.randomized_group == 1:
                     single_participant.send_email("intervention_access_immediate", extra_context={
                         "username": single_participant.user.username,
                         "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
                     })
+                    single_participant.randomization_email_sent = True
+                    single_participant.randomization_email_sent_date = timezone.now().date()
+                    single_participant.save()
                     print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {single_participant.participant_id}")
             except Exception as e:
                 print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to single participant {single_participant.participant_id}: {str(e)}")

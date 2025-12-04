@@ -129,6 +129,8 @@ class Participant(models.Model):
     randomization_pair_id = models.IntegerField(null=True, blank=True, help_text="Pair ID for 2-block randomization (1, 2, 3, etc.)")
     randomization_position = models.IntegerField(null=True, blank=True, choices=[(1, 'First in pair'), (2, 'Second in pair')], help_text="Position within the randomization pair")
     randomization_completed = models.BooleanField(default=False, help_text="Whether 2-block randomization has been completed")
+    randomization_email_sent = models.BooleanField(default=False, help_text="Whether randomization email was sent to this participant")
+    randomization_email_sent_date = models.DateField(null=True, blank=True, help_text="Date when randomization email was sent")
     engagement_tracked = models.BooleanField(default=False)
     email = models.EmailField(null=True, blank=True)  
     wave1_survey_email_sent = models.BooleanField(default=False)

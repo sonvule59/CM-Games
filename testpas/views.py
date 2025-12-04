@@ -951,13 +951,7 @@ def enter_code(request, wave):
                     send_wave1_code_entry_email(participant.id)
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
-                    # participant.code_entered = True
-                    # participant.code_entry_date = timezone.now().date()
-                    # participant.save()
-                    
-                    # Send Information 12 email
-                    # send_wave1_code_entry_email.delay(participant.id)
-                    
+                # Check for wave 3 code entry    
                 elif wave == 3:
                     participant.wave3_code_entered = True
                     participant.wave3_code_entry_date = timezone.now().date()
