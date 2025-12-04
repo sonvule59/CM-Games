@@ -101,15 +101,40 @@ def daily_timeline_check(user):
     if today and today > 134:
         print(f"[SKIP] User {user.id} completed study (Day {today} > 134)")
         return
-        
-    # study_day = get_timeline_day(user, compressed=settings.TIME_COMPRESSION, seconds_per_day=settings.SECONDS_PER_DAY)
+    
+    # CRITICAL: Refresh participant from database to get latest status
+    # This prevents stale data issues when multiple Celery workers are running
+    participant.refresh_from_db()
     print(f"[CHECK] User {user.id}, Day {today}, Status: {participant.email_status}")
 
     # Info 9 – Day 1: Wave 1 Online Survey Ready
-    # Allow catch-up if missed (send if on Day 1 or later but not sent yet)
-    if today and today >= 1 and participant.email_status != 'sent_wave1_survey':
-        print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
-        participant.send_email("wave1_survey_ready", mark_as='sent_wave1_survey')
+    # Send on Day 1, allow catch-up only during Wave 1 period (Days 1-7)
+    # Don't send on Day 57+ when Wave 2 is sent, as email_status gets overwritten
+    if today and 1 <= today <= 7 and participant.email_status != 'sent_wave1_survey':
+        # Use atomic database update to prevent race condition with multiple workers
+        # Only update if status is NOT already 'sent_wave1_survey'
+        from django.db.models import F
+        updated_count = Participant.objects.filter(
+            id=participant.id
+        ).exclude(
+            email_status='sent_wave1_survey'
+        ).update(email_status='sent_wave1_survey')
+        
+        if updated_count > 0:
+            # Status was successfully updated (wasn't already sent) - safe to send email
+            participant.refresh_from_db()  # Refresh to get updated status
+            print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
+            try:
+                participant.send_email("wave1_survey_ready", mark_as='sent_wave1_survey')
+            except Exception as e:
+                # If email fails, send_email will set status to 'failed', so we can retry later
+                print(f"[EMAIL] Failed to send Wave 1 survey email to {participant.participant_id}: {str(e)}")
+                # Re-raise to let Celery know the task failed
+                raise
+        else:
+            # Another worker already set the status - skip sending to prevent duplicate
+            participant.refresh_from_db()
+            print(f"[EMAIL] SKIP - Wave 1 survey email already sent to {participant.participant_id} (status: {participant.email_status})")
 
     # Info 10 – Day 8: Wave 1 Physical Activity Monitoring – Ready
     # Send at 7 AM CT in real-time mode; in time-compression, send immediately when day>=8
@@ -173,31 +198,6 @@ def daily_timeline_check(user):
 
     	Group 1 (i.e., the intervention group) will be given the access to the intervention from Day 29 to Day 56. We will track their engagement with the intervention (e.g., the number of challenges completed) from Group 1.
     """
-    # # Info 15 – Day 29: Randomization
-    # # On Day 29, randomize participants into Group 0 (control) or Group 1 (intervention) if not already randomized.
-    # if today and 29 <= today <= 30 and participant.randomized_group is None:
-    #     import random
-    #     group = random.choice([0, 1])
-    #     participant.randomized_group = group
-    #     participant.group = group  # Also set the group field for consistency
-    #     participant.group_assigned = True  # Mark as assigned
-    #     participant.save()
-    #     print(f"[RANDOMIZE] User {user.id} assigned to Group {group}")
-
-    #     if participant.randomized_group == 0:
-    #         participant.send_email("intervention_access_later", extra_context={
-    #             "username": user.username
-    #         })
-    #     elif participant.randomized_group == 1:
-    #         participant.send_email("intervention_access_immediate", extra_context={
-    #             "username": user.username,
-    #             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com" ## to be updated with the actual login page in production.
-    #         })
-    ############### NEW DOUBLE BLIND RANDOMIZATION MECHANICS STARTS HERE ######################
-    #Pair 1: TEST001 (Position 1) + TEST002 (Position 2)
-    #Pair 2: TEST003 (Position 1) + TEST004 (Position 2) #########################################
-    
-    # Fix data inconsistency: if randomization_completed is True but randomized_group is None
     # This can happen if there was a bug or manual data change
     if participant.randomization_completed and participant.randomized_group is None:
         print(f"[FIX] Participant {participant.participant_id} has randomization_completed=True but randomized_group=None. Resetting randomization_completed.")
@@ -239,15 +239,13 @@ def daily_timeline_check(user):
             participant.randomization_position = position
             participant.save()
         
-        # Now perform the 2-block randomization
+        # The 2-block randomization procedure starts here
         pair_participants = Participant.objects.filter(
             randomization_pair_id=participant.randomization_pair_id
         ).order_by('id')  # Order by enrollment time (earlier ID = earlier enrollment)
         
         if len(pair_participants) == 2:
             # Both participants in the pair are ready for randomization
-            import random
-            
             # First participant (earlier enrollment) gets random assignment
             first_participant = pair_participants[0]
             second_participant = pair_participants[1]
@@ -257,13 +255,13 @@ def daily_timeline_check(user):
                 # First participant already randomized, assign second participant to opposite group
                 first_group = first_participant.randomized_group
                 second_group = 1 - first_group  # Opposite group
-                
+                # Assign groups to second participant
                 second_participant.randomized_group = second_group
                 second_participant.group = second_group
                 second_participant.group_assigned = True
                 second_participant.randomization_completed = True
                 second_participant.save()
-                
+                # Log the randomization result
                 print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id}: "
                       f"First participant (ID {first_participant.id}) already in Group {first_group}, "
                       f"Second participant (ID {second_participant.id}) -> Group {second_group}")
@@ -406,8 +404,10 @@ def daily_timeline_check(user):
     if today and today >= 57 and not participant.wave2_survey_email_sent:
         try:
             print(f"[INFO 18] Sending Wave 2 survey email to {participant.participant_id} (Day {today})")
+            # Use mark_as to set specific status that won't conflict with Wave 1 status
             participant.send_email(
                 "wave2_survey_ready",
+                mark_as='sent_wave2_survey',  # Set specific status to avoid overwriting Wave 1 status
                 extra_context={
                     # "participant_id": participant.participant_id,
                     "username": participant.user.username,

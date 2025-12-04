@@ -151,7 +151,7 @@ CELERY_BEAT_SCHEDULE = {
 # CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 # Celery broker URL - can be overridden by REDIS_URL or CELERY_BROKER_URL env vars in celery.py
 # Render typically provides REDIS_URL, which will be used by celery.py
-CELERY_BROKER_URL = os.environ.get("REDIS_URL") or os.environ.get("CELERY_BROKER_URL")
+CELERY_BROKER_URL = os.environ.get("REDIS_URL") or os.environ.get("CELERY_BROKER_URL") or "redis://localhost:6379/0"
 # CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
 CELERY_RESULT_BACKEND = None
 CELERY_TASK_IGNORE_RESULT = True
