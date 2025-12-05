@@ -179,11 +179,38 @@ def daily_timeline_check(user):
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
     if participant.code_entry_day is not None:
         code_day = participant.code_entry_day  # Use stored timeline day directly
+        """ Commented out previous code
         if today == code_day + 7 and participant.email_status != 'sent_wave1_survey_return':
             print(f"[SEND] Info 13 (Return Monitor) to user {user.id}")
             participant.send_email("wave1_survey_return")
             participant.email_status = 'sent_wave1_survey_return'
             participant.save()
+        """
+        target_day = code_day + 7
+        
+        if today and today >= target_day and participant.email_status != 'sent_wave1_survey_return':
+            # Use atomic database update to prevent race condition with multiple workers
+            # Only update if status is NOT already 'sent_wave1_survey_return'
+            updated_count = Participant.objects.filter(
+                id=participant.id
+            ).exclude(
+                email_status='sent_wave1_survey_return'
+            ).update(email_status='sent_wave1_survey_return')
+            
+            if updated_count > 0:
+                # Status was successfully updated (wasn't already sent) - safe to send email
+                participant.refresh_from_db()  # Refresh to get updated status
+                print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
+                try:
+                    participant.send_email("wave1_survey_return", mark_as='sent_wave1_survey_return')
+                except Exception as e:
+                    print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
+                    logger.error(f"Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
+                    raise
+            else:
+                # Another worker already set the status - skip sending to prevent duplicate
+                participant.refresh_from_db()
+                print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
 
     # Info 15 – Day 29: Randomization
     """
@@ -402,8 +429,17 @@ def daily_timeline_check(user):
     Allow catch-up if missed (send if on Day 57 or later but not sent yet).
     """
     if today and today >= 57 and not participant.wave2_survey_email_sent:
-        try:
-            print(f"[INFO 18] Sending Wave 2 survey email to {participant.participant_id} (Day {today})")
+        # Use atomic database update to prevent race condition with multiple workers
+        # Only update if wave2_survey_email_sent is NOT already True
+        updated_count = Participant.objects.filter(
+            id=participant.id,
+            wave2_survey_email_sent=False
+        ).update(wave2_survey_email_sent=True)
+        
+        if updated_count > 0:
+            # Status was successfully updated (wasn't already sent) - safe to send email
+            participant.refresh_from_db()  # Refresh to get updated status
+            """
             # Use mark_as to set specific status that won't conflict with Wave 1 status
             participant.send_email(
                 "wave2_survey_ready",
@@ -420,7 +456,30 @@ def daily_timeline_check(user):
         except Exception as e:
             print(f"[INFO 18] ERROR: Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
             logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
-            # Don't set wave2_survey_email_sent = True if email failed, so it can be retried
+            # Don't set wave2_survey_email_sent = True if email failed, so it can be retried"""
+            print(f"[INFO 18] Sending Wave 2 survey email to {participant.participant_id} (Day {today})")
+            try:
+                # Use mark_as to set specific status that won't conflict with Wave 1 status
+                participant.send_email(
+                    "wave2_survey_ready",
+                    mark_as='sent_wave2_survey',  # Set specific status to avoid overwriting Wave 1 status
+                    extra_context={
+                        # "participant_id": participant.participant_id,
+                        "username": participant.user.username,
+                    }
+                )
+                print(f"[INFO 18] Successfully sent Wave 2 survey email to {participant.participant_id}")
+                logger.info(f"Sent Wave 2 survey email to {participant.participant_id}")
+            except Exception as e:
+                # If email fails, reset the flag so it can be retried
+                Participant.objects.filter(id=participant.id).update(wave2_survey_email_sent=False)
+                print(f"[INFO 18] ERROR: Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
+                logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
+                raise
+        else:
+            # Another worker already set the flag - skip sending to prevent duplicate
+            participant.refresh_from_db()
+            print(f"[INFO 18] SKIP - Wave 2 survey email already sent to {participant.participant_id}")
 
     """
     Information 20: Day 64 – No Wave 2 Physical Activity Monitoring
