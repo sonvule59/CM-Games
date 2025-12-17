@@ -43,6 +43,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 # }
 
 if DATABASE_URL and not USE_LOCAL_DB:
+    # Production: Use PostgreSQL from Render
     db_config = dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=0,      # OK: no long-lived conns
@@ -60,6 +61,18 @@ if DATABASE_URL and not USE_LOCAL_DB:
 
     DATABASES = {"default": db_config}
 else:
+    # Local development: Use SQLite
+    # WARNING: If running on Render and DATABASE_URL is not set, this will use SQLite
+    # which won't have the production database tables. Make sure DATABASE_URL is set
+    # in Render dashboard for all services (web, worker, beat).
+    if os.environ.get('RENDER'):
+        import warnings
+        warnings.warn(
+            "Running on Render but DATABASE_URL is not set! "
+            "The Celery worker/beat services need DATABASE_URL in their environment variables. "
+            "Go to Render dashboard > Your Service > Environment > Add DATABASE_URL",
+            UserWarning
+        )
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
