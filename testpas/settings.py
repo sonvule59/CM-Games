@@ -43,18 +43,23 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 # }
 if DATABASE_URL:
     # Production: Use PostgreSQL from Render
-    db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    # Render PostgreSQL requires SSL connections
-    # Use 'require' to enforce SSL (Render PostgreSQL requires SSL)
-    # If you get "SSL connection has been closed unexpectedly", try 'prefer' instead
+    db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
+    # Render PostgreSQL SSL configuration
+    # Try 'prefer' first - it will use SSL if available, fallback to non-SSL if SSL fails
+    # This is more forgiving than 'require' which fails completely if SSL has issues
     db_config['OPTIONS'] = {
-        'sslmode': 'require',
+        'sslmode': 'prefer',
         'connect_timeout': 10,
+        'keepalives': 1,
+        'keepalives_idle': 30,
+        'keepalives_interval': 10,
+        'keepalives_count': 5,
     }
-    # Ensure connection pooling is enabled to reuse connections
-    db_config['CONN_MAX_AGE'] = 600
+    # Disable connection pooling to avoid stale SSL connections
+    # Render PostgreSQL can have issues with long-lived connections
+    # CONN_MAX_AGE = 0 means each request gets a fresh connection
+    db_config['CONN_MAX_AGE'] = 0
     DATABASES = {
-        #'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
         'default': db_config
     }
 else:

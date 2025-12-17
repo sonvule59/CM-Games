@@ -76,6 +76,28 @@ if redis_url:
 # Auto-discover tasks in installed apps (e.g., testpas.tasks)
 app.autodiscover_tasks()
 
+# Close database connections after each task to prevent SSL connection issues
+# This ensures each task gets a fresh database connection
+@app.task(bind=True)
+def close_db_connections(self):
+    """Signal handler to close database connections after each task"""
+    from django.db import connections
+    for conn in connections.all():
+        conn.close()
+
+# Register signal to close DB connections after each task
+from celery.signals import task_postrun
+
+@task_postrun.connect
+def close_db_connections_handler(sender=None, **kwargs):
+    """Close database connections after each Celery task completes"""
+    from django.db import connections
+    for conn in connections.all():
+        try:
+            conn.close()
+        except Exception:
+            pass  # Ignore errors when closing connections
+
 # Configure Celery Beat schedule
 from django.conf import settings as django_settings
 
