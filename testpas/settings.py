@@ -41,33 +41,29 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 #         'PORT': '5432',
 #     }
 # }
-if DATABASE_URL:
-    # Production: Use PostgreSQL from Render
-    db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
-    # Render PostgreSQL SSL configuration
-    # Try 'prefer' first - it will use SSL if available, fallback to non-SSL if SSL fails
-    # This is more forgiving than 'require' which fails completely if SSL has issues
-    db_config['OPTIONS'] = {
-        'sslmode': 'prefer',
-        'connect_timeout': 10,
-        'keepalives': 1,
-        'keepalives_idle': 30,
-        'keepalives_interval': 10,
-        'keepalives_count': 5,
-    }
-    # Disable connection pooling to avoid stale SSL connections
-    # Render PostgreSQL can have issues with long-lived connections
-    # CONN_MAX_AGE = 0 means each request gets a fresh connection
-    db_config['CONN_MAX_AGE'] = 0
-    DATABASES = {
-        'default': db_config
-    }
+
+if DATABASE_URL and not USE_LOCAL_DB:
+    db_config = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=0,      # OK: no long-lived conns
+        ssl_require=True,    # <-- sets sslmode=require
+    )
+
+    db_config.setdefault("OPTIONS", {})
+    db_config["OPTIONS"].update({
+        "connect_timeout": 10,
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 10,
+        "keepalives_count": 5,
+    })
+
+    DATABASES = {"default": db_config}
 else:
-    # Local development: Use SQLite
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 BASE_DIR = Path(__file__).resolve().parent.parent
