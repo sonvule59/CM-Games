@@ -42,6 +42,9 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 #     }
 # }
 
+# Detect if we're running on Render
+IS_RENDER = os.environ.get('RENDER') == 'true' or 'render.com' in os.environ.get('HOSTNAME', '')
+
 if DATABASE_URL and not USE_LOCAL_DB:
     # Production: Use PostgreSQL from Render
     db_config = dj_database_url.parse(
