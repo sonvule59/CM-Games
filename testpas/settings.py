@@ -22,17 +22,38 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import dj_database_url
 import os
 
+# Database configuration
+# Switch between local (SQLite) and production (Render PostgreSQL)
+# Option 1: Set USE_LOCAL_DB=True in .env file for local testing
+# Option 2: Set DATABASE_URL environment variable for production (Render automatically sets this)
+# Option 3: If neither is set, defaults to local SQLite for safety
+
+USE_LOCAL_DB = os.environ.get('USE_LOCAL_DB', 'False').lower() == 'true'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 # Use DATABASE_URL if provided (Render PostgreSQL), else default to SQLite
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cm_intervention',  
-        'USER': 'cm_intervention_user',  
-        'PASSWORD': 'J4g5pu8Tvd8zo9tL3qIrS6W9lfhvAFNg',  
-        'HOST': 'dpg-d46kcdmuk2gs73882790-a.ohio-postgres.render.com', 
-        'PORT': '5432',
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'cm_intervention',  
+#         'USER': 'cm_intervention_user',  
+#         'PASSWORD': 'J4g5pu8Tvd8zo9tL3qIrS6W9lfhvAFNg',  
+#         'HOST': 'dpg-d46kcdmuk2gs73882790-a.ohio-postgres.render.com', 
+#         'PORT': '5432',
+#     }
+# }
+if DATABASE_URL:
+    # Production: Use PostgreSQL from Render
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-}
+else:
+    # Local development: Use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 BASE_DIR = Path(__file__).resolve().parent.parent
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
@@ -212,8 +233,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATICFILES_DIRS = [

@@ -10,32 +10,30 @@ from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.crypto import get_random_string
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
+from django.db.models import Model
+
+from testpas.settings import *
 from hashlib import sha256
-from testpas.tasks import send_wave1_monitoring_email, send_wave1_code_entry_email, send_wave3_code_entry_email
-# from testpas.settings import DEFAULT_FROM_EMAIL
 from testpas.schedule_emails import schedule_wave1_monitoring_email
-# from testpas.utils import generate_token, validate_token, send_confirmation_email
 from .models import *
 from .utils import validate_token
 import uuid
-from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
-from testpas.settings import *
 import os
 import datetime
-
 import pytz
+
 from .models import Participant, SurveyProgress, Survey, UserSurveyProgress, Content
-from django.db.models import Model
 from .forms import CodeEntryForm, InterestForm, EligibilityForm, ConsentForm, UserRegistrationForm, PasswordResetForm, PasswordResetConfirmForm
 import csv
 from testpas.schedule_emails import schedule_wave1_monitoring_email
-from django.http import HttpResponse
-from django.contrib.admin.views.decorators import staff_member_required
 from testpas.utils import get_current_time
-
 from .timeline import get_timeline_day, get_study_day
-from django.conf import settings
+
 
 logger = logging.getLogger(__name__)
 
@@ -411,13 +409,6 @@ def consent_form(request, survey_id=None):
             user_progress.consent_given = True
             user_progress.save()
 
-            # Remove duplicate email sending - let the timeline system handle it
-            # if not participant.wave1_survey_email_sent:
-            #     participant.send_email("wave1_survey_ready", extra_context={"username": user.username})
-            #     participant.wave1_survey_email_sent = True
-            #     participant.save()
-
-            # end Jun 25
             try:
                 user_progress.save()
                 logger.debug(f"Saved progress for {user.username}: consent_given=True, day_1={user_progress.day_1}")
@@ -452,8 +443,6 @@ def exit_screen_not_eligible(request):
     except Content.DoesNotExist:
         return render(request, 'exit_screen_not_eligible.html')
 
-
-
 @login_required
 def survey_view(request, wave):
     """Handle survey views for different waves"""
@@ -467,8 +456,7 @@ def survey_view(request, wave):
         'wave': wave,
         'participant': participant,
         'survey_title': f'Wave {wave} Survey',
-    }
-    
+    }   
     if wave == 1:
         context['survey_description'] = 'Wave 1 Online Survey Set - Complete this survey within 10 days to earn a $5 Amazon gift card.'
     elif wave == 2:
@@ -477,7 +465,6 @@ def survey_view(request, wave):
         context['survey_description'] = 'Wave 3 Online Survey Set - Complete this survey within 10 days to earn a $5 Amazon gift card.'
     else:
         context['survey_description'] = f'Wave {wave} Survey'
-    
     return render(request, 'survey.html', context)
 
 @login_required
@@ -490,14 +477,12 @@ def daily_log_view(request, wave):
         'participant': participant,
         'log_title': f'Wave {wave} Daily Activity Log',
     }
-    
     if wave == 1:
         context['log_description'] = 'Wave 1 Daily Activity Log - Record your physical activity for the past 7 days.'
     elif wave == 3:
         context['log_description'] = 'Wave 3 Daily Activity Log - Record your physical activity for the past 7 days.'
     else:
         context['log_description'] = f'Wave {wave} Daily Activity Log'
-    
     return render(request, 'daily_log.html', context)
 
 @login_required
@@ -538,6 +523,7 @@ def dashboard(request):
     else:
         print(f"[DEBUG] No user progress found for user {request.user.username}")
     
+    # Initialize variables for display
     current_date = get_current_time().date()
     within_wave1_period = False
     within_wave3_period = False
@@ -552,7 +538,6 @@ def dashboard(request):
     day_104 = None
     day_120 = None
     day_133 = None
-    
     # Use compressed timeline calculation consistently
     if user_progress and user_progress.eligible and user_progress.consent_given and participant:
         if not participant.enrollment_date:

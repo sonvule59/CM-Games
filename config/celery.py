@@ -64,8 +64,7 @@ if redis_url:
     # Set broker URL after SSL configuration
     app.conf.broker_url = redis_url
     
-    # CRITICAL: Ensure result backend stays as rpc:// after broker configuration
-    # This must be set after broker_url to prevent Celery from auto-configuring
+    # CRITICAL: Ensure result backend stays as redis:// after broker configuration
     # a Redis result backend based on the broker URL
     # rpc:// backend doesn't require Redis, avoiding SSL configuration conflicts
     app.conf.result_backend = 'rpc://'
@@ -78,8 +77,6 @@ if redis_url:
 app.autodiscover_tasks()
 
 # Configure Celery Beat schedule
-# Use settings from testpas.settings (which checks TIME_COMPRESSION)
-# This allows different schedules for testing vs production
 from django.conf import settings as django_settings
 
 # Check if TIME_COMPRESSION is enabled (for testing)
@@ -99,50 +96,3 @@ app.conf.beat_schedule = {
         'schedule': schedule_seconds,
     },
 }
-
-# import os
-# import django
-# from celery import Celery
-# import ssl
-# from testpas import settings
- 
-# # Set default Django settings module
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'testpas.settings')
-# django.setup()
- 
-# # Create Celery app
-# app = Celery('config')
- 
-# # Read broker URL from environment variable
-# REDIS_URL = os.environ.get("REDIS_URL")
-# if not REDIS_URL:
-#     raise ValueError("REDIS_URL environment variable not set!")
- 
-# # Configure broker and result backend
-# app.conf.broker_url = REDIS_URL
-# app.conf.result_backend = REDIS_URL
- 
-# # Explicit SSL context for rediss:// connections
-# ssl_context = ssl.create_default_context()
-# app.conf.broker_transport_options = {"ssl": ssl_context}
- 
-# # Load additional config from Django settings
-# app.config_from_object('django.conf:settings', namespace='CELERY')
- 
-# # Auto-discover tasks from installed apps
-# app.autodiscover_tasks(lambda: settings.INSTALLED_APPS, related_name='tasks')
-# app.conf.broker_use_ssl = {
-#     'ssl_cert_reqs': False  # Upstash SSL without local certs
-# } 
-# # Optional debug task
-# @app.task(bind=True)
-# def debug_task(self):
-#     print(f'Request: {self.request!r}')
- 
-# # Configure Celery Beat schedule
-# app.conf.beat_schedule = {
-#     'run-daily-timeline-checks': {
-#         'task': 'testpas.tasks.run_daily_timeline_checks',
-#         'schedule': 10.0,  # For testing, adjust as needed
-#     },
-# }
