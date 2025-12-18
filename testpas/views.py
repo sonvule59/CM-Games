@@ -33,6 +33,7 @@ import csv
 from testpas.schedule_emails import schedule_wave1_monitoring_email
 from testpas.utils import get_current_time
 from .timeline import get_timeline_day, get_study_day
+from testpas.tasks import send_wave1_code_entry_email, send_wave3_code_entry_email
 
 
 logger = logging.getLogger(__name__)
@@ -933,7 +934,17 @@ def enter_code(request, wave):
                     participant.save()
                     
                     # Send Information 12 email - use participant.id (database ID)
-                    send_wave1_code_entry_email(participant.id)
+                    # Try async first, fallback to sync if Celery is unavailable
+                    try:
+                        send_wave1_code_entry_email.delay(participant.id)
+                        logger.info(f"Queued wave1_code_entry email for participant {participant.participant_id}")
+                    except Exception as e:
+                        logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        try:
+                            send_wave1_code_entry_email(participant.id)
+                            logger.info(f"Sent wave1_code_entry email synchronously for participant {participant.participant_id}")
+                        except Exception as e2:
+                            logger.error(f"Failed to send wave1_code_entry email for participant {participant.participant_id}: {e2}")
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
                 # Check for wave 3 code entry    
@@ -954,7 +965,17 @@ def enter_code(request, wave):
                     participant.save()
                     
                     # Send Information 25 email - use participant.id (database ID)
-                    send_wave3_code_entry_email(participant.id)
+                    # Try async first, fallback to sync if Celery is unavailable
+                    try:
+                        send_wave3_code_entry_email.delay(participant.id)
+                        logger.info(f"Queued wave3_code_entry email for participant {participant.participant_id}")
+                    except Exception as e:
+                        logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        try:
+                            send_wave3_code_entry_email(participant.id)
+                            logger.info(f"Sent wave3_code_entry email synchronously for participant {participant.participant_id}")
+                        except Exception as e2:
+                            logger.error(f"Failed to send wave3_code_entry email for participant {participant.participant_id}: {e2}")
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
                 
