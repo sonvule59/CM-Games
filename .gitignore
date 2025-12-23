@@ -207,3 +207,4 @@ celerybeat-schedule-wal
 IMPLEMENTATION_SUMMARY.md
 testpas/management/commands/check_randomization.py
 .vscode/
+*.csv
