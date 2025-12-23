@@ -44,6 +44,10 @@ def landing(request):
         return redirect('dashboard')
     return render(request, 'landing.html')
 
+def test_all_challenges(request):
+    """Test page with links to all challenges for quick testing"""
+    return render(request, 'test_all_challenges.html')
+
 @login_required
 def home(request):
     """Home page - redirects authenticated users to dashboard"""
@@ -1052,18 +1056,57 @@ def logout_view(request):
 
 def mark_challenge_completed(user, challenge_number, challenge_name):
     """Helper function to mark a challenge as completed for a user"""
-    from .models import ChallengeCompletion, Participant
+    from .models import ChallengeCompletion, Participant, InterventionResponse
     
     try:
         participant = Participant.objects.get(user=user)
+        # Record in ChallengeCompletion
         ChallengeCompletion.objects.get_or_create(
             user=user,
             participant=participant,
             challenge_number=challenge_number,
             defaults={'challenge_name': challenge_name}
         )
+        
+        # Also record in InterventionResponse for Group 1 participants
+        if participant.randomized_group == 1:
+            InterventionResponse.objects.create(
+                user=user,
+                participant=participant,
+                challenge_number=challenge_number,
+                challenge_name=challenge_name,
+                response_type='challenge_completion',
+                response_data={'action': 'completed', 'challenge_number': challenge_number}
+            )
     except Participant.DoesNotExist:
         pass  # Skip if participant doesn't exist
+
+def record_intervention_response(user, response_type, challenge_number=None, challenge_name=None, response_data=None, notes=None, request=None):
+    """Helper function to record any intervention response for Group 1 participants"""
+    from .models import Participant, InterventionResponse
+    
+    try:
+        participant = Participant.objects.get(user=user)
+        # Only record for Group 1 (intervention group)
+        if participant.randomized_group == 1:
+            ip_address = None
+            if request:
+                ip_address = request.META.get('REMOTE_ADDR')
+            
+            InterventionResponse.objects.create(
+                user=user,
+                participant=participant,
+                challenge_number=challenge_number,
+                challenge_name=challenge_name,
+                response_type=response_type,
+                response_data=response_data or {},
+                notes=notes,
+                ip_address=ip_address
+            )
+            return True
+    except Participant.DoesNotExist:
+        pass
+    return False
 
 @login_required
 def intervention_access(request):
@@ -1154,6 +1197,26 @@ def intervention_challenge_1(request):
         'participant': participant,
     }
     return render(request, 'interventions/challenge_1.html', context)
+
+@login_required
+@csrf_exempt
+def record_commitment_click(request):
+    """Record when a participant clicks the commitment button (AJAX endpoint)"""
+    if request.method == 'POST':
+        challenge_number = request.POST.get('challenge_number')
+        challenge_name = request.POST.get('challenge_name', '')
+        
+        success = record_intervention_response(
+            user=request.user,
+            response_type='commitment_click',
+            challenge_number=int(challenge_number) if challenge_number else None,
+            challenge_name=challenge_name,
+            response_data={'action': 'commitment_acknowledged'},
+            request=request
+        )
+        
+        return JsonResponse({'success': success})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
 @login_required
 def intervention_challenge_2(request):
