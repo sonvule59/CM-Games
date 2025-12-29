@@ -3,7 +3,7 @@ sendgrid.en
 dump.rdb     # Database dumps
 *.py[cod]   # Compiled Python files (more comprehensive)
 __pycache__/  # Python cache directory
-testpas/migrations/*
+
 testpas/migrations/__pycache__/
 __pycache__/  # For any other __pycache__ directories in your project
 *.pyc        # For compiled Python files
