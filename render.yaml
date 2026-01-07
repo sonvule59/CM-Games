@@ -25,8 +25,6 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
-      - key: BASE_URL
-        value: https://cm-intervention.onrender.com
 
   # --- Celery Worker ---
   - type: worker
@@ -47,8 +45,6 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
-      - key: BASE_URL
-        value: https://testpas-web.onrender.com
 
   # --- Celery Beat (scheduler, optional) ---
   - type: worker
@@ -69,5 +65,3 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
-      - key: BASE_URL
-        value: https://testpas-web.onrender.com
