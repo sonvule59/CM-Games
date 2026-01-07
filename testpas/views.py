@@ -19,6 +19,8 @@ from django.db.models import Model
 
 from testpas.settings import *
 from hashlib import sha256
+from testpas.tasks import send_wave1_monitoring_email, send_wave1_code_entry_email, send_wave3_code_entry_email, send_confirmation_email_task, send_password_reset_email_task
+# from testpas.settings import DEFAULT_FROM_EMAIL
 from testpas.schedule_emails import schedule_wave1_monitoring_email
 from .models import *
 from .utils import validate_token
@@ -82,21 +84,24 @@ def create_account(request):
                         enrollment_date=timezone.now().date(),
                         is_confirmed=False
                     )
+                    # Send confirmation email asynchronously using Celery
+                    # This prevents account creation from hanging on email sending
                     try:
-                        # Use send_confirmation_email to avoid auth issues
-                        participant.send_confirmation_email()
+                        send_confirmation_email_task.delay(participant.id)
+                        logger.info(f"Queued confirmation email for participant {participant.participant_id}")
                     except Exception as e:
-                        logger.error(f"Failed to send account_confirmation email for participant {participant.participant_id}: {e}")
-                        # Don't fail account creation if email fails - log it and continue
-                        # This allows the account to be created even if email service is down
-                        if is_ajax:
-                            return JsonResponse({
-                                'status': 'success',
-                                'message': 'Account created. Note: Confirmation email could not be sent. Please contact support.',
-                                'redirect': '/'
-                            })
-                        messages.warning(request, "Account created, but confirmation email could not be sent. Please contact support.")
-                        return redirect("landing")
+                        # If Celery is not available, try synchronous sending as fallback
+                        logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        try:
+                            logger.info(f"Sending confirmation email synchronously for participant {participant.participant_id}")
+                            participant.send_confirmation_email()
+                            logger.info(f"Successfully sent confirmation email to {participant.email}")
+                        except Exception as e2:
+                            logger.error(f"Failed to send account_confirmation email for participant {participant.participant_id}: {e2}")
+                            import traceback
+                            logger.error(f"Traceback: {traceback.format_exc()}")
+                            # Don't fail account creation if email fails - log it and continue
+                            # This allows the account to be created even if email service is down
                     
                     # Handle AJAX
                     if is_ajax:
@@ -225,15 +230,27 @@ def password_reset(request):
                 token = Token.generate_token()
                 Token.objects.create(recipient=user, token=token)
                 
-                # Send reset email
+                # Send reset email asynchronously
                 reset_link = f"{settings.BASE_URL}/password-reset-confirm/{token}/"
-                send_mail(
-                    'Password Reset Request - Confident Moves Intervention',
-                    f'Click the following link to reset your password: {reset_link}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Confident Moves Research Team',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
+                try:
+                    send_password_reset_email_task.delay(email, reset_link)
+                    logger.info(f"Queued password reset email for {email}")
+                except Exception as e:
+                    # If Celery is not available, try synchronous sending as fallback
+                    logger.warning(f"Celery task failed for password reset email, trying synchronous: {e}")
+                    try:
+                        send_mail(
+                            'Password Reset Request - Confident Moves Intervention',
+                            f'Click the following link to reset your password: {reset_link}\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe Confident Moves Research Team',
+                            settings.DEFAULT_FROM_EMAIL,
+                            [email],
+                            fail_silently=False,
+                        )
+                    except Exception as e2:
+                        logger.error(f"Failed to send password reset email to {email}: {e2}")
+                        messages.error(request, 'Failed to send password reset email. Please try again later.')
+                        return redirect('password_reset')
+                
                 messages.success(request, 'Password reset email sent. Please check your email.')
                 return redirect('login')
             else:
@@ -327,9 +344,13 @@ def questionnaire(request):
         )
         print(f"Eligibility Result: {eligible}")
 
-        survey = Survey.objects.first()
-        if not survey:
-            return JsonResponse({"error": "No survey available. Contact support."}, status=500)
+        # Get or create the Eligibility Criteria survey
+        survey, created = Survey.objects.get_or_create(
+            title="Eligibility Criteria",
+            defaults={"description": "Survey to determine participant eligibility"}
+        )
+        if created:
+            logger.info("Created Eligibility Criteria survey automatically")
         
         # Save participant information including dominant hand
         try:
@@ -933,21 +954,21 @@ def enter_code(request, wave):
                     participant.code_entry_date = timezone.now().date()
                     participant.save()
                     
-                    # Send Information 12 email - use participant.id (database ID)
-                    # Try async first, fallback to sync if Celery is unavailable
+                    # Send Information 12 email asynchronously - use participant.id (database ID)
                     try:
                         send_wave1_code_entry_email.delay(participant.id)
-                        logger.info(f"Queued wave1_code_entry email for participant {participant.participant_id}")
+                        logger.info(f"Queued Wave 1 code entry email for participant {participant.participant_id}")
                     except Exception as e:
-                        logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        # If Celery is not available, try synchronous sending as fallback
+                        logger.warning(f"Celery task failed for Wave 1 code entry email, trying synchronous: {e}")
                         try:
                             send_wave1_code_entry_email(participant.id)
-                            logger.info(f"Sent wave1_code_entry email synchronously for participant {participant.participant_id}")
                         except Exception as e2:
-                            logger.error(f"Failed to send wave1_code_entry email for participant {participant.participant_id}: {e2}")
+                            logger.error(f"Failed to send Wave 1 code entry email for participant {participant.participant_id}: {e2}")
+                    
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
-                # Check for wave 3 code entry    
+                    
                 elif wave == 3:
                     participant.wave3_code_entered = True
                     participant.wave3_code_entry_date = timezone.now().date()
@@ -976,6 +997,18 @@ def enter_code(request, wave):
                             logger.info(f"Sent wave3_code_entry email synchronously for participant {participant.participant_id}")
                         except Exception as e2:
                             logger.error(f"Failed to send wave3_code_entry email for participant {participant.participant_id}: {e2}")
+                    # Send Information 25 email asynchronously - use participant.id (database ID)
+                    try:
+                        send_wave3_code_entry_email.delay(participant.id)
+                        logger.info(f"Queued Wave 3 code entry email for participant {participant.participant_id}")
+                    except Exception as e:
+                        # If Celery is not available, try synchronous sending as fallback
+                        logger.warning(f"Celery task failed for Wave 3 code entry email, trying synchronous: {e}")
+                        try:
+                            send_wave3_code_entry_email(participant.id)
+                        except Exception as e2:
+                            logger.error(f"Failed to send Wave 3 code entry email for participant {participant.participant_id}: {e2}")
+                    
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
                 
