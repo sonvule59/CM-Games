@@ -819,7 +819,6 @@ def dashboard(request):
     if participant and participant.wave3_code_entered and participant.wave3_code_entry_date:
         show_information_25 = True
         # Format dates for display
-        from datetime import timedelta
         code_date = participant.wave3_code_entry_date
         start_date = code_date + timedelta(days=1)
         end_date = code_date + timedelta(days=7)
