@@ -575,3 +575,35 @@ class ChallengeCompletion(models.Model):
     def __str__(self):
         return f"Challenge {self.challenge_number}: {self.challenge_name} - {self.user.username}"
 
+class InterventionResponse(models.Model):
+    """Comprehensive model to store all intervention responses from Group 1 participants"""
+    RESPONSE_TYPES = [
+        ('commitment_click', 'Commitment Box Clicked'),
+        ('challenge_completion', 'Challenge Completed'),
+        ('form_submission', 'Form Submission'),
+        ('game_interaction', 'Game Interaction'),
+        ('video_watched', 'Video Watched'),
+        ('other', 'Other'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    challenge_number = models.IntegerField(null=True, blank=True, help_text="Challenge number if applicable")
+    challenge_name = models.CharField(max_length=200, null=True, blank=True, help_text="Name of the challenge")
+    response_type = models.CharField(max_length=50, choices=RESPONSE_TYPES, help_text="Type of response")
+    response_data = models.JSONField(default=dict, help_text="Structured response data (answers, selections, etc.)")
+    notes = models.TextField(blank=True, null=True, help_text="Additional notes or context")
+    created_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'challenge_number']),
+            models.Index(fields=['participant', 'response_type']),
+            models.Index(fields=['created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.get_response_type_display()} - {self.user.username} - Challenge {self.challenge_number or 'N/A'} - {self.created_at:%Y-%m-%d %H:%M}"
+

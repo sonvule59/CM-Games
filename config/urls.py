@@ -25,6 +25,7 @@ urlpatterns = [
     # Landing page and authentication
     path('', views.landing, name='landing'),
     path('home/', views.home, name='home'),
+    path('test-challenges/', views.test_all_challenges, name='test_all_challenges'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -109,6 +110,7 @@ urlpatterns = [
     path('intervention/mindfulness/challenge-32/', views.mindfulness_challenge_31, name='mindfulness_challenge_32'),
     path('intervention/challenge-1/', views.intervention_challenge_1, name='intervention_challenge_1'),
     path('intervention/update-points/', views.update_intervention_points, name='update_intervention_points'),
+    path('intervention/record-commitment/', views.record_commitment_click, name='record_commitment_click'),
     # path('dev/time-controls/', views.dev_time_controls, name='dev_time_controls'),
     
     # Surveys (Information 9, 18, 20)

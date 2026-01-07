@@ -620,23 +620,25 @@ def send_wave1_survey_return_email(participant_id):
 @shared_task
 def send_wave1_code_entry_email(participant_id):
     """Information 12: Physical Activity Monitoring Tomorrow (Wave 1)"""
+    from django.db import connections
     try:
+        # Ensure fresh database connection
+        connections.close_all()
+        
         participant = Participant.objects.get(id=participant_id)
         # Check email_status to prevent duplicates
         if participant.email_status == 'sent_wave1_code':
             logger.info(f"Skipping wave1_code_entry for {participant.email}: already sent")
             return
+        
         code_date = participant.code_entry_date
         if not code_date:
             logger.error(f"No code entry date for participant {participant_id}")
             return
+        
         start_date = code_date + timedelta(days=1)
         end_date = code_date + timedelta(days=7)
-        # Send immediately at 7 AM CT
-        now = timezone.now()
-        send_time = now.replace(hour=7, minute=0, second=0, microsecond=0)
-        if now.hour >= 7:
-            send_time += timedelta(days=1)
+        
         participant.send_email(
             'wave1_code_entry',
             extra_context={
@@ -652,7 +654,12 @@ def send_wave1_code_entry_email(participant_id):
     except Participant.DoesNotExist:
         logger.error(f"Participant {participant_id} not found for wave1_code_entry")
     except Exception as e:
+        import traceback
         logger.error(f"Error sending wave1_code_entry for participant {participant_id}: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+    finally:
+        # Close database connections
+        connections.close_all()
 
 @shared_task
 def send_wave1_monitoring_email(participant_id):
@@ -684,7 +691,11 @@ def send_wave1_monitoring_email(participant_id):
 @shared_task
 def send_wave3_code_entry_email(participant_id):
     """Information 25: Physical Activity Monitoring Tomorrow (Wave 3)"""
+    from django.db import connections
     try:
+        # Ensure fresh database connection
+        connections.close_all()
+        
         participant = Participant.objects.get(id=participant_id)
         
         # Calculate dates
@@ -705,8 +716,15 @@ def send_wave3_code_entry_email(participant_id):
             }
         )
         logger.info(f"Sent Wave 3 code entry email to {participant.participant_id}")
+    except Participant.DoesNotExist:
+        logger.error(f"Participant {participant_id} not found for wave3_code_entry")
     except Exception as e:
-        logger.error(f"Error sending Wave 3 code entry email: {str(e)}")
+        import traceback
+        logger.error(f"Error sending wave3_code_entry for participant {participant_id}: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+    finally:
+        # Close database connections
+        connections.close_all()
 
 @shared_task
 def send_study_end_email(participant_id):
