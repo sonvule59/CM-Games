@@ -5,7 +5,7 @@ from testpas.models import EmailTemplate
 EMAIL_TEMPLATES = [
     {
         "name": "account_confirmation",
-        "subject": "Confirm Your CM (Confident Moves) Account",
+        "subject": "Confirm to Activate Your Account (Confident Moves Research)",
         # "body": "Dear {participant_id},\n\nPlease confirm your email by clicking the following link:\n{confirmation_link}\n\nThank you,\nPAS 2.0 Team"
         "body": "Dear {username},\n\nPlease confirm your email by clicking the following link:\n{confirmation_link}\n\nThank you,\nThe Confident Moves Research Team"
     },

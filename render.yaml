@@ -6,11 +6,12 @@ services:
     plan: starter
     buildCommand: |
       pip install -r requirements.txt
-      python manage.py migrate
       python manage.py collectstatic --noinput
     preDeployCommand: |
       python manage.py migrate
-    startCommand: gunicorn config.wsgi:application --log-file -
+      python manage.py seed_email_template
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --log-file -
+    # startCommand: gunicorn config.wsgi:application --log-file -
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: testpas.settings
@@ -46,6 +47,8 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
+      - key: BASE_URL
+        value: https://testpas-web.onrender.com
 
   # --- Celery Beat (scheduler, optional) ---
   - type: worker
@@ -66,3 +69,5 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
+      - key: BASE_URL
+        value: https://testpas-web.onrender.com
