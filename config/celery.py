@@ -107,14 +107,22 @@ from django.conf import settings as django_settings
 TIME_COMPRESSION = getattr(django_settings, 'TIME_COMPRESSION', False)
 if TIME_COMPRESSION:
     # For testing: run every 15 seconds
-    schedule_seconds = 15.0
+    schedule_seconds = 60.0
+    app.conf.beat_schedule = {
+        'run-daily-timeline-checks': {
+            'task': 'testpas.tasks.run_daily_timeline_checks',
+            'schedule': schedule_seconds,
+        },
+    }
 else:
-    # For production: run every 6 hours (21600 seconds) to catch up if missed
-    schedule_seconds = 21600.0  # Every 6 hours
-
-app.conf.beat_schedule = {
-    'run-daily-timeline-checks': {
-        'task': 'testpas.tasks.run_daily_timeline_checks',
-        'schedule': schedule_seconds,
-    },
-}
+    # For deployment: run daily at 7:00 AM Central Time
+    app.conf.update(
+        timezone='US/Central',
+        enable_utc=True,
+    )
+    app.conf.beat_schedule = {
+        'run-daily-timeline-checks': {
+            'task': 'testpas.tasks.run_daily_timeline_checks',
+            'schedule': crontab(hour=7, minute=0),  # Every day at 7:00AM for testing
+        },
+    }

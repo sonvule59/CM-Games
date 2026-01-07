@@ -1,3 +1,4 @@
+import random
 # from bz2 import compress
 from datetime import timedelta
 from celery import shared_task
@@ -5,7 +6,6 @@ from django.core.mail import send_mail
 from django.core.management import call_command
 from testpas import settings
 from django.utils import timezone
-import random
 from testpas.models import Participant, EmailTemplate, UserSurveyProgress
 import logging
 from testpas.management.commands.seed_email_template import EMAIL_TEMPLATES
@@ -137,44 +137,56 @@ def daily_timeline_check(user):
             print(f"[EMAIL] SKIP - Wave 1 survey email already sent to {participant.participant_id} (status: {participant.email_status})")
 
     # Info 10 – Day 8: Wave 1 Physical Activity Monitoring – Ready
-    # Send at 7 AM CT in real-time mode; in time-compression, send immediately when day>=8
-    # Allow catch-up if missed (send if on Day 8 or later but not sent yet)
-    if today and today >= 8 and not participant.code_entry_date and participant.email_status != 'sent_wave1_monitor':
-        print(f"[INFO 10] Checking Wave 1 monitoring email for {participant.participant_id} (Day {today})")
-        print(f"[INFO 10] Conditions: today={today}, code_entry_date={participant.code_entry_date}, email_status={participant.email_status}")
-        if not settings.TIME_COMPRESSION:
-            # Enforce 7 AM Central Time (CT) for real-time mode
-            from pytz import timezone as tz
-            ct = tz('US/Central')
-            now_ct = timezone.now().astimezone(ct)
-            if now_ct.hour == 7:
-                print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today}, 7 AM CT)")
-                participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
-                print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
-            else:
-                print(f"[INFO 10] Not 7 AM CT yet (current hour: {now_ct.hour}), waiting...")
-        else:
-            print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today}, time compression mode)")
+    if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing']:
+        from django.db.models import F
+        
+        updated_count = Participant.objects.filter(
+            id=participant.id
+        ).exclude(
+            email_status__in=['sent_wave1_monitor', 'sent_wave1_missing']
+        ).update(email_status='sent_wave1_monitor')
+        
+        if updated_count > 0:
+            participant.refresh_from_db()
+            print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
+            
             try:
                 participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
                 print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
             except Exception as e:
                 print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
                 logger.error(f"Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
+                Participant.objects.filter(id=participant.id).update(email_status='pending')
+                raise
+        else:
+            participant.refresh_from_db()
+            print(f"[INFO 10] SKIP - Wave 1 monitoring email already sent to {participant.participant_id} (status: {participant.email_status})")
     elif today and today >= 8:
-        # Debug why email wasn't sent
         if participant.code_entry_date:
             print(f"[INFO 10] Skipped for {participant.participant_id}: code already entered on {participant.code_entry_date}")
-        elif participant.email_status == 'sent_wave1_monitor':
+        elif participant.email_status in ['sent_wave1_monitor', 'sent_wave1_missing']:
             print(f"[INFO 10] Skipped for {participant.participant_id}: email already sent (status: {participant.email_status})")
 
-    # Info 14 – Day 22: Missing Code Entry (Wave 1)
-    # Allow catch-up if missed (send if on Day 22 or later but not sent yet)
+    # Info 14 – Day 22: Missing Code Entry (Wave 1) - THIS SHOULD BE AT THE SAME LEVEL AS INFO 10, NOT INSIDE IT!
     if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
-        print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
-        participant.send_email("wave1_missing_code")
-        participant.email_status = 'sent_wave1_missing'
-        participant.save()
+        updated_count = Participant.objects.filter(
+            id=participant.id
+        ).exclude(
+            email_status='sent_wave1_missing'
+        ).update(email_status='sent_wave1_missing')
+        
+        if updated_count > 0:
+            participant.refresh_from_db()
+            print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
+            try:
+                participant.send_email("wave1_missing_code", mark_as='sent_wave1_missing')
+            except Exception as e:
+                print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
+                Participant.objects.filter(id=participant.id).update(email_status='pending')
+                raise
+        else:
+            participant.refresh_from_db()
+            print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}")
 
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
     if participant.code_entry_day is not None:
