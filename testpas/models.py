@@ -10,7 +10,6 @@ import random
 import uuid
 from django.core.mail import send_mail
 from django.conf import settings
-from testpas import settings
 
 class Survey(models.Model):
     title = models.CharField(max_length=255)

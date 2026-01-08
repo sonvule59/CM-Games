@@ -95,7 +95,23 @@ if not SECRET_KEY:
 
 
 # TEST_MODE = False  # Set to True for 112-minute testing mode
-# BASE_URL is set above based on environment detection
+# Set BASE_URL with Render-aware defaults
+BASE_URL = os.getenv('BASE_URL')
+if not BASE_URL:
+    # Try to detect Render URL from environment
+    if IS_RENDER:
+        # Default Render URL format - user should set BASE_URL explicitly
+        import warnings
+        warnings.warn(
+            "BASE_URL not set on Render! Please set BASE_URL environment variable in Render dashboard. "
+            "Using fallback: https://testpas-web.onrender.com",
+            UserWarning
+        )
+        BASE_URL = 'https://testpas-web.onrender.com'
+    else:
+        # Local development default
+        BASE_URL = 'http://127.0.0.1:8000'
+
 LOGIN_URL = '/login/'  # Default login URL for the application
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
