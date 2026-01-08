@@ -3,6 +3,8 @@ import os
 import ssl
 from celery import Celery
 from celery.schedules import crontab
+# Configure Celery Beat schedule
+from django.conf import settings as django_settings
 
 # Set the default Django settings module for Celery
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'testpas.settings')
@@ -98,13 +100,10 @@ def close_db_connections_handler(sender=None, **kwargs):
         except Exception:
             pass  # Ignore errors when closing connections
 
-# Configure Celery Beat schedule
-from django.conf import settings as django_settings
-
 # Check if TIME_COMPRESSION is enabled (for testing)
 # Set TIME_COMPRESSION = True in testpas/settings.py for testing
 # Set TIME_COMPRESSION = False in testpas/settings.py for production
-TIME_COMPRESSION = getattr(django_settings, 'TIME_COMPRESSION', False)
+TIME_COMPRESSION = getattr(django_settings, 'TIME_COMPRESSION', True)
 if TIME_COMPRESSION:
     # For testing: run every 15 seconds
     schedule_seconds = 60.0

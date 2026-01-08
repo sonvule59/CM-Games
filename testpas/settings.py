@@ -95,7 +95,7 @@ if not SECRET_KEY:
 
 
 # TEST_MODE = False  # Set to True for 112-minute testing mode
-BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:8000')  # Default to local development if not set
+# BASE_URL is set above based on environment detection
 LOGIN_URL = '/login/'  # Default login URL for the application
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
