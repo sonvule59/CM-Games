@@ -166,6 +166,43 @@ class Participant(models.Model):
         super().save(*args, **kwargs)
 
     def send_email(self, template_name, extra_context=None, mark_as=None):
+        # Use atomic database operation to prevent duplicate emails
+        # This ensures only one worker/thread can send the email
+        from django.db import transaction
+        
+        # If mark_as is provided, check if email was already sent with that status
+        # Use atomic update to prevent race conditions - try to claim the task
+        if mark_as:
+            # Refresh from DB to get latest status
+            self.refresh_from_db()
+            
+            # Check if email was already sent
+            if self.email_status == mark_as:
+                logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                return
+            
+            # Try to atomically claim the task by updating status to 'sending'
+            # This prevents multiple workers from processing the same email
+            updated_count = Participant.objects.filter(
+                id=self.id,
+            ).exclude(
+                email_status=mark_as
+            ).update(
+                email_status='sending'  # Temporary status to claim the task
+            )
+            
+            if updated_count == 0:
+                # Another worker already claimed this task or email was already sent - skip
+                self.refresh_from_db()
+                if self.email_status == mark_as:
+                    logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                else:
+                    logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
+                return
+            
+            # Refresh to get the updated status
+            self.refresh_from_db()
+        
         try:
             template = EmailTemplate.objects.get(name=template_name)
         except EmailTemplate.DoesNotExist:
@@ -198,19 +235,37 @@ class Participant(models.Model):
                 [self.email or self.user.email, 'svu23@iastate.edu', 'vuleson59@gmail.com', 'projectpas2024@gmail.com'],
                 fail_silently=False,
             )
-            self.email_status = mark_as or 'sent'
+            # Update status after successful send
+            if mark_as:
+                self.email_status = mark_as
+            else:
+                self.email_status = 'sent'
             self.email_send_date = timezone.now().date()
             self.save()
         except Exception as e:
-            self.email_status = 'failed'
+            # On failure, set status back from 'sending' to allow retry
+            if mark_as and self.email_status == 'sending':
+                self.email_status = 'failed'
+            else:
+                self.email_status = 'failed'
             self.save()
             raise Exception(f"Failed to send email: {str(e)}")
 
     def send_confirmation_email(self):
+        # Prevent duplicate confirmation emails
+        # Only send if account is not yet confirmed and confirmation email hasn't been sent
+        if self.is_confirmed:
+            logger.info(f"Account already confirmed for participant {self.participant_id}, skipping confirmation email")
+            return
+        if self.email_status == 'confirmation_email_sent':
+            logger.info(f"Confirmation email already sent for participant {self.participant_id}, skipping duplicate")
+            return
+        
         confirmation_link = f"{settings.BASE_URL}/confirm-account/{self.confirmation_token}/"
         self.send_email(
             'account_confirmation',
-            extra_context={'confirmation_link': confirmation_link}
+            extra_context={'confirmation_link': confirmation_link},
+            mark_as='confirmation_email_sent'
         )
     def __str__(self):
         return self.user.username

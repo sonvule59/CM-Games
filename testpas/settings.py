@@ -198,6 +198,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Chicago'
 CELERY_ENABLE_UTC = False
+# Prevent duplicate task execution
+CELERY_TASK_ACKS_LATE = True  # Acknowledge tasks AFTER completion, not before
+CELERY_TASK_REJECT_ON_WORKER_LOST = True  # Reject tasks if worker dies
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Only prefetch one task at a time to prevent duplicates
+CELERY_TASK_MAX_RETRIES = 0  # Don't automatically retry failed tasks (we handle retries manually)
+CELERY_TASK_DEFAULT_RETRY_DELAY = 0  # No default retry delay
 CELERY_BEAT_SCHEDULE = {
     'run-timeline-checks': {
         'task': 'testpas.tasks.run_daily_timeline_checks',

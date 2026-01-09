@@ -90,16 +90,26 @@ def create_account(request):
                     )
                     # Send confirmation email asynchronously using Celery
                     # This prevents account creation from hanging on email sending
+                    # Use atomic update to prevent duplicate emails if account is created multiple times
+                    from django.db.models import F
                     try:
-                        send_confirmation_email_task.delay(participant.id)
-                        logger.info(f"Queued confirmation email for participant {participant.participant_id}")
+                        # Only queue email if participant is not yet confirmed
+                        # This prevents duplicate emails if the task is queued multiple times
+                        if not participant.is_confirmed and participant.email_status != 'confirmation_email_sent':
+                            send_confirmation_email_task.delay(participant.id)
+                            logger.info(f"Queued confirmation email for participant {participant.participant_id}")
+                        else:
+                            logger.info(f"Skipping confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
                     except Exception as e:
                         # If Celery is not available, try synchronous sending as fallback
                         logger.warning(f"Celery task failed, trying synchronous email: {e}")
                         try:
-                            logger.info(f"Sending confirmation email synchronously for participant {participant.participant_id}")
-                            participant.send_confirmation_email()
-                            logger.info(f"Successfully sent confirmation email to {participant.email}")
+                            if not participant.is_confirmed and participant.email_status != 'confirmation_email_sent':
+                                logger.info(f"Sending confirmation email synchronously for participant {participant.participant_id}")
+                                participant.send_confirmation_email()
+                                logger.info(f"Successfully sent confirmation email to {participant.email}")
+                            else:
+                                logger.info(f"Skipping synchronous confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
                         except Exception as e2:
                             logger.error(f"Failed to send account_confirmation email for participant {participant.participant_id}: {e2}")
                             import traceback
