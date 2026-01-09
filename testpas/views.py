@@ -1391,16 +1391,24 @@ def ge_challenge_5(request):
     return render(request, 'interventions/ge_challenge_5.html', context)
 
 @login_required
-def wr_challenge_7(request):
-    """Work-Related Physical Activity - Challenge 7: Learning"""
+def wr_challenge_6(request):
+    """Work-Related Physical Activity - Challenge 6: Learning"""
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 6, "Work-Related Learning")
     context = { 'participant': participant }
-    return render(request, 'interventions/wr_challenge_7.html', context)
+    return render(request, 'interventions/wr_challenge_6.html', context)
+
+@login_required
+def wr_challenge_7(request):
+     """Work-Related Physical Activity - Challenge 7: Easy Task"""
+    participant = get_object_or_404(Participant, user=request.user)
+    mark_challenge_completed(request.user, 7, "Work-Related Easy Task")
+    context = { 'participant': participant }
+    return render(request, 'interventions/wr_challenge_6.html', context)
 
 @login_required
 def wr_challenge_8(request):
-    """Work-Related Physical Activity - Challenge 8: Easy Task"""
+    """Work-Related Physical Activity - Challenge 7: Easy Task"""
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 7, "Work-Related Easy Task")
     
