@@ -12,9 +12,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'testpas.settings')
 # Create Celery app instance
 app = Celery('config')
 
-# IMPORTANT: Set a dummy result backend BEFORE loading settings
 # Using 'rpc://' (RPC backend) avoids Redis SSL conflicts
-# Celery Beat doesn't need result storage, but needs a backend to initialize
 app.conf.result_backend = 'rpc://'
 app.conf.task_ignore_result = True
 app.conf.task_store_eager_result = False
@@ -119,6 +117,6 @@ else:
     app.conf.beat_schedule = {
         'run-daily-timeline-checks': {
             'task': 'testpas.tasks.run_daily_timeline_checks',
-            'schedule': crontab(hour=7, minute=0),  # Every day at 7:00AM for testing
+            'schedule': crontab(os.environ.get('REALTIME_EMAIL_HOUR', '7'), os.environ.get('REALTIME_EMAIL_MINUTE', '0')),
         },
     }
