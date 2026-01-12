@@ -12,9 +12,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'testpas.settings')
 # Create Celery app instance
 app = Celery('config')
 
-# IMPORTANT: Set a dummy result backend BEFORE loading settings
 # Using 'rpc://' (RPC backend) avoids Redis SSL conflicts
-# Celery Beat doesn't need result storage, but needs a backend to initialize
 app.conf.result_backend = 'rpc://'
 app.conf.task_ignore_result = True
 app.conf.task_store_eager_result = False
@@ -40,40 +38,37 @@ redis_url = os.environ.get('REDIS_URL') or os.environ.get('CELERY_BROKER_URL') o
 # Override with environment variable if it exists (Render uses REDIS_URL)
 if redis_url:
     # Ensure Redis URL uses rediss:// if it's supposed to be SSL
-    # Some Redis providers give rediss:// but we need to ensure consistency
     if not redis_url.startswith(('redis://', 'rediss://')):
-        # If it doesn't start with redis:// or rediss://, assume it needs rediss://
         if '://' not in redis_url:
             redis_url = f'rediss://{redis_url}'
     
-    # Configure SSL for rediss:// connections BEFORE setting broker_url
-    # This ensures SSL options are applied when the connection is established
-    if redis_url.startswith('rediss://'):
-        # For Render Redis, we need to disable SSL certificate verification
-        # since Render provides Redis with self-signed certificates
-        # Only use broker_transport_options (not broker_use_ssl) to avoid
-        # affecting result backend configuration
-        app.conf.broker_transport_options = {
-            'ssl_cert_reqs': ssl.CERT_NONE,
-            'ssl_ca_certs': None,
-            'ssl_certfile': None,
-            'ssl_keyfile': None,
-        }
-    elif redis_url.startswith('redis://'):
-        # For non-SSL Redis, explicitly clear any SSL settings to avoid conflicts
-        app.conf.broker_transport_options = {}
-    
-    # Set broker URL after SSL configuration
+    # Set broker URL first
     app.conf.broker_url = redis_url
     
-    # CRITICAL: Ensure result backend stays as redis:// after broker configuration
-    # a Redis result backend based on the broker URL
-    # rpc:// backend doesn't require Redis, avoiding SSL configuration conflicts
+    # Configure SSL for Upstash - use proper SSL with certificate verification
+    if redis_url.startswith('rediss://'):
+        # Upstash requires SSL - use default Python SSL context (secure)
+        # Remove the custom broker_transport_options that set CERT_NONE
+        app.conf.broker_use_ssl = {
+            'ssl_cert_reqs': ssl.CERT_REQUIRED,  # Changed from CERT_NONE
+        }
+    elif redis_url.startswith('redis://'):
+        # For non-SSL Redis, explicitly clear any SSL settings
+        app.conf.broker_use_ssl = None
+        app.conf.broker_transport_options = {}
+    
+    # Keep result backend as rpc://
     app.conf.result_backend = 'rpc://'
     
-    # Connection settings for better reliability
+    # Connection settings for better reliability with Upstash
     app.conf.broker_connection_retry = True
     app.conf.broker_connection_max_retries = 10
+    app.conf.broker_connection_retry_on_startup = True
+    app.conf.broker_heartbeat = 30  # Send keepalive every 30 seconds
+    app.conf.broker_connection_timeout = 30
+    app.conf.task_acks_late = True
+    app.conf.worker_prefetch_multiplier = 1
+    app.conf.worker_max_tasks_per_child = 100  # Restart worker after 100 tasks
 
 # Auto-discover tasks in installed apps (e.g., testpas.tasks)
 app.autodiscover_tasks()
@@ -122,6 +117,6 @@ else:
     app.conf.beat_schedule = {
         'run-daily-timeline-checks': {
             'task': 'testpas.tasks.run_daily_timeline_checks',
-            'schedule': crontab(hour=os.environ.get('REALTIME_EMAIL_HOUR', 7), minute=os.environ.get('REALTIME_EMAIL_MINUTE', 0)),  # Every day at 7:00AM for testing
+            'schedule': crontab(os.environ.get('REALTIME_EMAIL_HOUR', '7'), os.environ.get('REALTIME_EMAIL_MINUTE', '0')),
         },
     }
