@@ -117,6 +117,6 @@ else:
     app.conf.beat_schedule = {
         'run-daily-timeline-checks': {
             'task': 'testpas.tasks.run_daily_timeline_checks',
-            'schedule': crontab(os.environ.get('REALTIME_EMAIL_HOUR', '7'), os.environ.get('REALTIME_EMAIL_MINUTE', '0')),
+            'schedule': crontab(hour='16', minute='10')
         },
     }
