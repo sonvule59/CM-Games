@@ -298,10 +298,63 @@ def password_reset_confirm(request, token):
         return redirect('login')
 
 def questionnaire_interest(request):
+    """Information 4: Interest Screening - Store IRB interest response"""
     if request.method == 'GET':
         return render(request, 'questionnaire_interest.html')
     elif request.method == 'POST':
         interested = request.POST.get('interested')
+        reason = request.POST.get('reason', '')  # Get reason if provided
+        
+        # Save interest response to SurveyProgress model
+        from .models import SurveyProgress
+        survey_progress, created = SurveyProgress.objects.get_or_create(
+            user=request.user,
+            defaults={
+                'interest_submitted': True,
+                'interested': (interested == 'yes'),
+            }
+        )
+        if not created:
+            survey_progress.interest_submitted = True
+            survey_progress.interested = (interested == 'yes')
+            survey_progress.save()
+        
+        # Also save to Response model if Questions exist for interest screening
+        # This provides detailed response tracking
+        try:
+            from .models import Survey, Question, Response
+            interest_survey, _ = Survey.objects.get_or_create(
+                title="Interest Screening",
+                defaults={"description": "Information 4: Interest Screening Questionnaire"}
+            )
+            
+            # Save the interest response
+            question_interested, _ = Question.objects.get_or_create(
+                survey=interest_survey,
+                question_text="Are you interested in determining your eligibility?",
+                defaults={}
+            )
+            Response.objects.create(
+                user=request.user,
+                question=question_interested,
+                answer=interested
+            )
+            
+            # Save reason if provided
+            if interested == 'no' and reason:
+                question_reason, _ = Question.objects.get_or_create(
+                    survey=interest_survey,
+                    question_text="If not interested, please provide a brief reason",
+                    defaults={}
+                )
+                Response.objects.create(
+                    user=request.user,
+                    question=question_reason,
+                    answer=reason
+                )
+        except Exception as e:
+            logger.error(f"Error saving interest response details: {e}")
+        
         if interested == 'no':
             return redirect('exit_screen_not_interested')
         return redirect('questionnaire')

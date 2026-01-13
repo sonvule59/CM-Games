@@ -122,9 +122,6 @@ class Participant(models.Model):
     intervention_start_date = models.DateTimeField(null=True, blank=True)
     intervention_end_date = models.DateTimeField(null=True, blank=True)
     
-    ############ 2-Block Randomization fields ################
-    ####### NEW DOUBLE BLIND RANDOMIZATION MECHANICS######## 
-    # October 16, 2025 #########################################
     randomization_pair_id = models.IntegerField(null=True, blank=True, help_text="Pair ID for 2-block randomization (1, 2, 3, etc.)")
     randomization_position = models.IntegerField(null=True, blank=True, choices=[(1, 'First in pair'), (2, 'Second in pair')], help_text="Position within the randomization pair")
     randomization_completed = models.BooleanField(default=False, help_text="Whether 2-block randomization has been completed")
