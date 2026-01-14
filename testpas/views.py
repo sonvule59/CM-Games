@@ -302,6 +302,11 @@ def questionnaire_interest(request):
     if request.method == 'GET':
         return render(request, 'questionnaire_interest.html')
     elif request.method == 'POST':
+        # Check if user is authenticated before saving
+        if not request.user.is_authenticated:
+            messages.error(request, 'Please log in to submit your response.')
+            return redirect('login')
+        
         interested = request.POST.get('interested')
         reason = request.POST.get('reason', '')  # Get reason if provided
         
@@ -984,7 +989,7 @@ def enter_code(request, wave):
             return redirect('home')
         if participant.code_entered:
             messages.info(request, "You have already entered the code for Wave 1.")
-            return redirect('home')        
+            return redirect('home')
     elif wave == 3:
         # Check if within Wave 3 window (Days 120-133)
         print(f"[DEBUG] Wave 3 check: 120 <= {study_day} <= 133 = {120 <= study_day <= 133}")
@@ -1456,6 +1461,22 @@ def wr_challenge_7(request):
     """Work-Related Physical Activity - Challenge 7: Easy Task"""
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 7, "Work-Related Easy Task")
+    
+    if request.method == 'POST':
+        from .models import WorkRelatedChallenge8Response
+        
+        # Save responses
+        WorkRelatedChallenge8Response.objects.create(
+            user=request.user,
+            participant=participant,
+            answer1=request.POST.get('answer1', ''),
+            answer2=request.POST.get('answer2', ''),
+            answer3=request.POST.get('answer3', ''),
+            answer4=request.POST.get('answer4', ''),
+        )
+        messages.success(request, "Your responses have been recorded. Thank you!")
+        return redirect('intervention_access')
+    
     context = { 'participant': participant }
     return render(request, 'interventions/wr_challenge_7.html', context)
 @login_required

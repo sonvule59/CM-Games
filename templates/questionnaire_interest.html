@@ -1,56 +1,194 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Questionnaire Interest</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Participation Questionnaire - Confident Moves Intervention</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h1 {
+            color: #333;
+            margin: 0 0 1.5rem 0;
+            font-size: 2rem;
+            font-weight: 300;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+        .card h2 {
+            color: #555;
+            margin: 1.5rem 0 1.5rem 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+        .radio-group {
+            margin-top: 1rem;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            font-weight: 400;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        .radio-group label:hover {
+            background-color: #f8f9fa;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 0.75rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        #reason-field {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        #reason-field label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+        #reason-field textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        #reason-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+            .card h1 {
+                font-size: 1.75rem;
+            }
+            .card h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Participation Questionnaire</h1>
-    </header>
-    
-    <main>
-        <section id="questionnaire-interest">
+    <div class="container">
+        <div class="card">
+            <h1>Participation Questionnaire</h1>
             <h2>Are you interested in participating in the eligibility questionnaire?</h2>
+            
             <form id="questionnaire-interest-form" action="" method="POST">
                 {% csrf_token %}
-                <label>
-                    <input type="radio" name="interested" value="yes" required> Yes
-                </label><br><br>
-                <label>
-                    <input type="radio" name="interested" value="no" required> No
-                </label><br><br>
-                <div id="reason-field" style="display: none; margin-top: 1rem;">
-                    <label for="reason">If not interested, please provide a brief reason:</label><br>
-                    <textarea name="reason" id="reason" rows="3" cols="50" style="width: 100%; max-width: 500px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                
+                <div class="form-group">
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="interested" value="yes" required> Yes
+                        </label>
+                        <label>
+                            <input type="radio" name="interested" value="no" required> No
+                        </label>
+                    </div>
                 </div>
-                <br>
-                <button type="submit">Submit</button>
+                
+                <div id="reason-field" style="display: none;">
+                    <label for="reason">If not interested, please provide a brief reason:</label>
+                    <textarea name="reason" id="reason" rows="4" placeholder="Please provide your reason here..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Submit</button>
             </form>
-            <script>
-                document.querySelectorAll('input[name="interested"]').forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        const reasonField = document.getElementById('reason-field');
-                        if (this.value === 'no') {
-                            reasonField.style.display = 'block';
-                            document.getElementById('reason').required = true;
-                        } else {
-                            reasonField.style.display = 'none';
-                            document.getElementById('reason').required = false;
-                            document.getElementById('reason').value = '';
-                        }
-                    });
-                });
-            </script>
-        </section>
-    </main>
+        </div>
+    </div>
 
-    <footer>
-        <p>&copy;Confident Moves Intervention. All rights reserved.</p>
-    </footer>
+    <script>
+        document.querySelectorAll('input[name="interested"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const reasonField = document.getElementById('reason-field');
+                const reasonTextarea = document.getElementById('reason');
+                if (this.value === 'no') {
+                    reasonField.style.display = 'block';
+                    reasonTextarea.required = true;
+                } else {
+                    reasonField.style.display = 'none';
+                    reasonTextarea.required = false;
+                    reasonTextarea.value = '';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
