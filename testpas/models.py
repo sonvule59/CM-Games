@@ -166,6 +166,29 @@ class Participant(models.Model):
         # Use atomic database operation to prevent duplicate emails
         # This ensures only one worker/thread can send the email
         from django.db import transaction
+        from collections import defaultdict
+
+        # Resolve template
+        if isinstance(template, str):
+            template_name = template
+            template_obj = EmailTemplate.objects.get(name=template_name)
+        else:
+            template_obj = template
+            template_name = getattr(template_obj, "name", None) or "<template>"
+
+        # Build a safe formatting context for templates
+        context = {
+            "username": getattr(self.user, "username", ""),
+            "participant_id": getattr(self, "participant_id", ""),
+            "email": (self.email or getattr(self.user, "email", "")),
+        }
+        if extra_context:
+            context.update(extra_context)
+
+        # Avoid KeyError on missing placeholders by defaulting to ""
+        safe_context = defaultdict(str, context)
+        subject = (template_obj.subject or "").format_map(safe_context)
+        body = (template_obj.body or "").format_map(safe_context)
         
         # If mark_as is provided, check if email was already sent with that status
         # Use atomic update to prevent race conditions - try to claim the task
@@ -175,7 +198,7 @@ class Participant(models.Model):
             
             # Check if email was already sent
             if self.email_status == mark_as:
-                #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                # logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
                 return
             
             # Try to atomically claim the task by updating status to 'sending'
@@ -193,7 +216,7 @@ class Participant(models.Model):
                 return # Another worker already claimed this task or email was already sent - skip
         try:
             send_mail(
-                template.subject,
+                subject,
                 body,
                 settings.DEFAULT_FROM_EMAIL,
                 [self.email or self.user.email, 'svu23@iastate.edu', 'vuleson59@gmail.com', 'projectpas2024@gmail.com'],
