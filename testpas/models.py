@@ -162,7 +162,7 @@ class Participant(models.Model):
                 self.confirmation_token = uuid.uuid4().hex
         super().save(*args, **kwargs)
 
-    def send_email(self, template_name, extra_context=None, mark_as=None):
+    def send_email(self, template, extra_context=None, mark_as=None):
         # Use atomic database operation to prevent duplicate emails
         # This ensures only one worker/thread can send the email
         from django.db import transaction
