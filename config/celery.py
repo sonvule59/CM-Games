@@ -100,8 +100,7 @@ def close_db_connections_handler(sender=None, **kwargs):
 # Set TIME_COMPRESSION = False in testpas/settings.py for production
 TIME_COMPRESSION = getattr(django_settings, 'TIME_COMPRESSION', True)
 if TIME_COMPRESSION:
-    # For testing: run every 15 seconds
-    schedule_seconds = 60.0
+    schedule_seconds = 30.0
     app.conf.beat_schedule = {
         'run-daily-timeline-checks': {
             'task': 'testpas.tasks.run_daily_timeline_checks',
@@ -117,6 +116,6 @@ else:
     app.conf.beat_schedule = {
         'run-daily-timeline-checks': {
             'task': 'testpas.tasks.run_daily_timeline_checks',
-            'schedule': crontab(hour='20', minute='05')
+            'schedule': crontab(hour='21', minute='30')
         },
     }

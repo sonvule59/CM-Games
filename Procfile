@@ -5,7 +5,7 @@ web: gunicorn config.wsgi --log-file -
 release: python manage.py migrate
 
 # Start the Celery worker
-worker: celery -A testpas.celery worker --loglevel=info
+worker: celery -A config.celery worker --loglevel=info
 
 # Start Celery Beat for scheduled tasks
-beat: celery -A testpas.celery beat --loglevel=info
+beat: celery -A config.celery beat --loglevel=info

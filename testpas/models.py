@@ -162,10 +162,33 @@ class Participant(models.Model):
                 self.confirmation_token = uuid.uuid4().hex
         super().save(*args, **kwargs)
 
-    def send_email(self, template_name, extra_context=None, mark_as=None):
+    def send_email(self, template, extra_context=None, mark_as=None):
         # Use atomic database operation to prevent duplicate emails
         # This ensures only one worker/thread can send the email
         from django.db import transaction
+        from collections import defaultdict
+
+        # Resolve template
+        if isinstance(template, str):
+            template_name = template
+            template_obj = EmailTemplate.objects.get(name=template_name)
+        else:
+            template_obj = template
+            template_name = getattr(template_obj, "name", None) or "<template>"
+
+        # Build a safe formatting context for templates
+        context = {
+            "username": getattr(self.user, "username", ""),
+            "participant_id": getattr(self, "participant_id", ""),
+            "email": (self.email or getattr(self.user, "email", "")),
+        }
+        if extra_context:
+            context.update(extra_context)
+
+        # Avoid KeyError on missing placeholders by defaulting to ""
+        safe_context = defaultdict(str, context)
+        subject = (template_obj.subject or "").format_map(safe_context)
+        body = (template_obj.body or "").format_map(safe_context)
         
         # If mark_as is provided, check if email was already sent with that status
         # Use atomic update to prevent race conditions - try to claim the task
@@ -175,7 +198,7 @@ class Participant(models.Model):
             
             # Check if email was already sent
             if self.email_status == mark_as:
-                logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                # logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
                 return
             
             # Try to atomically claim the task by updating status to 'sending'
@@ -189,44 +212,11 @@ class Participant(models.Model):
             )
             
             if updated_count == 0:
-                # Another worker already claimed this task or email was already sent - skip
                 self.refresh_from_db()
-                if self.email_status == mark_as:
-                    logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
-                else:
-                    logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
-                return
-            
-            # Refresh to get the updated status
-            self.refresh_from_db()
-        
-        try:
-            template = EmailTemplate.objects.get(name=template_name)
-        except EmailTemplate.DoesNotExist:
-            raise Exception(f"Email template '{template_name}' not found in database. Please run 'python manage.py seed_email_template' to populate email templates.")
-        
-        context = {'participant_id': self.participant_id, 'username': self.user.username}
-        
-        # Add survey links for survey-related emails
-        if 'survey' in template_name or 'study_end' in template_name:
-            if 'wave1' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave1/"
-            elif 'wave2' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave2/"
-            elif 'wave3' in template_name or 'study_end' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave3/"
-        
-        if extra_context:
-            context.update(extra_context)
-        
-        try:
-            body = template.body.format(**context)
-        except KeyError as e:
-            raise Exception(f"Email template '{template_name}' is missing required placeholder: {str(e)}")
-        
+                return # Another worker already claimed this task or email was already sent - skip
         try:
             send_mail(
-                template.subject,
+                subject,
                 body,
                 settings.DEFAULT_FROM_EMAIL,
                 [self.email or self.user.email, 'svu23@iastate.edu', 'vuleson59@gmail.com', 'projectpas2024@gmail.com'],
@@ -252,10 +242,10 @@ class Participant(models.Model):
         # Prevent duplicate confirmation emails
         # Only send if account is not yet confirmed and confirmation email hasn't been sent
         if self.is_confirmed:
-            logger.info(f"Account already confirmed for participant {self.participant_id}, skipping confirmation email")
+            #logger.info(f"Account already confirmed for participant {self.participant_id}, skipping confirmation email")
             return
         if self.email_status == 'confirmation_email_sent':
-            logger.info(f"Confirmation email already sent for participant {self.participant_id}, skipping duplicate")
+            #logger.info(f"Confirmation email already sent for participant {self.participant_id}, skipping duplicate")
             return
         
         confirmation_link = f"{settings.BASE_URL}/confirm-account/{self.confirmation_token}/"
