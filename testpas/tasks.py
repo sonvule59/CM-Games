@@ -7,16 +7,17 @@ from django.core.management import call_command
 from testpas import settings
 from django.utils import timezone
 from testpas.models import Participant, EmailTemplate, UserSurveyProgress
-import logging
 from testpas.management.commands.seed_email_template import EMAIL_TEMPLATES
 from testpas.utils import get_current_time
 from .models import User
 from .timeline import get_study_day
-logger = logging.getLogger(__name__)
+import logging
+
 from .timeline import get_timeline_day
-### Jun 11: Add in run_daily_timeline_checks task among other tasks
+logger = logging.getLogger(__name__)
 @shared_task
 def run_daily_timeline_checks():
+    logger = logging.getLogger(__name__)
     print(f"[CELERY TASK] run_daily_timeline_checks started")
     users = User.objects.all()
     print(f"[CELERY TASK] Processing {users.count()} users")
@@ -28,9 +29,8 @@ def run_daily_timeline_checks():
             logger.error(f"Error in daily_timeline_check for user {user.id}: {str(e)}")
     print(f"[CELERY TASK] run_daily_timeline_checks completed")
 
-## Jun 11: Add in run_daily_timeline_checks task among other tasks. 
-## This is rewritten send_scheduled_emails() function.
 def daily_timeline_check(user):
+    logger = logging.getLogger(__name__)
     seconds_per_day = getattr(settings, 'SECONDS_PER_DAY', 86400)
     compressed = getattr(settings, 'TIME_COMPRESSION', False)
 
@@ -570,6 +570,7 @@ def daily_timeline_check(user):
 @shared_task
 def send_confirmation_email_task(participant_id):
     """Send account confirmation email asynchronously"""
+    logger = logging.getLogger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         participant.send_confirmation_email()
@@ -582,6 +583,7 @@ def send_confirmation_email_task(participant_id):
 @shared_task
 def send_password_reset_email_task(email, reset_link):
     """Send password reset email asynchronously"""
+    logger = logging.getLogger(__name__)
     try:
         send_mail(
             'Password Reset Request - Confident Moves Intervention',
@@ -597,6 +599,7 @@ def send_password_reset_email_task(email, reset_link):
 @shared_task
 def send_wave1_survey_return_email(participant_id):
     """Information 13: Survey by Today & Return Monitor (Wave 1)"""
+    logger = logging.getLogger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         if participant.email_status == 'sent_wave1_survey_return':
@@ -620,6 +623,7 @@ def send_wave1_survey_return_email(participant_id):
 def send_wave1_code_entry_email(participant_id):
     """Information 12: Physical Activity Monitoring Tomorrow (Wave 1)"""
     from django.db import connections
+    logger = logging.getLogger(__name__)
     try:
         # Ensure fresh database connection
         connections.close_all()
@@ -664,6 +668,7 @@ def send_wave1_code_entry_email(participant_id):
 def send_wave1_monitoring_email(participant_id):
     """Send Wave 1 Physical Activity Monitoring email to participant."""
     """Information 10: Wave 1 Physical Activity Monitoring Ready"""
+    logger = logging.getLogger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         template = EmailTemplate.objects.get(name='wave1_monitor_ready')
@@ -691,6 +696,7 @@ def send_wave1_monitoring_email(participant_id):
 def send_wave3_code_entry_email(participant_id):
     """Information 25: Physical Activity Monitoring Tomorrow (Wave 3)"""
     from django.db import connections
+    logger = logging.getLogger(__name__)
     try:
         # Ensure fresh database connection
         connections.close_all()
@@ -728,6 +734,7 @@ def send_wave3_code_entry_email(participant_id):
 @shared_task
 def send_study_end_email(participant_id):
     """Information 24: Survey and Monitor Return Email (Study End)"""
+    logger = logging.getLogger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         
@@ -748,6 +755,7 @@ def send_study_end_email(participant_id):
 @shared_task
 def send_wave3_missing_code_email(participant_id):
     """Information 27: Missing Code Entry Email (Study End)"""
+    logger = logging.getLogger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         
