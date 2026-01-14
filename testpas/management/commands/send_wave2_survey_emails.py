@@ -9,7 +9,7 @@ from testpas.timeline import get_study_day
 from testpas import settings
 import logging
 
-logger = logging.getLogger(__name__)
+#logger = logging.get#logger(__name__)
 
 class Command(BaseCommand):
     help = 'Send Wave 2 survey emails (Information 18) to participants on Day 57'
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                         f'✗ Failed to send email to {participant.participant_id}: {str(e)}'
                     )
                 )
-                logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
+                #logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
                 failed_count += 1
         
         self.stdout.write('\n' + '='*60)

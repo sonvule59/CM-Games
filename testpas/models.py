@@ -175,7 +175,7 @@ class Participant(models.Model):
             
             # Check if email was already sent
             if self.email_status == mark_as:
-                logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
                 return
             
             # Try to atomically claim the task by updating status to 'sending'
@@ -192,9 +192,9 @@ class Participant(models.Model):
                 # Another worker already claimed this task or email was already sent - skip
                 self.refresh_from_db()
                 if self.email_status == mark_as:
-                    logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                    #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
                 else:
-                    logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
+                    #logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
                 return
             
             # Refresh to get the updated status
@@ -252,10 +252,10 @@ class Participant(models.Model):
         # Prevent duplicate confirmation emails
         # Only send if account is not yet confirmed and confirmation email hasn't been sent
         if self.is_confirmed:
-            logger.info(f"Account already confirmed for participant {self.participant_id}, skipping confirmation email")
+            #logger.info(f"Account already confirmed for participant {self.participant_id}, skipping confirmation email")
             return
         if self.email_status == 'confirmation_email_sent':
-            logger.info(f"Confirmation email already sent for participant {self.participant_id}, skipping duplicate")
+            #logger.info(f"Confirmation email already sent for participant {self.participant_id}, skipping duplicate")
             return
         
         confirmation_link = f"{settings.BASE_URL}/confirm-account/{self.confirmation_token}/"

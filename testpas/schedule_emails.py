@@ -7,7 +7,7 @@ from testpas.tasks import send_wave1_monitoring_email
 import logging
 from datetime import timedelta
 
-logger = logging.getLogger(__name__)
+#logger = logging.get#logger(__name__)
 
 # FIXED SNIPPET START: Schedule Wave 1 monitoring email
 @shared_task
@@ -16,12 +16,12 @@ def schedule_wave1_monitoring_email(participant_id):
     try:
         participant = Participant.objects.get(id=participant_id)
         if not participant.is_confirmed or not UserSurveyProgress.objects.filter(user=participant.user, survey__title="Eligibility Criteria", consent_given=True).exists():
-            logger.info(f"Skipping Wave 1 monitoring email for {participant.participant_id}: not confirmed or not consented")
+            #logger.info(f"Skipping Wave 1 monitoring email for {participant.participant_id}: not confirmed or not consented")
             return
         
         progress = UserSurveyProgress.objects.filter(user=participant.user, survey__title="Eligibility Criteria").first()
         if not progress or not progress.day_1:
-            logger.error(f"No day_1 set for {participant.participant_id}")
+            #logger.error(f"No day_1 set for {participant.participant_id}")
             return
 
         # Calculate send time (Day 11 at 7 AM CT)
@@ -36,7 +36,7 @@ def schedule_wave1_monitoring_email(participant_id):
         
         # Schedule email
         send_wave1_monitoring_email(participant_id)
-        logger.info(f"Scheduled Wave 1 monitoring email for {participant.participant_id} at {send_time}")
+        #logger.info(f"Scheduled Wave 1 monitoring email for {participant.participant_id} at {send_time}")
     except Participant.DoesNotExist:
-        logger.error(f"Participant {participant_id} not found for scheduling")
+        #logger.error(f"Participant {participant_id} not found for scheduling")
 # FIXED SNIPPET END

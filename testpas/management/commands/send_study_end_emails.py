@@ -9,7 +9,7 @@ from testpas.timeline import get_study_day
 from django.conf import settings
 import logging
 
-logger = logging.getLogger(__name__)
+#logger = logging.get#logger(__name__)
 
 class Command(BaseCommand):
     help = 'Send Study End Survey & Monitor Return emails (Information 24) to participants on Day 120'
@@ -125,13 +125,13 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.SUCCESS(
                             f'  ✓ Sent to: {participant.participant_id} ({user.username}) - {reason}'
                         ))
-                        logger.info(f"Manually sent Study End Survey & Monitor Return email to {participant.participant_id}")
+                        #logger.info(f"Manually sent Study End Survey & Monitor Return email to {participant.participant_id}")
                     except Exception as e:
                         error_count += 1
                         self.stdout.write(self.style.ERROR(
                             f'  ✗ ERROR sending to {participant.participant_id} ({user.username}): {str(e)}'
                         ))
-                        logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
+                        #logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
             else:
                 skipped_count += 1
                 if study_day == target_day:
