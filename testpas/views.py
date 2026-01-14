@@ -38,7 +38,7 @@ from .timeline import get_timeline_day, get_study_day
 from testpas.tasks import send_wave1_code_entry_email, send_wave3_code_entry_email
 
 
-#logger = logging.get#logger(__name__)
+print(f"[DEBUG] Views module loaded")
 
 def landing(request):
     """Landing page for unauthenticated users"""
@@ -97,23 +97,23 @@ def create_account(request):
                         # This prevents duplicate emails if the task is queued multiple times
                         if not participant.is_confirmed and participant.email_status != 'confirmation_email_sent':
                             send_confirmation_email_task.delay(participant.id)
-                            #logger.info(f"Queued confirmation email for participant {participant.participant_id}")
+                            print(f"[SEND] Queued confirmation email for participant {participant.participant_id}")
                         else:
-                            #logger.info(f"Skipping confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
+                            print(f"[SKIP] Skipping confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
                     except Exception as e:
                         # If Celery is not available, try synchronous sending as fallback
-                        #logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        print(f"[ERROR] Celery task failed, trying synchronous email: {e}")
                         try:
                             if not participant.is_confirmed and participant.email_status != 'confirmation_email_sent':
-                                #logger.info(f"Sending confirmation email synchronously for participant {participant.participant_id}")
+                                print(f"[SEND] Sending confirmation email synchronously for participant {participant.participant_id}")
                                 participant.send_confirmation_email()
-                                #logger.info(f"Successfully sent confirmation email to {participant.email}")
+                                print(f"[SEND] Successfully sent confirmation email to {participant.email}")
                             else:
-                                #logger.info(f"Skipping synchronous confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
+                                print(f"[SKIP] Skipping synchronous confirmation email for participant {participant.participant_id} - already confirmed or email already sent")
                         except Exception as e2:
-                            #logger.error(f"Failed to send account_confirmation email for participant {participant.participant_id}: {e2}")
+                            print(f"[ERROR] Failed to send account_confirmation email for participant {participant.participant_id}: {e2}")
                             import traceback
-                            #logger.error(f"Traceback: {traceback.format_exc()}")
+                            print(f"[ERROR] Traceback: {traceback.format_exc()}")
                             # Don't fail account creation if email fails - log it and continue
                             # This allows the account to be created even if email service is down
                     
@@ -129,7 +129,7 @@ def create_account(request):
                 except Exception as e:
                     import traceback
                     error_trace = traceback.format_exc()
-                    #logger.error(f"Error creating account for username {form.cleaned_data.get('username')}: {e}\n{error_trace}")
+                    print(f"[ERROR] Error creating account for username {form.cleaned_data.get('username')}: {e}\n{error_trace}")
                     if is_ajax:
                         return JsonResponse({
                             'status': 'error',
@@ -137,7 +137,7 @@ def create_account(request):
                         }, status=500)
                     messages.error(request, f"Failed to create account: {str(e)}")
             else:
-                #logger.warning(f"Invalid form submission: {form.errors}")
+                print(f"[ERROR] Invalid form submission: {form.errors}")
                 if is_ajax:
                     return JsonResponse({
                         'status': 'error',
@@ -156,7 +156,7 @@ def create_account(request):
         # Catch any unexpected errors and always return JSON for AJAX requests
         import traceback
         error_trace = traceback.format_exc()
-        #logger.error(f"Unexpected error in create_account: {e}\n{error_trace}")
+        print(f"[ERROR] Unexpected error in create_account: {e}\n{error_trace}")
         if is_ajax:
             return JsonResponse({
                 'status': 'error',
@@ -248,10 +248,10 @@ def password_reset(request):
                 reset_link = f"{settings.BASE_URL}/password-reset-confirm/{token}/"
                 try:
                     send_password_reset_email_task.delay(email, reset_link)
-                    #logger.info(f"Queued password reset email for {email}")
+                    print(f"[SEND] Queued password reset email for {email}")
                 except Exception as e:
                     # If Celery is not available, try synchronous sending as fallback
-                    #logger.warning(f"Celery task failed for password reset email, trying synchronous: {e}")
+                    print(f"[ERROR] Celery task failed for password reset email, trying synchronous: {e}")
                     try:
                         send_mail(
                             'Password Reset Request - Confident Moves Intervention',
@@ -261,7 +261,7 @@ def password_reset(request):
                             fail_silently=False,
                         )
                     except Exception as e2:
-                        #logger.error(f"Failed to send password reset email to {email}: {e2}")
+                        print(f"[ERROR] Failed to send password reset email to {email}: {e2}")
                         messages.error(request, 'Failed to send password reset email. Please try again later.')
                         return redirect('password_reset')
                 
@@ -358,7 +358,7 @@ def questionnaire_interest(request):
                     answer=reason
                 )
         except Exception as e:
-            #logger.error(f"Error saving interest response details: {e}")
+            print(f"[ERROR] Error saving interest response details: {e}")
         
         if interested == 'no':
             return redirect('exit_screen_not_interested')
@@ -422,7 +422,7 @@ def questionnaire(request):
             defaults={"description": "Survey to determine participant eligibility"}
         )
         if created:
-            #logger.info("Created Eligibility Criteria survey automatically")
+            print(f"[SEND] Created Eligibility Criteria survey automatically")
         
         # Save participant information including dominant hand
         try:
@@ -470,12 +470,12 @@ Participants should be able to access the IRB consent form on the website."""
 @login_required
 def consent_form(request, survey_id=None):
     if request.method == "POST":
-        #logger.debug(f"Consent form POST data for {request.user.username}: {dict(request.POST)}")
+        print(f"[DEBUG] Consent form POST data for {request.user.username}: {dict(request.POST)}")
         
         # Check if user declined consent
         consent_choice = request.POST.get('consent')
         if consent_choice == 'no':
-            #logger.info(f"User {request.user.username} declined consent")
+            print(f"[ERROR] User {request.user.username} declined consent")
             return redirect('exit_screen_not_interested')
         
         form = ConsentForm(request.POST)
@@ -484,17 +484,17 @@ def consent_form(request, survey_id=None):
             try:
                 user_progress = UserSurveyProgress.objects.get(user=user, survey__title="Eligibility Criteria")
                 if not user_progress.eligible:
-                    #logger.warning(f"User {user.username} not eligible")
+                    print(f"[ERROR] User {user.username} not eligible")
                     messages.error(request, "You are not eligible to participate.")
                     return redirect("exit_screen_not_eligible")
             except UserSurveyProgress.DoesNotExist:
-                #logger.error(f"No UserSurveyProgress found for {user.username}")
+                print(f"[ERROR] No UserSurveyProgress found for {user.username}")
                 messages.error(request, "No eligibility record found. Please contact support.")
                 return render(request, "consent_form.html", {"form": form})
 
             participant, created = Participant.objects.get_or_create(user=user)
             if created:
-                #logger.info(f"Created Participant for {user.username}")
+                print(f"[SEND] Created Participant for {user.username}")
 
             # Set timeline for time compression testing
             current_time = timezone.now()
@@ -505,24 +505,25 @@ def consent_form(request, survey_id=None):
 
             try:
                 user_progress.save()
-                #logger.debug(f"Saved progress for {user.username}: consent_given=True, day_1={user_progress.day_1}")
+                print(f"[SEND] Saved progress for {user.username}: consent_given=True, day_1={user_progress.day_1}")
             except Exception as e:
-                #logger.error(f"Failed to save progress for {user.username}: {e}")
+                print(f"[ERROR] Failed to save progress for {user.username}: {e}")
                 messages.error(request, "Failed to save consent data. Please try again.")
                 return render(request, "consent_form.html", {"form": form})
 
             # Trigger timeline automation
             try:
                 schedule_wave1_monitoring_email(participant.pk)
-                #logger.info(f"Triggered timeline email scheduling for participant {participant.participant_id}")
+                print(f"[SEND] Triggered timeline email scheduling for participant {participant.participant_id}")
             except Exception as e:
-                #logger.error(f"Failed to trigger timeline email scheduling for {participant.participant_id}: {e}")
+                print(f"[ERROR] Failed to trigger timeline email scheduling for {participant.participant_id}: {e}")
                 messages.warning(request, "Consent saved, but email scheduling failed. Contact support.")
 
-            #logger.info(f"Consent processed successfully for {user.username}")
+            print(f"[SEND] Consent processed successfully for {user.username}")
             return redirect("dashboard")
         else:
             #logger.warning(f"Consent form invalid for {request.user.username}: {form.errors}")
+            print(f"[ERROR] Consent form invalid for {request.user.username}: {form.errors}")
             messages.error(request, "Please correct the errors below.")
             return render(request, "consent_form.html", {"form": form})
     else:
@@ -1028,14 +1029,14 @@ def enter_code(request, wave):
                     # Send Information 12 email asynchronously - use participant.id (database ID)
                     try:
                         send_wave1_code_entry_email.delay(participant.id)
-                        #logger.info(f"Queued Wave 1 code entry email for participant {participant.participant_id}")
+                        print(f"[SEND] Queued Wave 1 code entry email for participant {participant.participant_id}")
                     except Exception as e:
                         # If Celery is not available, try synchronous sending as fallback
-                        #logger.warning(f"Celery task failed for Wave 1 code entry email, trying synchronous: {e}")
+                        print(f"[ERROR] Celery task failed for Wave 1 code entry email, trying synchronous: {e}")
                         try:
                             send_wave1_code_entry_email(participant.id)
                         except Exception as e2:
-                            #logger.error(f"Failed to send Wave 1 code entry email for participant {participant.participant_id}: {e2}")
+                            print(f"[ERROR] Failed to send Wave 1 code entry email for participant {participant.participant_id}: {e2}")
                     
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)
@@ -1060,25 +1061,25 @@ def enter_code(request, wave):
                     # Try async first, fallback to sync if Celery is unavailable
                     try:
                         send_wave3_code_entry_email.delay(participant.id)
-                        #logger.info(f"Queued wave3_code_entry email for participant {participant.participant_id}")
+                        print(f"[SEND] Queued wave3_code_entry email for participant {participant.participant_id}")
                     except Exception as e:
-                        #logger.warning(f"Celery task failed, trying synchronous email: {e}")
+                        print(f"[ERROR] Celery task failed, trying synchronous email: {e}")
                         try:
                             send_wave3_code_entry_email(participant.id)
-                            #logger.info(f"Sent wave3_code_entry email synchronously for participant {participant.participant_id}")
+                            print(f"[SEND] Sent wave3_code_entry email synchronously for participant {participant.participant_id}")
                         except Exception as e2:
-                            #logger.error(f"Failed to send wave3_code_entry email for participant {participant.participant_id}: {e2}")
+                            print(f"[ERROR] Failed to send wave3_code_entry email for participant {participant.participant_id}: {e2}")
                     # Send Information 25 email asynchronously - use participant.id (database ID)
                     try:
                         send_wave3_code_entry_email.delay(participant.id)
-                        #logger.info(f"Queued Wave 3 code entry email for participant {participant.participant_id}")
+                        print(f"[SEND] Queued Wave 3 code entry email for participant {participant.participant_id}")
                     except Exception as e:
                         # If Celery is not available, try synchronous sending as fallback
-                        #logger.warning(f"Celery task failed for Wave 3 code entry email, trying synchronous: {e}")
+                        print(f"[ERROR] Celery task failed for Wave 3 code entry email, trying synchronous: {e}")
                         try:
                             send_wave3_code_entry_email(participant.id)
                         except Exception as e2:
-                            #logger.error(f"Failed to send Wave 3 code entry email for participant {participant.participant_id}: {e2}")
+                            print(f"[ERROR] Failed to send Wave 3 code entry email for participant {participant.participant_id}: {e2}")
                     
                     messages.success(request, "Code entered successfully!")
                     return redirect('code_success', wave=wave)

@@ -14,10 +14,8 @@ from .timeline import get_study_day
 import logging
 
 from .timeline import get_timeline_day
-#logger = logging.get#logger(__name__)
 @shared_task
 def run_daily_timeline_checks():
-    #logger = logging.get#logger(__name__)
     print(f"[CELERY TASK] run_daily_timeline_checks started")
     users = User.objects.all()
     print(f"[CELERY TASK] Processing {users.count()} users")
@@ -26,11 +24,9 @@ def run_daily_timeline_checks():
             daily_timeline_check(user)
         except Exception as e:
             print(f"[CELERY TASK] ERROR processing user {user.id}: {str(e)}")
-            #logger.error(f"Error in daily_timeline_check for user {user.id}: {str(e)}")
     print(f"[CELERY TASK] run_daily_timeline_checks completed")
 
 def daily_timeline_check(user):
-    #logger = logging.get#logger(__name__)
     seconds_per_day = getattr(settings, 'SECONDS_PER_DAY', 86400)
     compressed = getattr(settings, 'TIME_COMPRESSION', False)
 
@@ -154,7 +150,6 @@ def daily_timeline_check(user):
                 print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
             except Exception as e:
                 print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
-                #logger.error(f"Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
                 Participant.objects.filter(id=participant.id).update(email_status='pending')
                 raise
         else:
@@ -216,7 +211,6 @@ def daily_timeline_check(user):
                     participant.send_email("wave1_survey_return", mark_as='sent_wave1_survey_return')
                 except Exception as e:
                     print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
-                    #logger.error(f"Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
                     raise
             else:
                 # Another worker already set the status - skip sending to prevent duplicate
@@ -325,7 +319,6 @@ def daily_timeline_check(user):
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
-                    #logger.error(f"Failed to send randomization email to {second_participant.participant_id}: {str(e)}")
             else:
                 # Neither participant is randomized yet - do full 2-block randomization
                 # Fair coin flip for first participant
@@ -370,7 +363,6 @@ def daily_timeline_check(user):
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {first_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to first participant {first_participant.participant_id}: {str(e)}")
-                    #logger.error(f"Failed to send randomization email to {first_participant.participant_id}: {str(e)}")
                 
                 try:
                     if second_participant.randomized_group == 0:
@@ -392,7 +384,6 @@ def daily_timeline_check(user):
                         print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {second_participant.participant_id}")
                 except Exception as e:
                     print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to second participant {second_participant.participant_id}: {str(e)}")
-                    #logger.error(f"Failed to send randomization email to {second_participant.participant_id}: {str(e)}")
         elif len(pair_participants) == 1:
             # Only one participant in pair - randomize them now, second participant will get opposite when they join
             import random
@@ -430,7 +421,6 @@ def daily_timeline_check(user):
                     print(f"[2-BLOCK RANDOMIZE] Sent intervention_access_immediate email to {single_participant.participant_id}")
             except Exception as e:
                 print(f"[2-BLOCK RANDOMIZE] ERROR: Failed to send email to single participant {single_participant.participant_id}: {str(e)}")
-                #logger.error(f"Failed to send randomization email to {single_participant.participant_id}: {str(e)}")
         else:
             print(f"[2-BLOCK RANDOMIZE] Pair {participant.randomization_pair_id} has unexpected number of participants: {len(pair_participants)}")
     ############### NEW DOUBLE BLIND RANDOMIZATION MECHANICS ENDS HERE ######################
@@ -463,10 +453,8 @@ def daily_timeline_check(user):
             participant.wave2_survey_email_sent = True
             participant.save()
             print(f"[INFO 18] Successfully sent Wave 2 survey email to {participant.participant_id}")
-            #logger.info(f"Sent Wave 2 survey email to {participant.participant_id}")
         except Exception as e:
             print(f"[INFO 18] ERROR: Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
-            #logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
             # Don't set wave2_survey_email_sent = True if email failed, so it can be retried"""
             print(f"[INFO 18] Sending Wave 2 survey email to {participant.participant_id} (Day {today})")
             try:
@@ -480,12 +468,10 @@ def daily_timeline_check(user):
                     }
                 )
                 print(f"[INFO 18] Successfully sent Wave 2 survey email to {participant.participant_id}")
-                #logger.info(f"Sent Wave 2 survey email to {participant.participant_id}")
             except Exception as e:
                 # If email fails, reset the flag so it can be retried
                 Participant.objects.filter(id=participant.id).update(wave2_survey_email_sent=False)
                 print(f"[INFO 18] ERROR: Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
-                #logger.error(f"Failed to send Wave 2 survey email to {participant.participant_id}: {str(e)}")
                 raise
         else:
             # Another worker already set the flag - skip sending to prevent duplicate
@@ -533,10 +519,8 @@ def daily_timeline_check(user):
             participant.wave3_monitor_ready_sent = True
             participant.save()
             print(f"[INFO 23] Successfully sent Wave 3 Monitoring Ready email to {participant.participant_id}")
-            #logger.info(f"Sent Wave 3 Monitoring Ready email to {participant.participant_id}")
         except Exception as e:
             print(f"[INFO 23] ERROR: Failed to send Wave 3 Monitoring Ready email to {participant.participant_id}: {str(e)}")
-            #logger.error(f"Failed to send Wave 3 Monitoring Ready email to {participant.participant_id}: {str(e)}")
             # Don't set wave3_monitor_ready_sent = True if email failed, so it can be retried
 
     # Info 27 – Day 134: Missed Wave 3 Code Entry (Study End)
@@ -561,29 +545,27 @@ def daily_timeline_check(user):
                 participant.wave3_survey_monitor_return_date = timezone.now().date()
                 participant.save()
                 print(f"[STUDY END] Successfully sent Study End Survey & Monitor Return email to {participant.participant_id}")
-                #logger.info(f"Sent Study End Survey & Monitor Return email to {participant.participant_id}")
             except Exception as e:
                 print(f"[STUDY END] ERROR: Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
-                #logger.error(f"Failed to send Study End Survey & Monitor Return email to {participant.participant_id}: {str(e)}")
                 # Don't set wave3_survey_monitor_return_sent = True if email failed, so it can be retried
 
 @shared_task
 def send_confirmation_email_task(participant_id):
     """Send account confirmation email asynchronously"""
-    #logger = logging.get#logger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         participant.send_confirmation_email()
-        #logger.info(f"Sent confirmation email to {participant.email}")
+        print(f"[SEND] Sent confirmation email to {participant.email}")
     except Participant.DoesNotExist:
-        #logger.error(f"Participant {participant_id} not found for confirmation email")
+        print(f"[ERROR] Participant {participant_id} not found for confirmation email")
+        pass
     except Exception as e:
-        #logger.error(f"Error sending confirmation email for participant {participant_id}: {str(e)}")
+        print(f"[ERROR] Error sending confirmation email for participant {participant_id}: {str(e)}")
+        pass
 
 @shared_task
 def send_password_reset_email_task(email, reset_link):
-    """Send password reset email asynchronously"""
-    #logger = logging.get#logger(__name__)
+    """Send password reset email asynchronously"""  
     try:
         send_mail(
             'Password Reset Request - Confident Moves Intervention',
@@ -592,18 +574,18 @@ def send_password_reset_email_task(email, reset_link):
             [email],
             fail_silently=False,
         )
-        #logger.info(f"Sent password reset email to {email}")
+        print(f"[SEND] Sent password reset email to {email}")
     except Exception as e:
-        #logger.error(f"Error sending password reset email to {email}: {str(e)}")
+        print(f"[ERROR] Error sending password reset email to {email}: {str(e)}")
+        pass
 
 @shared_task
 def send_wave1_survey_return_email(participant_id):
     """Information 13: Survey by Today & Return Monitor (Wave 1)"""
-    #logger = logging.get#logger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         if participant.email_status == 'sent_wave1_survey_return':
-            #logger.info(f"Skipping wave1_survey_return for {participant.email}: already sent")
+            print(f"[SKIP] Skipping wave1_survey_return for {participant.email}: already sent")
             return
         # Schedule 8 days after code_entry_date at 7 AM CT
         now = timezone.now()
@@ -613,17 +595,18 @@ def send_wave1_survey_return_email(participant_id):
         participant.send_email('wave1_survey_return', extra_context={'username': participant.user.username})
         participant.email_status = 'sent_wave1_survey_return'
         participant.save()
-        #logger.info(f"Sent wave1_survey_return to {participant.email}")
+        print(f"[SEND] Sent wave1_survey_return to {participant.email}")
     except Participant.DoesNotExist:
-        #logger.error(f"Participant {participant_id} not found for wave1_survey_return")
+        print(f"[ERROR] Participant {participant_id} not found for wave1_survey_return")
+        pass
     except Exception as e:
-        #logger.error(f"Error sending wave1_survey_return for participant {participant_id}: {str(e)}")
+        print(f"[ERROR] Error sending wave1_survey_return for participant {participant_id}: {str(e)}")
+        pass
 
 @shared_task
 def send_wave1_code_entry_email(participant_id):
     """Information 12: Physical Activity Monitoring Tomorrow (Wave 1)"""
     from django.db import connections
-    #logger = logging.get#logger(__name__)
     try:
         # Ensure fresh database connection
         connections.close_all()
@@ -631,12 +614,12 @@ def send_wave1_code_entry_email(participant_id):
         participant = Participant.objects.get(id=participant_id)
         # Check email_status to prevent duplicates
         if participant.email_status == 'sent_wave1_code':
-            #logger.info(f"Skipping wave1_code_entry for {participant.email}: already sent")
+            print(f"[SKIP] Skipping wave1_code_entry for {participant.email}: already sent")
             return
         
         code_date = participant.code_entry_date
         if not code_date:
-            #logger.error(f"No code entry date for participant {participant_id}")
+            print(f"[ERROR] No code entry date for participant {participant_id}")
             return
         
         start_date = code_date + timedelta(days=1)
@@ -653,13 +636,12 @@ def send_wave1_code_entry_email(participant_id):
         )
         participant.email_status = 'sent_wave1_code'
         participant.save()
-        #logger.info(f"Sent wave1_code_entry to {participant.email}")
+        print(f"[SEND] Sent wave1_code_entry to {participant.email}")
     except Participant.DoesNotExist:
-        #logger.error(f"Participant {participant_id} not found for wave1_code_entry")
+        print(f"[ERROR] Participant {participant_id} not found for wave1_code_entry")
+        pass
     except Exception as e:
-        import traceback
-        #logger.error(f"Error sending wave1_code_entry for participant {participant_id}: {str(e)}")
-        #logger.error(f"Traceback: {traceback.format_exc()}")
+        pass
     finally:
         # Close database connections
         connections.close_all()
@@ -668,7 +650,6 @@ def send_wave1_code_entry_email(participant_id):
 def send_wave1_monitoring_email(participant_id):
     """Send Wave 1 Physical Activity Monitoring email to participant."""
     """Information 10: Wave 1 Physical Activity Monitoring Ready"""
-    #logger = logging.get#logger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         template = EmailTemplate.objects.get(name='wave1_monitor_ready')
@@ -684,19 +665,21 @@ def send_wave1_monitoring_email(participant_id):
         participant.email_status = 'sent'
         participant.email_send_date = timezone.now().date()
         participant.save()
-        #logger.info(f"Sent Wave 1 monitoring email to {participant.participant_id}")
+        print(f"[SEND] Sent Wave 1 monitoring email to {participant.participant_id}")
     except Participant.DoesNotExist:
-        #logger.error(f"Participant {participant_id} not found")
-    except EmailTemplate.DoesNotExist:
-        #logger.error("Wave 1 monitor ready email template not found")
+        print(f"[ERROR] Participant {participant_id} not found")
+        pass
+    except EmailTemplate.DoesNotExist:  
+        print(f"[ERROR] Wave 1 monitor ready email template not found")
+        pass
     except Exception as e:
-        #logger.error(f"Failed to send Wave 1 monitoring email to {participant_id}: {e}")
+        print(f"[ERROR] Failed to send Wave 1 monitoring email to {participant_id}: {e}")
+        pass
 
 @shared_task
 def send_wave3_code_entry_email(participant_id):
     """Information 25: Physical Activity Monitoring Tomorrow (Wave 3)"""
     from django.db import connections
-    #logger = logging.get#logger(__name__)
     try:
         # Ensure fresh database connection
         connections.close_all()
@@ -706,7 +689,7 @@ def send_wave3_code_entry_email(participant_id):
         # Calculate dates
         code_date = participant.wave3_code_entry_date
         if not code_date:
-            #logger.error(f"No Wave 3 code entry date for participant {participant_id}")
+            print(f"[ERROR] No Wave 3 code entry date for participant {participant_id}")
             return
         # Plus 1 day since it is tomorrow
         start_date = code_date + timedelta(days=1)
@@ -720,13 +703,12 @@ def send_wave3_code_entry_email(participant_id):
                 'end_date': end_date.strftime('%m/%d/%Y'),
             }
         )
-        #logger.info(f"Sent Wave 3 code entry email to {participant.participant_id}")
+        print(f"[SEND] Sent Wave 3 code entry email to {participant.participant_id}")
     except Participant.DoesNotExist:
-        #logger.error(f"Participant {participant_id} not found for wave3_code_entry")
+        print(f"[ERROR] Participant {participant_id} not found for wave3_code_entry")
+        pass
     except Exception as e:
-        import traceback
-        #logger.error(f"Error sending wave3_code_entry for participant {participant_id}: {str(e)}")
-        #logger.error(f"Traceback: {traceback.format_exc()}")
+        pass
     finally:
         # Close database connections
         connections.close_all()
@@ -734,44 +716,43 @@ def send_wave3_code_entry_email(participant_id):
 @shared_task
 def send_study_end_email(participant_id):
     """Information 24: Survey and Monitor Return Email (Study End)"""
-    #logger = logging.get#logger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         
         # Check if already sent
         if participant.wave3_survey_monitor_return_sent:
-            #logger.info(f"Study end email already sent for participant {participant_id}")
+            print(f"[SKIP] Study end email already sent for participant {participant_id}")
             return
-            
+        print(f"[SEND] Sending study end email to {participant.participant_id}")
         participant.send_email('study_end')
         participant.wave3_survey_monitor_return_sent = True
         participant.wave3_survey_monitor_return_date = timezone.now().date()
         participant.save()
         
-        #logger.info(f"Sent study end email to {participant.participant_id}")
+        print(f"[SEND] Sent study end email to {participant.participant_id}")
     except Exception as e:
-        #logger.error(f"Error sending study end email: {str(e)}")
+        print(f"[ERROR] Error sending study end email: {str(e)}")
+        pass
 
 @shared_task
 def send_wave3_missing_code_email(participant_id):
     """Information 27: Missing Code Entry Email (Study End)"""
-    #logger = logging.get#logger(__name__)
     try:
         participant = Participant.objects.get(id=participant_id)
         
         # Check if already sent
         if participant.wave3_missing_code_sent:
-            #logger.info(f"Wave 3 missing code email already sent for participant {participant_id}")
+            print(f"[SKIP] Wave 3 missing code email already sent for participant {participant_id}")
             return
             
         participant.send_email('wave3_missing_code')
         participant.wave3_missing_code_sent = True
         participant.save()
         
-        #logger.info(f"Sent Wave 3 missing code email to {participant.participant_id}")
+        print(f"[SEND] Sent Wave 3 missing code email to {participant.participant_id}")
     except Exception as e:
-        #logger.error(f"Error sending Wave 3 missing code email: {str(e)}")
-
+        print(f"[ERROR] Error sending Wave 3 missing code email: {str(e)}")
+        pass
 
 @shared_task
 def run_randomization():

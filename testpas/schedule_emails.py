@@ -39,4 +39,5 @@ def schedule_wave1_monitoring_email(participant_id):
         #logger.info(f"Scheduled Wave 1 monitoring email for {participant.participant_id} at {send_time}")
     except Participant.DoesNotExist:
         #logger.error(f"Participant {participant_id} not found for scheduling")
+        pass
 # FIXED SNIPPET END

@@ -191,10 +191,10 @@ class Participant(models.Model):
             if updated_count == 0:
                 # Another worker already claimed this task or email was already sent - skip
                 self.refresh_from_db()
-                if self.email_status == mark_as:
-                    #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
-                else:
-                    #logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
+                # if self.email_status == mark_as:
+                #     #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
+                # else:
+                #     #logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
                 return
             
             # Refresh to get the updated status
