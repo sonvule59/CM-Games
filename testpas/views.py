@@ -740,12 +740,7 @@ def dashboard(request):
             wave1_survey_content = Content.objects.create(
                 content_type='wave1_survey',
                 title='Wave 1 Online Survey',
-                content=(
-                    '<div>'
-                    '<p>\u00b7 Link: TBD</p>'
-                    '<a href="https://s.surveyplanet.com/u1ecju7x" class="btn btn-primary" style="margin-top: 0.5rem;">Open Survey 1</a>'
-                    '</div>'
-                )
+                content='https://s.surveyplanet.com/u1ecju7x'
             )
 
     # Check if Information 16 should be shown for Group 0 (Days 29-56)
