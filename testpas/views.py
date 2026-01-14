@@ -742,7 +742,7 @@ def dashboard(request):
                 content=(
                     '<div>'
                     '<p>\u00b7 Link: TBD</p>'
-                    '<a href="#" class="btn btn-primary" style="margin-top: 0.5rem;">Open Survey 1</a>'
+                    '<a href="https://s.surveyplanet.com/u1ecju7x" class="btn btn-primary" style="margin-top: 0.5rem;">Open Survey 1</a>'
                     '</div>'
                 )
             )
