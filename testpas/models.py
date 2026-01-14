@@ -189,41 +189,8 @@ class Participant(models.Model):
             )
             
             if updated_count == 0:
-                # Another worker already claimed this task or email was already sent - skip
                 self.refresh_from_db()
-                # if self.email_status == mark_as:
-                #     #logger.info(f"Email '{template_name}' already sent for participant {self.participant_id} (status: {mark_as}), skipping duplicate")
-                # else:
-                #     #logger.info(f"Email '{template_name}' already being processed for participant {self.participant_id}, skipping duplicate")
-                return
-            
-            # Refresh to get the updated status
-            self.refresh_from_db()
-        
-        try:
-            template = EmailTemplate.objects.get(name=template_name)
-        except EmailTemplate.DoesNotExist:
-            raise Exception(f"Email template '{template_name}' not found in database. Please run 'python manage.py seed_email_template' to populate email templates.")
-        
-        context = {'participant_id': self.participant_id, 'username': self.user.username}
-        
-        # Add survey links for survey-related emails
-        if 'survey' in template_name or 'study_end' in template_name:
-            if 'wave1' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave1/"
-            elif 'wave2' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave2/"
-            elif 'wave3' in template_name or 'study_end' in template_name:
-                context['survey_link'] = f"{settings.BASE_URL}/survey/wave3/"
-        
-        if extra_context:
-            context.update(extra_context)
-        
-        try:
-            body = template.body.format(**context)
-        except KeyError as e:
-            raise Exception(f"Email template '{template_name}' is missing required placeholder: {str(e)}")
-        
+                return # Another worker already claimed this task or email was already sent - skip
         try:
             send_mail(
                 template.subject,
