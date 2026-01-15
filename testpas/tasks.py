@@ -79,12 +79,16 @@ def daily_timeline_check(user):
         return
     
     # Calculate study day based on day_1 (which is set when consent is given)
-    today = get_timeline_day(
-        user, 
+    # CRITICAL: Use get_study_day with day_1, not get_timeline_day with user.date_joined
+    # today = get_timeline_day(
+    #     user, 
+    today = get_study_day(
+        user_progress.day_1,
         now=now,
         compressed=compressed,
-        seconds_per_day=seconds_per_day
-)
+        seconds_per_day=seconds_per_day,
+        reference_timestamp=user_progress.timeline_reference_timestamp
+    )
     """---------------------------------------------------------------------------------------------------------"""
     participant = getattr(user, 'participant', None)
     if not participant:

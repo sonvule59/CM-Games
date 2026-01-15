@@ -12,7 +12,7 @@ EMAIL_TEMPLATES = [
     {
         "name": "wave1_survey_ready",
         "subject": "Wave 1 Online Survey Set – Ready",
-        "body": "Hi {username},\n\nCongratulations! You are now enrolled as a participant in the study.\n\nPlease click the button below to complete your task, Survey 1, within 7 days to receive a $5 Amazon gift card. We highly recommend completing it as soon as possible before the link expires. You may need to remember your ID from this website and enter it to complete the survey. Your ID is: {participant_id}\n\n· Link: TBD\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (\"Seung\") Lee (Principal Investigator) at svu23@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
+        "body": "Hi {username},\n\nCongratulations! You are now enrolled as a participant in the study.\n\nPlease complete your task, Survey 1, within 7 days to receive a $5 Amazon gift card. We highly recommend completing it as soon as possible before the link expires. You may need to remember your ID from this website and enter it to complete the survey. Your ID is: {participant_id}\n\n· Link: {survey_link}\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (\"Seung\") Lee (Principal Investigator) at svu23@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
     },
     {
         "name": "wave1_monitor_ready",

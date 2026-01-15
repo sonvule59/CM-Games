@@ -171,7 +171,10 @@ class Participant(models.Model):
         # Resolve template
         if isinstance(template, str):
             template_name = template
-            template_obj = EmailTemplate.objects.get(name=template_name)
+            try:
+                template_obj = EmailTemplate.objects.get(name=template_name)
+            except EmailTemplate.DoesNotExist:
+                raise Exception(f"EmailTemplate '{template_name}' not found in database. Run: python manage.py seed_email_template")
         else:
             template_obj = template
             template_name = getattr(template_obj, "name", None) or "<template>"
