@@ -124,7 +124,11 @@ def daily_timeline_check(user):
             participant.refresh_from_db()  # Refresh to get updated status
             print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
             try:
-                participant.send_email("wave1_survey_ready", mark_as='sent_wave1_survey')
+                participant.send_email(
+                    "wave1_survey_ready", 
+                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                    mark_as='sent_wave1_survey'
+                )
             except Exception as e:
                 # If email fails, send_email will set status to 'failed', so we can retry later
                 print(f"[EMAIL] Failed to send Wave 1 survey email to {participant.participant_id}: {str(e)}")
@@ -150,7 +154,11 @@ def daily_timeline_check(user):
             print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
             
             try:
-                participant.send_email("wave1_monitor_ready", mark_as='sent_wave1_monitor')
+                participant.send_email(
+                    "wave1_monitor_ready", 
+                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                    mark_as='sent_wave1_monitor'
+                )
                 print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
             except Exception as e:
                 print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
@@ -177,7 +185,11 @@ def daily_timeline_check(user):
             participant.refresh_from_db()
             print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
             try:
-                participant.send_email("wave1_missing_code", mark_as='sent_wave1_missing')
+                participant.send_email(
+                    "wave1_missing_code", 
+                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                    mark_as='sent_wave1_missing'
+                )
             except Exception as e:
                 print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
                 Participant.objects.filter(id=participant.id).update(email_status='pending')
@@ -212,7 +224,11 @@ def daily_timeline_check(user):
                 participant.refresh_from_db()  # Refresh to get updated status
                 print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
                 try:
-                    participant.send_email("wave1_survey_return", mark_as='sent_wave1_survey_return')
+                    participant.send_email(
+                        "wave1_survey_return", 
+                        extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                        mark_as='sent_wave1_survey_return'
+                    )
                 except Exception as e:
                     print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
                     raise

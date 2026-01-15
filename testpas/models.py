@@ -181,17 +181,30 @@ class Participant(models.Model):
 
         # Build a safe formatting context for templates
         context = {
-            "username": getattr(self.user, "username", ""),
+            "username": getattr(self.user, "username", "") if hasattr(self, 'user') and self.user else "",
             "participant_id": getattr(self, "participant_id", ""),
-            "email": (self.email or getattr(self.user, "email", "")),
+            "email": (self.email or (getattr(self.user, "email", "") if hasattr(self, 'user') and self.user else "")),
         }
         if extra_context:
             context.update(extra_context)
 
-        # Avoid KeyError on missing placeholders by defaulting to ""
-        safe_context = defaultdict(str, context)
-        subject = (template_obj.subject or "").format_map(safe_context)
-        body = (template_obj.body or "").format_map(safe_context)
+        # Use SafeFormatter to handle missing keys gracefully
+        class SafeFormatter(dict):
+            def __missing__(self, key):
+                return f"{{{key}}}"  # Return the placeholder if key is missing
+        
+        safe_context = SafeFormatter(context)
+        try:
+            subject = (template_obj.subject or "").format_map(safe_context)
+            body = (template_obj.body or "").format_map(safe_context)
+        except (KeyError, ValueError) as e:
+            # Fallback: if format_map still fails, use format with **kwargs
+            # This handles cases where format_map doesn't work as expected
+            try:
+                subject = (template_obj.subject or "").format(**context)
+                body = (template_obj.body or "").format(**context)
+            except KeyError as ke:
+                raise Exception(f"Missing required template variable: {ke}. Available: {list(context.keys())}")
         
         # If mark_as is provided, check if email was already sent with that status
         # Use atomic update to prevent race conditions - try to claim the task
