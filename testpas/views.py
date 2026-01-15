@@ -733,20 +733,20 @@ def dashboard(request):
     wave1_survey_content = None
     if study_day and 1 <= study_day <= 7:
         show_wave1_survey = True
-        try:
-            wave1_survey_content = Content.objects.get(content_type='wave1_survey')
-        except Content.DoesNotExist:
-            # Create default content if it doesn't exist
-            wave1_survey_content = Content.objects.create(
-                content_type='wave1_survey',
-                title='Wave 1 Online Survey',
-                content=(
-                    '<div>'
-                    '<p>\u00b7 Link: TBD</p>'
-                    '<a href="#" class="btn btn-primary" style="margin-top: 0.5rem;">Open Survey 1</a>'
-                    '</div>'
+        wave1_survey_content, created = Content.objects.update_or_create(
+            content_type='wave1_survey',
+            defaults={
+                'title': 'Wave 1 Online Survey',
+                'content': (
+                    '<a href="https://s.surveyplanet.com/u1ecju7x" '
+                    'class="btn btn-primary" '
+                    'target="_blank" '
+                    'style="margin-top: 0.5rem;">'
+                    'Open Survey 1'
+                    '</a>'
                 )
-            )
+            }
+    )
 
     # Check if Information 16 should be shown for Group 0 (Days 29-56)
     # Information 16: Control group sees this message from Day 29 to Day 56, removed on Day 57
