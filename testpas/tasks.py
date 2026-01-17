@@ -109,94 +109,136 @@ def daily_timeline_check(user):
     # Info 9 – Day 1: Wave 1 Online Survey Ready
     # Send on Day 1, allow catch-up only during Wave 1 period (Days 1-7)
     # Don't send on Day 57+ when Wave 2 is sent, as email_status gets overwritten
-    if today and 1 <= today <= 7 and participant.email_status != 'sent_wave1_survey':
-        # Use atomic database update to prevent race condition with multiple workers
-        # Only update if status is NOT already 'sent_wave1_survey'
-        from django.db.models import F
-        updated_count = Participant.objects.filter(
-            id=participant.id
-        ).exclude(
-            email_status='sent_wave1_survey'
-        ).update(email_status='sent_wave1_survey')
+    # if today and 1 <= today <= 7 and participant.email_status != 'sent_wave1_survey':
+    #     # Use atomic database update to prevent race condition with multiple workers
+    #     # Only update if status is NOT already 'sent_wave1_survey'
+    #     from django.db.models import F
+    #     updated_count = Participant.objects.filter(
+    #         id=participant.id
+    #     ).exclude(
+    #         email_status='sent_wave1_survey'
+    #     ).update(email_status='sent_wave1_survey')
         
-        if updated_count > 0:
-            # Status was successfully updated (wasn't already sent) - safe to send email
-            participant.refresh_from_db()  # Refresh to get updated status
-            print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
-            try:
-                participant.send_email(
-                    "wave1_survey_ready", 
-                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
-                    mark_as='sent_wave1_survey'
-                )
-            except Exception as e:
-                # If email fails, send_email will set status to 'failed', so we can retry later
-                print(f"[EMAIL] Failed to send Wave 1 survey email to {participant.participant_id}: {str(e)}")
-                # Re-raise to let Celery know the task failed
-                raise
-        else:
-            # Another worker already set the status - skip sending to prevent duplicate
-            participant.refresh_from_db()
-            print(f"[EMAIL] SKIP - Wave 1 survey email already sent to {participant.participant_id} (status: {participant.email_status})")
+    #     if updated_count > 0:
+    #         # Status was successfully updated (wasn't already sent) - safe to send email
+    #         participant.refresh_from_db()  # Refresh to get updated status
+    #         print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
+    #         try:
+    #             participant.send_email(
+    #                 "wave1_survey_ready", 
+    #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
+    #                 mark_as='sent_wave1_survey'
+    #             )
+    #         except Exception as e:
+    #             # If email fails, send_email will set status to 'failed', so we can retry later
+    #             print(f"[EMAIL] Failed to send Wave 1 survey email to {participant.participant_id}: {str(e)}")
+    #             # Re-raise to let Celery know the task failed
+    #             raise
+    #     else:
+    #         # Another worker already set the status - skip sending to prevent duplicate
+    #         participant.refresh_from_db()
+    #         print(f"[EMAIL] SKIP - Wave 1 survey email already sent to {participant.participant_id} (status: {participant.email_status})")
+    if today and 1 <= today <= 7 and participant.email_status not in ['sent_wave1_survey', 'sending']:
+        # send_email() will handle atomic status updates internally
+        print(f"[EMAIL] Sending Wave 1 survey email to {participant.participant_id} (Day {today})")
+        try:
+            participant.send_email(
+                "wave1_survey_ready", 
+                extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                mark_as='sent_wave1_survey'
+            )
+            print(f"[EMAIL] ✓ Successfully sent Wave 1 survey email to {participant.participant_id}")
+        except Exception as e:
+            # If email fails, send_email will set status to 'failed', so we can retry later
+            print(f"[EMAIL] Failed to send Wave 1 survey email to {participant.participant_id}: {str(e)}")
+            # Re-raise to let Celery know the task failed
+            raise
 
     # Info 10 – Day 8: Wave 1 Physical Activity Monitoring – Ready
-    if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing']:
-        from django.db.models import F
+    # if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing']:
+    #     from django.db.models import F
         
-        updated_count = Participant.objects.filter(
-            id=participant.id
-        ).exclude(
-            email_status__in=['sent_wave1_monitor', 'sent_wave1_missing']
-        ).update(email_status='sent_wave1_monitor')
+    #     updated_count = Participant.objects.filter(
+    #         id=participant.id
+    #     ).exclude(
+    #         email_status__in=['sent_wave1_monitor', 'sent_wave1_missing']
+    #     ).update(email_status='sent_wave1_monitor')
         
-        if updated_count > 0:
-            participant.refresh_from_db()
-            print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
+    #     if updated_count > 0:
+    #         participant.refresh_from_db()
+    #         print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
             
-            try:
-                participant.send_email(
-                    "wave1_monitor_ready", 
-                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
-                    mark_as='sent_wave1_monitor'
-                )
-                print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
-            except Exception as e:
-                print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
-                Participant.objects.filter(id=participant.id).update(email_status='pending')
-                raise
-        else:
-            participant.refresh_from_db()
-            print(f"[INFO 10] SKIP - Wave 1 monitoring email already sent to {participant.participant_id} (status: {participant.email_status})")
+    #         try:
+    #             participant.send_email(
+    #                 "wave1_monitor_ready", 
+    #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
+    #                 mark_as='sent_wave1_monitor'
+    #             )
+    #             print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
+    #         except Exception as e:
+    #             print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
+    #             Participant.objects.filter(id=participant.id).update(email_status='pending')
+    #             raise
+    #     else:
+    #         participant.refresh_from_db()
+    #         print(f"[INFO 10] SKIP - Wave 1 monitoring email already sent to {participant.participant_id} (status: {participant.email_status})")
+    if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing', 'sending']:
+        # send_email() will handle atomic status updates internally
+        print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
+        
+        try:
+            participant.send_email(
+                "wave1_monitor_ready", 
+                extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                mark_as='sent_wave1_monitor'
+            )
+            print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
+        except Exception as e:
+            print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
+            raise
     elif today and today >= 8:
         if participant.code_entry_date:
             print(f"[INFO 10] Skipped for {participant.participant_id}: code already entered on {participant.code_entry_date}")
         elif participant.email_status in ['sent_wave1_monitor', 'sent_wave1_missing']:
             print(f"[INFO 10] Skipped for {participant.participant_id}: email already sent (status: {participant.email_status})")
 
-    # Info 14 – Day 22: Missing Code Entry (Wave 1) - THIS SHOULD BE AT THE SAME LEVEL AS INFO 10, NOT INSIDE IT!
-    if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
-        updated_count = Participant.objects.filter(
-            id=participant.id
-        ).exclude(
-            email_status='sent_wave1_missing'
-        ).update(email_status='sent_wave1_missing')
+    # Info 14 – Day 22: Missing Code Entry (Wave 1)
+    # if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
+    #     updated_count = Participant.objects.filter(
+    #         id=participant.id
+    #     ).exclude(
+    #         email_status='sent_wave1_missing'
+    #     ).update(email_status='sent_wave1_missing')
         
-        if updated_count > 0:
-            participant.refresh_from_db()
-            print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
-            try:
-                participant.send_email(
-                    "wave1_missing_code", 
-                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
-                    mark_as='sent_wave1_missing'
-                )
-            except Exception as e:
-                print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
-                Participant.objects.filter(id=participant.id).update(email_status='pending')
-                raise
-        else:
-            participant.refresh_from_db()
-            print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}")
+    #     if updated_count > 0:
+    #         participant.refresh_from_db()
+    #         print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
+    #         try:
+    #             participant.send_email(
+    #                 "wave1_missing_code", 
+    #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
+    #                 mark_as='sent_wave1_missing'
+    #             )
+    #         except Exception as e:
+    #             print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
+    #             Participant.objects.filter(id=participant.id).update(email_status='pending')
+    #             raise
+    #     else:
+    #         participant.refresh_from_db()
+    #         print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}")
+    if today and today >= 22 and not participant.code_entered and participant.email_status not in ['sent_wave1_missing', 'sending']:
+        # send_email() will handle atomic status updates internally
+        print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
+        try:
+            participant.send_email(
+                "wave1_missing_code", 
+                extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                mark_as='sent_wave1_missing'
+            )
+            print(f"[EMAIL] ✓ Successfully sent Wave 1 missing code email to {participant.participant_id}")
+        except Exception as e:
+            print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
+            raise
 
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
     if participant.code_entry_day is not None:
@@ -210,32 +252,46 @@ def daily_timeline_check(user):
         """
         target_day = code_day + 7
         
-        if today and today >= target_day and participant.email_status != 'sent_wave1_survey_return':
-            # Use atomic database update to prevent race condition with multiple workers
-            # Only update if status is NOT already 'sent_wave1_survey_return'
-            updated_count = Participant.objects.filter(
-                id=participant.id
-            ).exclude(
-                email_status='sent_wave1_survey_return'
-            ).update(email_status='sent_wave1_survey_return')
+        # if today and today >= target_day and participant.email_status != 'sent_wave1_survey_return':
+        #     # Use atomic database update to prevent race condition with multiple workers
+        #     # Only update if status is NOT already 'sent_wave1_survey_return'
+        #     updated_count = Participant.objects.filter(
+        #         id=participant.id
+        #     ).exclude(
+        #         email_status='sent_wave1_survey_return'
+        #     ).update(email_status='sent_wave1_survey_return')
             
-            if updated_count > 0:
-                # Status was successfully updated (wasn't already sent) - safe to send email
-                participant.refresh_from_db()  # Refresh to get updated status
-                print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
-                try:
-                    participant.send_email(
-                        "wave1_survey_return", 
-                        extra_context={'username': user.username, 'participant_id': participant.participant_id},
-                        mark_as='sent_wave1_survey_return'
-                    )
-                except Exception as e:
-                    print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
-                    raise
-            else:
-                # Another worker already set the status - skip sending to prevent duplicate
-                participant.refresh_from_db()
-                print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
+        #     if updated_count > 0:
+        #         # Status was successfully updated (wasn't already sent) - safe to send email
+        #         participant.refresh_from_db()  # Refresh to get updated status
+        #         print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
+        #         try:
+        #             participant.send_email(
+        #                 "wave1_survey_return", 
+        #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
+        #                 mark_as='sent_wave1_survey_return'
+        #             )
+        #         except Exception as e:
+        #             print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
+        #             raise
+        #     else:
+        #         # Another worker already set the status - skip sending to prevent duplicate
+        #         participant.refresh_from_db()
+        #         print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
+
+        if today and today >= target_day and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
+            # send_email() will handle atomic status updates internally
+            print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
+            try:
+                participant.send_email(
+                    "wave1_survey_return", 
+                    extra_context={'username': user.username, 'participant_id': participant.participant_id},
+                    mark_as='sent_wave1_survey_return'
+                )
+                print(f"[SEND] ✓ Successfully sent Return Monitor email to {participant.participant_id}")
+            except Exception as e:
+                print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
+                raise
 
     # Info 15 – Day 29: Randomization
     """
