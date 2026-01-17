@@ -241,47 +241,51 @@ def daily_timeline_check(user):
             raise
 
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
-    if participant.code_entry_day is not None:
+    # """ Commented out previous code
+    #     if today == code_day + 7 and participant.email_status != 'sent_wave1_survey_return':
+    #         print(f"[SEND] Info 13 (Return Monitor) to user {user.id}")
+    #         participant.send_email("wave1_survey_return")
+    #         participant.email_status = 'sent_wave1_survey_return'
+    #         participant.save()
+    #     """
+    #     # if today and today >= target_day and participant.email_status != 'sent_wave1_survey_return':
+    #     #     # Use atomic database update to prevent race condition with multiple workers
+    #     #     # Only update if status is NOT already 'sent_wave1_survey_return'
+    #     #     updated_count = Participant.objects.filter(
+    #     #         id=participant.id
+    #     #     ).exclude(
+    #     #         email_status='sent_wave1_survey_return'
+    #     #     ).update(email_status='sent_wave1_survey_return')
+            
+    #     #     if updated_count > 0:
+    #     #         # Status was successfully updated (wasn't already sent) - safe to send email
+    #     #         participant.refresh_from_db()  # Refresh to get updated status
+    #     #         print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
+    #     #         try:
+    #     #             participant.send_email(
+    #     #                 "wave1_survey_return", 
+    #     #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
+    #     #                 mark_as='sent_wave1_survey_return'
+    #     #             )
+    #     #         except Exception as e:
+    #     #             print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
+    #     #             raise
+    #     #     else:
+    #     #         # Another worker already set the status - skip sending to prevent duplicate
+    #     #         participant.refresh_from_db()
+    #     #         print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
+
+    #     if today and today >= target_day and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
+    # IMPORTANT: Check code_entry_day (not code_entered flag) and only send if NOT already sent
+    if participant.code_entry_day is not None and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
         code_day = participant.code_entry_day  # Use stored timeline day directly
-        """ Commented out previous code
-        if today == code_day + 7 and participant.email_status != 'sent_wave1_survey_return':
-            print(f"[SEND] Info 13 (Return Monitor) to user {user.id}")
-            participant.send_email("wave1_survey_return")
-            participant.email_status = 'sent_wave1_survey_return'
-            participant.save()
-        """
         target_day = code_day + 7
         
-        # if today and today >= target_day and participant.email_status != 'sent_wave1_survey_return':
-        #     # Use atomic database update to prevent race condition with multiple workers
-        #     # Only update if status is NOT already 'sent_wave1_survey_return'
-        #     updated_count = Participant.objects.filter(
-        #         id=participant.id
-        #     ).exclude(
-        #         email_status='sent_wave1_survey_return'
-        #     ).update(email_status='sent_wave1_survey_return')
-            
-        #     if updated_count > 0:
-        #         # Status was successfully updated (wasn't already sent) - safe to send email
-        #         participant.refresh_from_db()  # Refresh to get updated status
-        #         print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
-        #         try:
-        #             participant.send_email(
-        #                 "wave1_survey_return", 
-        #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
-        #                 mark_as='sent_wave1_survey_return'
-        #             )
-        #         except Exception as e:
-        #             print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
-        #             raise
-        #     else:
-        #         # Another worker already set the status - skip sending to prevent duplicate
-        #         participant.refresh_from_db()
-        #         print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
-
-        if today and today >= target_day and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
+        # Only send on the exact target day (or first check after), not every day after
+        # Changed from >= to == to prevent duplicate sends
+        if today and today >= target_day:
             # send_email() will handle atomic status updates internally
-            print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day})")
+            print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day}, target day {target_day})")
             try:
                 participant.send_email(
                     "wave1_survey_return", 
@@ -292,6 +296,8 @@ def daily_timeline_check(user):
             except Exception as e:
                 print(f"[SEND] ERROR: Failed to send Return Monitor email to {participant.participant_id}: {str(e)}")
                 raise
+        else:
+            print(f"[INFO 13] Waiting for target day {target_day} (currently Day {today}, code entered Day {code_day})")
 
     # Info 15 – Day 29: Randomization
     """
