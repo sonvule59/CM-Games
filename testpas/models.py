@@ -94,9 +94,13 @@ def generate_confirmation_token():
 class Participant(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    age = models.IntegerField(null=True, blank=True)
-    weight = models.IntegerField(null=True, blank=True)  # weight in pounds
-    height = models.IntegerField(null=True, blank=True)  # height in inches
+    age = models.IntegerField(null=True, blank=True, default=None)
+    weight = models.IntegerField(null=True, blank=True, default=None)  # weight in pounds
+    height = models.IntegerField(null=True, blank=True, default=None)  # height in inches
+    bmi = models.FloatField(null=True, blank=True, default=None)
+    willing_no_other_study = models.BooleanField(null=True, blank=True, default=None)
+    willing_monitor = models.BooleanField(null=True, blank=True, default=None)
+    willing_contact = models.BooleanField(null=True, blank=True, default=None)
     enrollment_date = models.DateField(default=timezone.now)
     code_entered = models.BooleanField(default=False)
     code_entry_date = models.DateField(null=True, blank=True)

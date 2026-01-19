@@ -431,6 +431,10 @@ def questionnaire(request):
             participant.weight = weight
             participant.height = height
             participant.age = age
+            participant.bmi = bmi
+            participant.willing_no_other_study = willing_no_other_study
+            participant.willing_monitor = willing_monitor
+            participant.willing_contact = willing_contact
             participant.dominant_hand = dominant_hand if dominant_hand in ['left', 'right'] else None
             participant.save()
         except Participant.DoesNotExist:
