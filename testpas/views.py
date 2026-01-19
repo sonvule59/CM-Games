@@ -427,6 +427,10 @@ def questionnaire(request):
         # Save participant information including dominant hand
         try:
             participant = Participant.objects.get(user=user)
+            # Add weight, height, and age to participant
+            participant.weight = weight
+            participant.height = height
+            participant.age = age
             participant.dominant_hand = dominant_hand if dominant_hand in ['left', 'right'] else None
             participant.save()
         except Participant.DoesNotExist:
