@@ -203,6 +203,8 @@ def daily_timeline_check(user):
             print(f"[INFO 10] Skipped for {participant.participant_id}: email already sent (status: {participant.email_status})")
 
     # Info 14 – Day 22: Missing Code Entry (Wave 1)
+    # IMPORTANT: Only send ONCE on Day 22 if code NOT entered. Then stop checking.
+    # Whether they enter code or not, they move to randomization (Info 15) on Day 29.
     # if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
     #     updated_count = Participant.objects.filter(
     #         id=participant.id
@@ -225,20 +227,24 @@ def daily_timeline_check(user):
     #             raise
     #     else:
     #         participant.refresh_from_db()
-    #         print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}")
-    if today and today >= 22 and not participant.code_entered and participant.email_status not in ['sent_wave1_missing', 'sending']:
+    #         print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}"):
+    if (today and today >= 22 and 
+        not participant.code_entered and 
+        participant.email_status not in ['sent_wave1_missing', 'sent_wave1_monitor', 'sent_wave1_survey_return', 'sending']):
         # send_email() will handle atomic status updates internally
-        print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
+        print(f"[INFO 14] Sending Wave 1 missing code email to {participant.participant_id} (Day {today}) - code NOT entered by Day 22")
         try:
             participant.send_email(
                 "wave1_missing_code", 
                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
                 mark_as='sent_wave1_missing'
             )
-            print(f"[EMAIL] ✓ Successfully sent Wave 1 missing code email to {participant.participant_id}")
+            print(f"[INFO 14] ✓ Successfully sent Wave 1 missing code email to {participant.participant_id}")
         except Exception as e:
-            print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
+            print(f"[INFO 14] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
             raise
+    elif today and today >= 22 and participant.code_entered:
+        print(f"[INFO 14] SKIP - User {user.id} already entered code, no missing code email needed")
 
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
     # """ Commented out previous code
