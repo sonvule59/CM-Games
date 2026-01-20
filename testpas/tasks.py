@@ -287,9 +287,8 @@ def daily_timeline_check(user):
         code_day = participant.code_entry_day  # Use stored timeline day directly
         target_day = code_day + 7
         
-        # Only send on the exact target day (or first check after), not every day after
-        # Changed from >= to == to prevent duplicate sends
-        if today and today >= target_day:
+        # Only send on the exact target day, not every day after
+        if today and today == target_day:
             # send_email() will handle atomic status updates internally
             print(f"[SEND] Info 13 (Return Monitor) to user {user.id} (Day {today}, code entered on Day {code_day}, target day {target_day})")
             try:
