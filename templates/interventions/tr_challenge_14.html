@@ -23,7 +23,7 @@
         
         /* Character Styling */
         .character { position: relative; width: 320px; height: 320px; margin: 0 auto 1rem; border-radius: 50%; overflow: hidden; background: #f0f0f0; border: 3px solid #667eea; }
-        .character img { width: 100%; height: 00%; object-fit: cover; border-radius: 50%; transition: all 0.5s ease; }
+        .character img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 50%; transition: all 0.5s ease; }
         .character.level-1 img { transform: scale(1.1); }
         .character.level-2 img { transform: scale(1.05); }
         .character.level-3 img { transform: scale(1.0); }
@@ -179,7 +179,15 @@
             <div class="game-container">
                 <div class="character-section">
                     <div class="character level-1" id="character">
-                        <img src="{% static 'demo_game/images/obese_man.png' %}" alt="Transport User" id="characterImage">
+                        <img
+                            src="{% static 'demo_game/images/obese_man.png' %}"
+                            alt="Transport User"
+                            id="characterImage"
+                            width="320"
+                            height="320"
+                            loading="eager"
+                            decoding="async"
+                        >
                         <div class="points-badge" id="pointsBadge">0</div>
                         <div class="exercise-animation" id="exerciseAnimation"></div>
                         <div class="points-earned" id="pointsEarned">+10 Points!</div>
@@ -220,6 +228,14 @@
         const pointsBadge = document.getElementById('pointsBadge');
         const exerciseAnimation = document.getElementById('exerciseAnimation');
         const pointsEarned = document.getElementById('pointsEarned');
+
+        // If the avatar fails to load, fall back to a more robust format.
+        // (This also helps if staticfiles caching/manifest causes a missing PNG in production.)
+        characterImage.addEventListener('error', () => {
+            console.error('[tr_challenge_14] Failed to load avatar image:', characterImage.src);
+            characterImage.src = "{% static 'demo_game/images/obese_man.png' %}";
+            characterImage.alt = "Transport User";
+        });
         
         // Update points display
         function updatePointsDisplay() {

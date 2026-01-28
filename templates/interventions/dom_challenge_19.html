@@ -235,7 +235,15 @@
             <div class="game-container">
                 <div class="character-section">
                     <div class="character level-1" id="character">
-                        <img src="{% static 'demo_game/images/obese_man.png' %}" alt="Home Worker" id="characterImage">
+                        <img
+                            src="{% static 'demo_game/images/obese_man.png' %}"
+                            alt="Home Worker"
+                            id="characterImage"
+                            width="320"
+                            height="320"
+                            loading="eager"
+                            decoding="async"
+                        >
                         <div class="points-badge" id="pointsBadge">0</div>
                         <div class="exercise-animation" id="exerciseAnimation"></div>
                         <div class="points-earned" id="pointsEarned">+10 Points!</div>
