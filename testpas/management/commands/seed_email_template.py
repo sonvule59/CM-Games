@@ -7,12 +7,16 @@ EMAIL_TEMPLATES = [
         "name": "account_confirmation",
         "subject": "Confirm to Activate Your Account (Confident Moves Research)",
         # "body": "Dear {participant_id},\n\nPlease confirm your email by clicking the following link:\n{confirmation_link}\n\nThank you,\nPAS 2.0 Team"
-        "body": "Dear {username},\n\nPlease confirm your email by clicking the following link:\n{confirmation_link}\n\nThank you,\nThe Confident Moves Research Team"
+        "body": "Hi {username},\n\nPlease click the following link to confirm your registration and activate your account:\n{confirmation_link}\n\n"
+        "If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\n"
+        "Sincerely,\nThe Confident Moves Research Team"
     },
     {
         "name": "wave1_survey_ready",
         "subject": "Wave 1 Online Survey Set – Ready",
-        "body": "Hi {username},\n\nCongratulations! You are now enrolled as a participant in the study.\n\nPlease complete your task, Survey 1, within 7 days to receive a $5 Amazon gift card. We highly recommend completing it as soon as possible before the link expires. You may need to remember your ID from this website and enter it to complete the survey. Your ID is: {participant_id}\n\n· Link: {survey_link}\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (\"Seung\") Lee (Principal Investigator) at svu23@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
+        "body": "Hi {username},\n\nCongratulations! You are now enrolled as a participant in the study."
+        "\n\nYour next task is to complete the Wave 1 Online Survey Set within 7 days. You will earn $5 in your Amazon electronic gift card account for completing this task. You will receive the accrued incentives after this study ends. After 7 days, this task will expire (i.e., no Amazon gift card for this task)."
+        "\n\n· Link: {survey_link}\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
     },
     {
         "name": "wave1_monitor_ready",
@@ -25,7 +29,7 @@ EMAIL_TEMPLATES = [
             "You will earn an additional $25 in your Amazon electronic gift card account for completing this task. "
             "You will receive the accrued incentives after this study ends. After 14 days, this task will expire (i.e., no Amazon gift card for this task).\n\n"
             "If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) "
-            "at svu23@iastate.edu or 517-898-0020.\n\n"
+            "at seunglee@iastate.edu or 517-898-0020.\n\n"
             "Sincerely,\n\n"
             "The Confident Moves Research Team"
         )
@@ -39,7 +43,7 @@ EMAIL_TEMPLATES = [
                 'Please start wearing the monitor tomorrow for seven consecutive days. For example, if you enter the code on {code_date} (Fri), please wear the monitor starting on {start_date} (Sat) and continue wearing it until {end_date} (Fri).\n\n'
                 'Please wear the monitor as much as possible during the seven consecutive days. To earn $25 in Amazon gift cards, please wear the monitor for at least 3 days with at least 10 hours each day. If this requirement is not met, we may not be able to provide the incentive.\n\n'
                 'Please keep the yellow prepaid envelope. You will use it to return the monitor after the 7 days.\n\n'
-                'If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at svu23@iastate.edu or 517-898-0020.\n\n'
+                'If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\n'
                 'Sincerely,\n\n'
                 'The Confident Moves Research Team'
             )
@@ -70,7 +74,7 @@ EMAIL_TEMPLATES = [
         },
     {
         "name": "intervention_access_later",
-        "subject": "Intervention Access Later - Next Task in Approximately 4 Weeks",
+        "subject": "Intervention Access Later",
         "body": "Hi {username},\n\nWe recommend that you maintain your usual daily routines. We will email you again in approximately 4 weeks for the next task (i.e., completing an online survey set). Please regularly check your inbox. You will receive the accrued incentives after this study ends.\n\nIf you need any assistance or have any questions at any time, please contact Seungmin (\"Seung\") Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\nSincerely,\n\nThe Confident Moves Research Team"
     },
     {
@@ -78,8 +82,8 @@ EMAIL_TEMPLATES = [
         "subject": "Intervention Access Immediately",  # Information 17
         "body": (
             "Hi {username},\n\n"
-            "You have been assigned to Group 1 (intervention group). Your access to the online physical activity intervention will begin immediately."
-            "You may access the online physical activity intervention whenever you wish throughout approximately 4 weeks (Days 29-56).\n\n"
+            "Your access to the online physical activity intervention will begin immediately."
+            "You may access the online physical activity intervention whenever you wish throughout approximately 4 weeks.\n\n"
             "· Please log in from the following website: (***Login link placeholder, will be updated in production***)\n"
             "· Your ID is: {username}. If you forgot your password, you may reset it on the website.\n\n"
             "If you complete at least 24 post-introductory challenges during the 4 weeks, you will earn an additional $20 "
@@ -112,7 +116,7 @@ EMAIL_TEMPLATES = [
             "Hi {username},\n\n"
             "There is no Wave 2 Physical Activity Monitoring.\n\n"
             "We will email you again in approximately 4 weeks for the next task (i.e., completing an online survey set). Please regularly check your inbox. You will receive the accrued incentives after this study ends.\n\n"
-            "If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at svu23@iastate.edu or 517-898-0020.\n\n"
+            "If you need any assistance or have any questions at any time, please contact Seungmin (“Seung”) Lee (Principal Investigator) at seunglee@iastate.edu or 517-898-0020.\n\n"
             "Sincerely,\n"
             "The Confident Moves Research Team"
         )

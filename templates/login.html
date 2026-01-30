@@ -151,11 +151,11 @@
             <h1>Welcome to Confident Moves Intervention</h1>
             <p>Login to Your Account</p>
             
-            {% if messages %}
+            <!-- {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-error">{{ message }}</div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} -->
             
             <form method="POST">
                 {% csrf_token %}
@@ -176,11 +176,12 @@
                 <p>Don't have an account? <a href="{% url 'create_account' %}" class="btn-link">Create Account</a></p>
                 <p>Forgot your password? <a href="{% url 'password_reset' %}" class="btn-link">Reset Password</a></p>
             </div>
+            <div class="footer">
+                <p>&copy; Confident Moves Intervention. All rights reserved.</p>
+            </div>
         </div>
     </div>
 
-    <div class="footer">
-        <p>&copy; Confident Moves Intervention. All rights reserved.</p>
-    </div>
+    
 </body>
 </html>

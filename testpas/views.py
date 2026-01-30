@@ -1417,7 +1417,7 @@ def ge_challenge_3(request):
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 3, "General Education 3")
     context = { 'participant': participant }
-    return render(request, 'interventions/ge_challenge_3.html', context)
+    return render(request, 'interventions/ge_challenge_3_game.html', context)
 
 @login_required
 def ge_challenge_4(request):
@@ -1518,7 +1518,7 @@ def wr_challenge_9(request):
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 8, "Work-Related Story")
     context = { 'participant': participant }
-    return render(request, 'interventions/wr_challenge_9.html', context)
+    return render(request, 'interventions/wr_challenge_9_game.html', context)
 
 @login_required
 def wr_challenge_10(request):
@@ -1595,7 +1595,7 @@ def tr_challenge_14(request):
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 13, "Transport-Related Story")
     context = { 'participant': participant }
-    return render(request, 'interventions/tr_challenge_14.html', context)
+    return render(request, 'interventions/tr_challenge_14_game.html', context)
 
 @login_required
 def tr_challenge_15(request):
@@ -1673,7 +1673,7 @@ def dom_challenge_19(request):
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 18, "Domestic Story")
     context = { 'participant': participant }
-    return render(request, 'interventions/dom_challenge_19.html', context)
+    return render(request, 'interventions/dom_challenge_19_game.html', context)
 
 @login_required
 def dom_challenge_20(request):
@@ -1780,48 +1780,48 @@ def leisure_challenge_26(request):
         return redirect('intervention_access')
     
     context = { 'participant': participant }
-    return render(request, 'interventions/leisure_challenge_26.html', context)
+    return render(request, 'interventions/leisure_challenge_26_game.html', context)
 
-# Mindfulness Challenges
+# Mindfulness Challenges (28–32)
 @login_required
-def mindfulness_challenge_27(request):
+def mindfulness_challenge_28(request):
     """Mindfulness - Challenge 28: Learning"""
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 28, "Mindfulness Learning")
-    context = { 'participant': participant }
-    return render(request, 'interventions/mindfulness_challenge_27.html', context)
-
-@login_required
-def mindfulness_challenge_28(request):
-    """Mindfulness - Challenge 29: Easy Task"""
-    participant = get_object_or_404(Participant, user=request.user)
-    mark_challenge_completed(request.user, 29, "Mindfulness Easy Task")
-    context = { 'participant': participant }
+    context = {'participant': participant}
     return render(request, 'interventions/mindfulness_challenge_28.html', context)
 
 @login_required
 def mindfulness_challenge_29(request):
-    """Mindfulness - Challenge 30: Mindfulness Practice"""
+    """Mindfulness - Challenge 29: Easy Task"""
     participant = get_object_or_404(Participant, user=request.user)
-    mark_challenge_completed(request.user, 30, "Mindfulness Practice")
-    context = { 'participant': participant }
+    mark_challenge_completed(request.user, 29, "Mindfulness Easy Task")
+    context = {'participant': participant}
     return render(request, 'interventions/mindfulness_challenge_29.html', context)
 
 @login_required
 def mindfulness_challenge_30(request):
-    """Mindfulness - Challenge 31: Game"""
+    """Mindfulness - Challenge 30: Mindfulness Practice"""
     participant = get_object_or_404(Participant, user=request.user)
-    mark_challenge_completed(request.user, 31, "Mindfulness Game")
-    context = { 'participant': participant }
+    mark_challenge_completed(request.user, 30, "Mindfulness Practice")
+    context = {'participant': participant}
     return render(request, 'interventions/mindfulness_challenge_30.html', context)
 
 @login_required
 def mindfulness_challenge_31(request):
+    """Mindfulness - Challenge 31: Game"""
+    participant = get_object_or_404(Participant, user=request.user)
+    mark_challenge_completed(request.user, 31, "Mindfulness Game")
+    context = {'participant': participant}
+    return render(request, 'interventions/mindfulness_challenge_31_game.html', context)
+
+@login_required
+def mindfulness_challenge_32(request):
     """Mindfulness - Challenge 32: Technique"""
     participant = get_object_or_404(Participant, user=request.user)
     mark_challenge_completed(request.user, 32, "Mindfulness Technique")
-    context = { 'participant': participant }
-    return render(request, 'interventions/mindfulness_challenge_31.html', context)
+    context = {'participant': participant}
+    return render(request, 'interventions/mindfulness_challenge_32.html', context)
 
 # Yoga Challenges
 @login_required
