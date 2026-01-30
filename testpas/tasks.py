@@ -201,7 +201,7 @@ def daily_timeline_check(user):
             print(f"[INFO 10] Skipped for {participant.participant_id}: code already entered on {participant.code_entry_date}")
         elif participant.email_status in ['sent_wave1_monitor', 'sent_wave1_missing']:
             print(f"[INFO 10] Skipped for {participant.participant_id}: email already sent (status: {participant.email_status})")
-
+    #########################################################################################################################       
     # Info 14 – Day 22: Missing Code Entry (Wave 1)
     # IMPORTANT: Only send ONCE on Day 22 if code NOT entered. Then stop checking.
     # Whether they enter code or not, they move to randomization (Info 15) on Day 29.
@@ -228,10 +228,14 @@ def daily_timeline_check(user):
     #     else:
     #         participant.refresh_from_db()
     #         print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}"):
+    #########################################################################################################################
     if (today and today >= 22 and 
         not participant.code_entered and 
-        participant.email_status not in ['sent_wave1_missing', 'sent_wave1_monitor', 'sent_wave1_survey_return', 'sending']):
+        participant.email_status != 'sent_wave1_missing' and
+        participant.email_status != 'sending'):
         # send_email() will handle atomic status updates internally
+        # Note: We only check for 'sent_wave1_missing' - NOT 'sent_wave1_monitor' 
+        # because Info 10 (Day 8) and Info 14 (Day 22) are independent
         print(f"[INFO 14] Sending Wave 1 missing code email to {participant.participant_id} (Day {today}) - code NOT entered by Day 22")
         try:
             participant.send_email(
@@ -239,13 +243,17 @@ def daily_timeline_check(user):
                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
                 mark_as='sent_wave1_missing'
             )
-            print(f"[INFO 14] ✓ Successfully sent Wave 1 missing code email to {participant.participant_id}")
+            print(f"[INFO 14] Successfully sent Wave 1 missing code email to {participant.participant_id}")
         except Exception as e:
             print(f"[INFO 14] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
             raise
-    elif today and today >= 22 and participant.code_entered:
-        print(f"[INFO 14] SKIP - User {user.id} already entered code, no missing code email needed")
+    elif today and today >= 22:
+        if participant.code_entered:
+            print(f"[INFO 14] SKIP - User {user.id} already entered code, no missing code email needed")
+        elif participant.email_status == 'sent_wave1_missing':
+            print(f"[INFO 14] SKIP - Missing code email already sent to {participant.participant_id} (status: {participant.email_status})")
 
+    #########################################################################################################################
     # Info 13 – 7 days after code entry: Return Monitor (Wave 1)
     # """ Commented out previous code
     #     if today == code_day + 7 and participant.email_status != 'sent_wave1_survey_return':
@@ -280,7 +288,7 @@ def daily_timeline_check(user):
     #     #         # Another worker already set the status - skip sending to prevent duplicate
     #     #         participant.refresh_from_db()
     #     #         print(f"[SEND] SKIP - Return Monitor email already sent to {participant.participant_id} (status: {participant.email_status})")
-
+    #########################################################################################################################       
     #     if today and today >= target_day and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
     # IMPORTANT: Check code_entry_day (not code_entered flag) and only send if NOT already sent
     if participant.code_entry_day is not None and participant.email_status not in ['sent_wave1_survey_return', 'sending']:
