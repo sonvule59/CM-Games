@@ -155,34 +155,12 @@ def daily_timeline_check(user):
             raise
 
     # Info 10 – Day 8: Wave 1 Physical Activity Monitoring – Ready
-    # if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing']:
-    #     from django.db.models import F
-        
-    #     updated_count = Participant.objects.filter(
-    #         id=participant.id
-    #     ).exclude(
-    #         email_status__in=['sent_wave1_monitor', 'sent_wave1_missing']
-    #     ).update(email_status='sent_wave1_monitor')
-        
-    #     if updated_count > 0:
-    #         participant.refresh_from_db()
-    #         print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
-            
-    #         try:
-    #             participant.send_email(
-    #                 "wave1_monitor_ready", 
-    #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
-    #                 mark_as='sent_wave1_monitor'
-    #             )
-    #             print(f"[INFO 10] ✓ Successfully sent Wave 1 monitoring email to {participant.participant_id}")
-    #         except Exception as e:
-    #             print(f"[INFO 10] ERROR: Failed to send Wave 1 monitoring email to {participant.participant_id}: {str(e)}")
-    #             Participant.objects.filter(id=participant.id).update(email_status='pending')
-    #             raise
-    #     else:
-    #         participant.refresh_from_db()
-    #         print(f"[INFO 10] SKIP - Wave 1 monitoring email already sent to {participant.participant_id} (status: {participant.email_status})")
-    if today and today >= 8 and not participant.code_entry_date and participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing', 'sending']:
+    # CRITICAL: Only send during Wave 1 period (Days 8-28). After Day 29 (randomization), don't send Wave 1 emails.
+    # After randomization, email_status may be overwritten to 'sent_intervention_access', so we check if randomization_completed
+    if (today and 8 <= today < 29 and  # Only during Wave 1 period, before randomization
+        not participant.code_entry_date and 
+        not participant.randomization_completed and  # Don't send if already randomized (past Day 29)
+        participant.email_status not in ['sent_wave1_monitor', 'sent_wave1_missing', 'sending']):
         # send_email() will handle atomic status updates internally
         print(f"[INFO 10] Sending Wave 1 monitoring email to {participant.participant_id} (Day {today})")
         
@@ -205,34 +183,11 @@ def daily_timeline_check(user):
     # Info 14 – Day 22: Missing Code Entry (Wave 1)
     # IMPORTANT: Only send ONCE on Day 22 if code NOT entered. Then stop checking.
     # Whether they enter code or not, they move to randomization (Info 15) on Day 29.
-    # if today and today >= 22 and not participant.code_entered and participant.email_status != 'sent_wave1_missing':
-    #     updated_count = Participant.objects.filter(
-    #         id=participant.id
-    #     ).exclude(
-    #         email_status='sent_wave1_missing'
-    #     ).update(email_status='sent_wave1_missing')
-        
-    #     if updated_count > 0:
-    #         participant.refresh_from_db()
-    #         print(f"[EMAIL] Sending Wave 1 missing code email to {participant.participant_id} (Day {today})")
-    #         try:
-    #             participant.send_email(
-    #                 "wave1_missing_code", 
-    #                 extra_context={'username': user.username, 'participant_id': participant.participant_id},
-    #                 mark_as='sent_wave1_missing'
-    #             )
-    #         except Exception as e:
-    #             print(f"[EMAIL] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
-    #             Participant.objects.filter(id=participant.id).update(email_status='pending')
-    #             raise
-    #     else:
-    #         participant.refresh_from_db()
-    #         print(f"[EMAIL] SKIP - Wave 1 missing code email already sent to {participant.participant_id}"):
-    #########################################################################################################################
-    if (today and today >= 22 and 
+    # CRITICAL: Only send during Wave 1 period (Days 22-28). After Day 29 (randomization), don't send Wave 1 emails.
+    if (today and 22 <= today < 29 and  # Only during Wave 1 period, before randomization
         not participant.code_entered and 
-        participant.email_status != 'sent_wave1_missing' and
-        participant.email_status != 'sending'):
+        not participant.randomization_completed and  # Don't send if already randomized (past Day 29)
+        participant.email_status not in ['sent_wave1_missing', 'sending']):
         # send_email() will handle atomic status updates internally
         # Note: We only check for 'sent_wave1_missing' - NOT 'sent_wave1_monitor' 
         # because Info 10 (Day 8) and Info 14 (Day 22) are independent
@@ -248,7 +203,10 @@ def daily_timeline_check(user):
             print(f"[INFO 14] ERROR: Failed to send Wave 1 missing code email: {str(e)}")
             raise
     elif today and today >= 22:
-        if participant.code_entered:
+        # Logging only - don't send after Day 29
+        if participant.randomization_completed:
+            print(f"[INFO 14] SKIP - User {user.id} already randomized (Day {today} >= 29), Wave 1 missing code email period has passed")
+        elif participant.code_entered:
             print(f"[INFO 14] SKIP - User {user.id} already entered code, no missing code email needed")
         elif participant.email_status == 'sent_wave1_missing':
             print(f"[INFO 14] SKIP - Missing code email already sent to {participant.participant_id} (status: {participant.email_status})")
@@ -398,7 +356,7 @@ def daily_timeline_check(user):
                     if second_participant.randomized_group == 0:
                         second_participant.send_email("intervention_access_later", extra_context={
                             "username": second_participant.user.username
-                        })
+                        }, mark_as='sent_intervention_access')
                         second_participant.randomization_email_sent = True
                         second_participant.randomization_email_sent_date = timezone.now().date()
                         second_participant.save()
@@ -407,7 +365,7 @@ def daily_timeline_check(user):
                         second_participant.send_email("intervention_access_immediate", extra_context={
                             "username": second_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                        })
+                        }, mark_as='sent_intervention_access')
                         second_participant.randomization_email_sent = True
                         second_participant.randomization_email_sent_date = timezone.now().date()
                         second_participant.save()
@@ -442,7 +400,7 @@ def daily_timeline_check(user):
                     if first_participant.randomized_group == 0:
                         first_participant.send_email("intervention_access_later", extra_context={
                             "username": first_participant.user.username
-                        })
+                        }, mark_as='sent_intervention_access')
                         first_participant.randomization_email_sent = True
                         first_participant.randomization_email_sent_date = timezone.now().date()
                         first_participant.save()
@@ -451,7 +409,7 @@ def daily_timeline_check(user):
                         first_participant.send_email("intervention_access_immediate", extra_context={
                             "username": first_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                        })
+                        }, mark_as='sent_intervention_access')
                         first_participant.randomization_email_sent = True
                         first_participant.randomization_email_sent_date = timezone.now().date()
                         first_participant.save()
@@ -463,7 +421,7 @@ def daily_timeline_check(user):
                     if second_participant.randomized_group == 0:
                         second_participant.send_email("intervention_access_later", extra_context={
                             "username": second_participant.user.username
-                        })
+                        }, mark_as='sent_intervention_access')
                         second_participant.randomization_email_sent = True
                         second_participant.randomization_email_sent_date = timezone.now().date()
                         second_participant.save()
@@ -472,7 +430,7 @@ def daily_timeline_check(user):
                         second_participant.send_email("intervention_access_immediate", extra_context={
                             "username": second_participant.user.username,
                             "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                        })
+                        }, mark_as='sent_intervention_access')
                         second_participant.randomization_email_sent = True
                         second_participant.randomization_email_sent_date = timezone.now().date()
                         second_participant.save()
@@ -500,7 +458,7 @@ def daily_timeline_check(user):
                 if single_participant.randomized_group == 0:
                     single_participant.send_email("intervention_access_later", extra_context={
                         "username": single_participant.user.username
-                    })
+                    }, mark_as='sent_intervention_access')
                     single_participant.randomization_email_sent = True
                     single_participant.randomization_email_sent_date = timezone.now().date()
                     single_participant.save()
@@ -509,7 +467,7 @@ def daily_timeline_check(user):
                     single_participant.send_email("intervention_access_immediate", extra_context={
                         "username": single_participant.user.username,
                         "login_link": settings.LOGIN_URL if hasattr(settings, "LOGIN_URL") else "https://your-login-page.com"
-                    })
+                    }, mark_as='sent_intervention_access')
                     single_participant.randomization_email_sent = True
                     single_participant.randomization_email_sent_date = timezone.now().date()
                     single_participant.save()
