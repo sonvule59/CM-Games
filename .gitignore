@@ -208,3 +208,7 @@ IMPLEMENTATION_SUMMARY.md
 testpas/management/commands/check_randomization.py
 .vscode/
 *.csv
+Frontend/node_modules
+Frontend/package-lock.json
+Frontend/CM_Intervention/package-lock.json
+Frontend/CM_Intervention/node_modules
