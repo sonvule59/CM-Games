@@ -1,0 +1,32 @@
+.stats-viewer {
+    display: inline-grid;
+    padding: 5px;
+    border-style: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: gray;
+    grid-template-columns: auto auto 3em;
+    align-items: center;
+}
+
+.stats-viewer > .stats-item {
+    display: contents;
+}
+
+.stats-viewer > .stats-item > :is(.stats-label, .stats-bar, .stats-number) {
+    margin: 5px;
+}
+
+.stats-viewer > .stats-item > .stats-label {
+    width: fit-content;
+    height: fit-content;
+    justify-self: end;
+}
+
+.stats-viewer > .stats-item > .stats-bar {
+    justify-self: start;
+}
+
+.stats-viewer > .stats-item > .stats-number {
+    justify-self: end;
+}
