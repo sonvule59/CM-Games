@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./OfficeGame.css";
+import "../Static/OfficeGame.css";
 
 const INITIAL_STATS = { Energy: 50, Mood: 50, Confidence: 50, Mobility: 40 };
 
