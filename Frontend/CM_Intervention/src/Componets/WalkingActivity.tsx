@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "../Static/WalkingActivity.css";
 
 // Statistics types are defined in this file for now.
@@ -61,30 +62,46 @@ function StatsViewer({ stats }: StatsViewerProps) {
     );
 }
 
-// ActivityOptions component.
-type OptionSpec = {
+// ActivityTasks component.
+type TaskSpec = {
     id: string;
+    className?: string;
     label: string;
-    onClick: () => void;
+    icon?: string;
+    desc?: string;
+    action: () => void;
 };
 
-type ActivityOptionsProps = {
-    options: Array<OptionSpec>;
+type ActivityTasksProps = {
+    tasks: Array<TaskSpec>;
 };
 
-function ActivityOptions({ options }: ActivityOptionsProps) {
+function ActivityTasks({ tasks }: ActivityTasksProps) {
     return (
-        <section className="options">
-            {options.map((option) => (
-                <button
-                    id={option.id}
-                    className="options-button"
-                    onClick={option.onClick}
-                >
-                    {option.label}
-                </button>
-            ))}
-        </section>
+        <>
+            <div className="og-tasks-title">Choose an Activity</div>
+            <section className="og-tasks">
+                {tasks.map((task) => (
+                    <button
+                        key={task.id}
+                        className={`task-card ${task.className ?? ""}`}
+                        onClick={task.action}
+                    >
+                        {task.icon === undefined ? (
+                            <></>
+                        ) : (
+                            <span className="task-icon">{task.icon}</span>
+                        )}
+                        <span className="task-name">{task.label}</span>
+                        {task.desc === undefined ? (
+                            <></>
+                        ) : (
+                            <span className="task-desc">{task.desc}</span>
+                        )}
+                    </button>
+                ))}
+            </section>
+        </>
     );
 }
 
@@ -95,18 +112,22 @@ type WalkingActivityProps = {
 };
 
 function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
-    const options: Array<OptionSpec> = [
+    const tasks: Array<TaskSpec> = [
         {
             id: "stretch",
             label: "Stretch",
-            onClick() {
+            icon: "🙆",
+            desc: "Take a stretch",
+            action() {
                 onStatChange("mobility", stats.mobility + 5);
             },
         },
         {
             id: "walk",
             label: "Walk",
-            onClick() {
+            icon: "🚶",
+            desc: "Take a relaxing walk",
+            action() {
                 onStatChange("confidence", stats.confidence + 5);
                 onStatChange("mood", stats.mood + 5);
                 onStatChange("energy", stats.energy + 5);
@@ -115,28 +136,22 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
         {
             id: "run",
             label: "Run",
-            onClick() {
+            icon: "🏃",
+            desc: "Run for a little bit",
+            action() {
                 onStatChange("confidence", stats.confidence + 5);
             },
         },
-        {
-            id: "sprint",
-            label: "Sprint",
-            onClick() {
-                if (stats.mobility >= 10 && stats.energy >= 10) {
-                    onStatChange("confidence", stats.confidence + 20);
-                    onStatChange("energy", stats.energy - 5);
-                } else {
-                    onStatChange("confidence", stats.confidence - 5);
-                    onStatChange("energy", stats.energy - 20);
-                }
-            },
-        },
     ];
+    const [feedback, setFeedback] = useState("");
     return (
         <>
-            <p>What should I do?</p>
-            <ActivityOptions options={options}></ActivityOptions>
+            <ActivityTasks tasks={tasks}></ActivityTasks>
+            {feedback && (
+                <div className="og-feedback" key={feedback}>
+                    {feedback}
+                </div>
+            )}
         </>
     );
 }
