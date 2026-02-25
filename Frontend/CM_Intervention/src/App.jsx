@@ -6,8 +6,8 @@ import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
-import WalkingActivityDemo from './WalkingActivityDemo'
-import RockClimbing from './rockClimbing'
+import WalkingActivityDemo from './Componets/WalkingActivityDemo'
+import RockClimbing from './Componets/rockClimbing'
 
 
 function App() {
