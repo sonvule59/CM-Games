@@ -111,8 +111,55 @@ type WalkingActivityProps = {
     onStatChange: StatChangeHandler;
 };
 
+const POSITIVE_FEEDBACK_MESSAGES: readonly string[] = [
+    "Good job!",
+    "Well done!",
+    "Awesome!",
+    "Great work!",
+    "Way to go!",
+    "Congratulations!",
+];
+const NEGATIVE_FEEDBACK_MESSAGES: readonly string[] = ["Oh no!", "Uh oh!"];
+
+function randomElement<T>(array: readonly T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function positiveFeedback(message: string): string {
+    return `${randomElement(POSITIVE_FEEDBACK_MESSAGES)} ${message}`;
+}
+
+function negativeFeedback(message: string): string {
+    return `${randomElement(NEGATIVE_FEEDBACK_MESSAGES)} ${message}`;
+}
+
 function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
+    const [feedback, setFeedback] = useState("");
     const tasks: Array<TaskSpec> = [
+        {
+            id: "break",
+            label: "Break",
+            icon: "😮‍💨",
+            desc: "Take a short break",
+            action() {
+                onStatChange("energy", Math.min(stats.energy + 50, 100));
+                if (stats.energy <= 80) {
+                    onStatChange("mood", Math.min(stats.mood + 20, 80));
+                    setFeedback(
+                        positiveFeedback(
+                            "After you've relaxed, you feel much better.",
+                        ),
+                    );
+                } else {
+                    onStatChange("mood", Math.max(0, stats.mood - 10));
+                    setFeedback(
+                        negativeFeedback(
+                            "You haven't done anything in a while, and you're starting to feel demotivated.",
+                        ),
+                    );
+                }
+            },
+        },
         {
             id: "stretch",
             label: "Stretch",
@@ -140,10 +187,10 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
             desc: "Run for a little bit",
             action() {
                 onStatChange("confidence", stats.confidence + 5);
+                onStatChange("energy", stats.energy - 10);
             },
         },
     ];
-    const [feedback, setFeedback] = useState("");
     return (
         <>
             <ActivityTasks tasks={tasks}></ActivityTasks>
