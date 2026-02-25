@@ -18,42 +18,42 @@ function StatsViewer({ stats }: StatsViewerProps) {
             <section className="stats-viewer">
                 <p className="stats-item">
                     <span className="stats-label">Energy</span>
-                    <progress
+                    <meter
                         className="stats-bar"
                         id="stat-bar-energy"
                         max="100"
                         value={stats.energy}
-                    ></progress>
+                    ></meter>
                     <span className="stats-number">{stats.energy}%</span>
                 </p>
                 <p className="stats-item">
                     <span className="stats-label">Mood</span>
-                    <progress
+                    <meter
                         className="stats-bar"
                         id="stat-bar-mood"
                         max="100"
                         value={stats.mood}
-                    ></progress>
+                    ></meter>
                     <span className="stats-number">{stats.mood}%</span>
                 </p>
                 <p className="stats-item">
                     <span className="stats-label">Confidence</span>
-                    <progress
+                    <meter
                         className="stats-bar"
                         id="stat-bar-confidence"
                         max="100"
                         value={stats.confidence}
-                    ></progress>
+                    ></meter>
                     <span className="stats-number">{stats.confidence}%</span>
                 </p>
                 <p className="stats-item">
                     <span className="stats-label">Mobility</span>
-                    <progress
+                    <meter
                         className="stats-bar"
                         id="stat-bar-mobility"
                         max="100"
                         value={stats.mobility}
-                    ></progress>
+                    ></meter>
                     <span className="stats-number">{stats.mobility}%</span>
                 </p>
             </section>
