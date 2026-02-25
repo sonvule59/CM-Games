@@ -133,6 +133,12 @@ function negativeFeedback(message: string): string {
     return `${randomElement(NEGATIVE_FEEDBACK_MESSAGES)} ${message}`;
 }
 
+function clamp(value: number, min: number, max: number): number {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
 function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
     const [feedback, setFeedback] = useState("");
     const tasks: Array<TaskSpec> = [
@@ -142,16 +148,16 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
             icon: "😮‍💨",
             desc: "Take a short break",
             action() {
-                onStatChange("energy", Math.min(stats.energy + 50, 100));
+                onStatChange("energy", clamp(stats.energy + 50, 0, 100));
                 if (stats.energy <= 80) {
-                    onStatChange("mood", Math.min(stats.mood + 20, 80));
+                    onStatChange("mood", clamp(stats.mood + 20, 0, 80));
                     setFeedback(
                         positiveFeedback(
                             "After you've relaxed, you feel much better.",
                         ),
                     );
                 } else {
-                    onStatChange("mood", Math.max(0, stats.mood - 10));
+                    onStatChange("mood", clamp(stats.mood - 10, 0, 100));
                     setFeedback(
                         negativeFeedback(
                             "You haven't done anything in a while, and you're starting to feel demotivated.",
@@ -166,7 +172,7 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
             icon: "🙆",
             desc: "Take a stretch",
             action() {
-                onStatChange("mobility", stats.mobility + 5);
+                onStatChange("mobility", clamp(stats.mobility + 5, 0, 100));
             },
         },
         {
@@ -175,9 +181,9 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
             icon: "🚶",
             desc: "Take a relaxing walk",
             action() {
-                onStatChange("confidence", stats.confidence + 5);
-                onStatChange("mood", stats.mood + 5);
-                onStatChange("energy", stats.energy + 5);
+                onStatChange("confidence", clamp(stats.confidence + 5, 0, 100));
+                onStatChange("mood", clamp(stats.mood + 5, 0, 100));
+                onStatChange("energy", clamp(stats.energy - 10, 0, 100));
             },
         },
         {
@@ -186,8 +192,8 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
             icon: "🏃",
             desc: "Run for a little bit",
             action() {
-                onStatChange("confidence", stats.confidence + 5);
-                onStatChange("energy", stats.energy - 10);
+                onStatChange("confidence", clamp(stats.confidence + 5, 0, 100));
+                onStatChange("energy", clamp(stats.energy - 50, 0, 100));
             },
         },
     ];
