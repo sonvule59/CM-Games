@@ -1,3 +1,6 @@
+// RockClimbing: a small choice-based mini‑game set in a climbing gym.
+// This component owns the narrative flow and stat logic; layout / visuals
+// are handled via Tailwind utility sets in `rockClimbingStyles`.
 import React, { useState } from 'react';
 import enteringGymImg from "../images/enteringGym.png";
 import climbingWallImg from "../images/climbingWall.png";
@@ -7,6 +10,7 @@ import stretchingMatsImg from "../images/stretchingMats.png";
 import warmupHoldsImg from "../images/warmupHolds.png";
 import { rcStyles } from './rockClimbingStyles';
 
+// Map high‑level scene keys to illustration assets shown above the text.
 const SCENE_IMAGES = {
   entrance: enteringGymImg,
   whichRoute: whichRouteImg,
@@ -16,6 +20,7 @@ const SCENE_IMAGES = {
   warmupHolds: warmupHoldsImg,
 };
 
+// Short labels used in the header pill to describe the current scene.
 const SCENE_LABELS = {
   entrance: 'Arriving at the gym',
   wall: 'On the wall',
@@ -24,6 +29,7 @@ const SCENE_LABELS = {
 };
 
 export default function RockClimbing() {
+  // All four stats live on a 0‑100 scale and are clamped on update.
   const initialStats = {
     energy: 50,
     confidence: 50,
@@ -32,7 +38,9 @@ export default function RockClimbing() {
   };
 
   const [stats, setStats] = useState(initialStats);
+  // scene drives which branch of the story is active.
   const [scene, setScene] = useState('entrance'); // 'entrance' | 'wall' | 'watch' | 'stretch'
+  // step is a small state machine inside each scene (intro → choices → result).
   const [step, setStep] = useState(0); // 0 = entrance, 1 = path intro, 2 = path follow-up choices, 3 = path follow-up result
   const [lastDelta, setLastDelta] = useState({
     energy: 0,
@@ -43,8 +51,10 @@ export default function RockClimbing() {
   const [resultText, setResultText] = useState('');
   const [stretchChoice, setStretchChoice] = useState(null); // 'mobility' | 'easyHolds' | null
 
+  // Enforce 0‑100 range so bars and numbers never overflow.
   const clamp = (value) => Math.max(0, Math.min(100, value));
 
+  // Apply stat changes in one place; any missing fields default to 0.
   const applyDelta = (delta) => {
     setStats((prev) => ({
       energy: clamp(prev.energy + (delta.energy || 0)),
@@ -60,6 +70,7 @@ export default function RockClimbing() {
     });
   };
 
+  // Hard reset back to the entrance with baseline stats.
   const resetGame = () => {
     setStats(initialStats);
     setScene('entrance');
@@ -69,6 +80,7 @@ export default function RockClimbing() {
     setStretchChoice(null);
   };
 
+  // Soft reset used by "Back to Entrance" buttons after a branch.
   const backToEntrance = () => {
     setScene('entrance');
     setStep(0);
@@ -77,6 +89,7 @@ export default function RockClimbing() {
     setStretchChoice(null);
   };
 
+  // Handle the very first choice from the entrance and move into a branch.
   const handleEntranceChoice = (choice) => {
     if (choice === 'wall') {
       applyDelta({ energy: -10, confidence: +8, mood: +5, mobility: +5 });
@@ -92,6 +105,7 @@ export default function RockClimbing() {
     setResultText('');
   };
 
+  // Wall follow‑ups: easier vs harder route trades energy vs confidence.
   const handleWallFollowup = (choice) => {
     if (choice === 'easy') {
       applyDelta({ energy: -5, confidence: +6, mood: +4, mobility: +3 });
@@ -107,6 +121,7 @@ export default function RockClimbing() {
     setStep(3);
   };
 
+  // Watching follow‑ups: social choices that mostly affect mood / confidence.
   const handleWatchFollowup = (choice) => {
     if (choice === 'cheer') {
       applyDelta({ energy: -1, confidence: +5, mood: +8, mobility: 0 });
@@ -122,6 +137,7 @@ export default function RockClimbing() {
     setStep(3);
   };
 
+  // Stretch follow‑ups: mobility vs easy climbing warm‑up, both supportive.
   const handleStretchFollowup = (choice) => {
     setStretchChoice(choice);
     if (choice === 'mobility') {
@@ -138,6 +154,7 @@ export default function RockClimbing() {
     setStep(3);
   };
 
+  // Render a small list summarizing the most recent stat changes.
   const renderDeltaList = () => {
     const items = [];
     const labels = {
@@ -166,6 +183,7 @@ export default function RockClimbing() {
     return items;
   };
 
+  // Single horizontal stat bar row; color is passed per stat.
   const renderStatsBar = (label, value, color) => {
     return (
       <div className={rcStyles.statRow}>

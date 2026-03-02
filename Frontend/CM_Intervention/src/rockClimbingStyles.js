@@ -1,6 +1,7 @@
 // Tailwind-powered class sets for the Rock Climbing UI.
-// These are just strings of utility classes; Tailwind is
-// enabled via @tailwindcss/vite and `@import "tailwindcss";`
+// These are collected here instead of inline so JSX stays readable
+// and we can keep the look & feel consistent across components.
+// Tailwind is enabled via @tailwindcss/vite and `@import "tailwindcss";`
 // in `index.css`.
 export const rcStyles = {
   container:
