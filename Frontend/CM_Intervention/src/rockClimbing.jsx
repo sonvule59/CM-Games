@@ -1,4 +1,27 @@
 import React, { useState } from 'react';
+import enteringGymImg from "../images/enteringGym.png";
+import climbingWallImg from "../images/climbingWall.png";
+import whichRouteImg from "../images/whichRoute.png";
+import watchingClimbersImg from "../images/watchingClimbers.png";
+import stretchingMatsImg from "../images/stretchingMats.png";
+import warmupHoldsImg from "../images/warmupHolds.png";
+import { rcStyles } from './rockClimbingStyles';
+
+const SCENE_IMAGES = {
+  entrance: enteringGymImg,
+  whichRoute: whichRouteImg,
+  climbingWall: climbingWallImg,
+  watch: watchingClimbersImg,
+  stretchingMats: stretchingMatsImg,
+  warmupHolds: warmupHoldsImg,
+};
+
+const SCENE_LABELS = {
+  entrance: 'Arriving at the gym',
+  wall: 'On the wall',
+  watch: 'Watching and learning',
+  stretch: 'Warming up & stretching',
+};
 
 export default function RockClimbing() {
   const initialStats = {
@@ -18,6 +41,7 @@ export default function RockClimbing() {
     mobility: 0,
   });
   const [resultText, setResultText] = useState('');
+  const [stretchChoice, setStretchChoice] = useState(null); // 'mobility' | 'easyHolds' | null
 
   const clamp = (value) => Math.max(0, Math.min(100, value));
 
@@ -42,6 +66,7 @@ export default function RockClimbing() {
     setStep(0);
     setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
     setResultText('');
+    setStretchChoice(null);
   };
 
   const backToEntrance = () => {
@@ -49,6 +74,7 @@ export default function RockClimbing() {
     setStep(0);
     setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
     setResultText('');
+    setStretchChoice(null);
   };
 
   const handleEntranceChoice = (choice) => {
@@ -97,6 +123,7 @@ export default function RockClimbing() {
   };
 
   const handleStretchFollowup = (choice) => {
+    setStretchChoice(choice);
     if (choice === 'mobility') {
       applyDelta({ energy: -3, confidence: +4, mood: +6, mobility: +12 });
       setResultText(
@@ -125,7 +152,7 @@ export default function RockClimbing() {
       if (!value) return;
       const sign = value > 0 ? '+' : '';
       items.push(
-        <li key={key} style={{ marginBottom: 4 }}>
+        <li key={key} className={rcStyles.deltaItem}>
           {sign}
           {value} {labels[key]}
         </li>
@@ -133,7 +160,7 @@ export default function RockClimbing() {
     });
 
     if (items.length === 0) {
-      return <li>No recent changes.</li>;
+      return <li className={rcStyles.deltaItem}>No recent changes.</li>;
     }
 
     return items;
@@ -141,12 +168,15 @@ export default function RockClimbing() {
 
   const renderStatsBar = (label, value, color) => {
     return (
-      <div style={styles.statRow}>
-        <div style={styles.statLabel}>{label}</div>
-        <div style={styles.barOuter}>
-          <div style={{ ...styles.barInner, width: `${value}%`, backgroundColor: color }} />
+      <div className={rcStyles.statRow}>
+        <div className={rcStyles.statLabel}>{label}</div>
+        <div className={rcStyles.barOuter}>
+          <div
+            className={rcStyles.barInner}
+            style={{ width: `${value}%`, backgroundColor: color }}
+          />
         </div>
-        <div style={styles.statValue}>{value}</div>
+        <div className={rcStyles.statValue}>{value}</div>
       </div>
     );
   };
@@ -154,28 +184,28 @@ export default function RockClimbing() {
   const renderSceneContent = () => {
     if (scene === 'entrance') {
       return (
-        <div style={{ marginTop: 24 }}>
-          <h2 style={styles.title}>Climbing Gym Entrance</h2>
-          <p style={styles.paragraph}>
+        <div className={rcStyles.section}>
+          <h2 className={rcStyles.title}>Climbing Gym Entrance</h2>
+          <p className={rcStyles.paragraph}>
             You enter the climbing gym and take in the sound of chalk bags, friendly chatter, and shoes
             squeaking on the mats. Today, your goal is simply to notice what feels right for your body and
             energy, without judgment.
           </p>
-          <div style={styles.buttonGroup}>
+          <div className={rcStyles.buttonGroup}>
             <button
-              style={styles.button}
+              className={rcStyles.button}
               onClick={() => handleEntranceChoice('wall')}
             >
               Hop on the wall
             </button>
             <button
-              style={styles.button}
+              className={rcStyles.button}
               onClick={() => handleEntranceChoice('watch')}
             >
               Sit and watch
             </button>
             <button
-              style={styles.button}
+              className={rcStyles.button}
               onClick={() => handleEntranceChoice('stretch')}
             >
               Go stretch and warm up
@@ -188,21 +218,21 @@ export default function RockClimbing() {
     if (scene === 'wall') {
       if (step === 1) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>On the Wall</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>On the Wall</h2>
+            <p className={rcStyles.paragraph}>
               You clip your shoes, chalk up, and place your hands on the holds. You don’t need to climb your
               hardest; you’re allowed to explore what feels steady and kind to your body today.
             </p>
-            <p style={styles.paragraph}>
+            <p className={rcStyles.paragraph}>
               Each move is a chance to listen to your breathing and notice your strength without labeling it
               as “good” or “bad.”
             </p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.primaryButton} onClick={() => setStep(2)}>
+            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
               Continue
             </button>
           </div>
@@ -211,21 +241,21 @@ export default function RockClimbing() {
 
       if (step === 2) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Choosing a Route</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Choosing a Route</h2>
+            <p className={rcStyles.paragraph}>
               Looking at the wall, you notice both gentler lines and more demanding climbs. You’re free to
               choose what fits your capacity right now, without needing to prove anything.
             </p>
-            <div style={styles.buttonGroup}>
+            <div className={rcStyles.buttonGroup}>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleWallFollowup('easy')}
               >
                 Try an easier route
               </button>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleWallFollowup('hard')}
               >
                 Try a harder route
@@ -237,14 +267,14 @@ export default function RockClimbing() {
 
       if (step === 3) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>On the Wall – Afterward</h2>
-            <p style={styles.paragraph}>{resultText}</p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>On the Wall – Afterward</h2>
+            <p className={rcStyles.paragraph}>{resultText}</p>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.secondaryButton} onClick={backToEntrance}>
+            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
               Back to Entrance
             </button>
           </div>
@@ -255,21 +285,21 @@ export default function RockClimbing() {
     if (scene === 'watch') {
       if (step === 1) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Watching from the Mats</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Watching from the Mats</h2>
+            <p className={rcStyles.paragraph}>
               You settle onto the mats and watch climbers move in all sorts of bodies and styles. Some move
               quickly, some slowly, and none of them need to look a certain way to belong here.
             </p>
-            <p style={styles.paragraph}>
+            <p className={rcStyles.paragraph}>
               Observing from a distance gives you space to notice what feels interesting or inviting without
               pressure to join in right away.
             </p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.primaryButton} onClick={() => setStep(2)}>
+            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
               Continue
             </button>
           </div>
@@ -278,21 +308,21 @@ export default function RockClimbing() {
 
       if (step === 2) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Connecting from the Sidelines</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Connecting from the Sidelines</h2>
+            <p className={rcStyles.paragraph}>
               As you keep watching, you notice chances to connect—either by offering encouragement or asking
               for guidance. Both are valid, grounded ways to participate.
             </p>
-            <div style={styles.buttonGroup}>
+            <div className={rcStyles.buttonGroup}>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleWatchFollowup('cheer')}
               >
                 Cheer someone on
               </button>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleWatchFollowup('ask')}
               >
                 Ask staff about beginner routes
@@ -304,14 +334,14 @@ export default function RockClimbing() {
 
       if (step === 3) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Watching – Afterward</h2>
-            <p style={styles.paragraph}>{resultText}</p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Watching – Afterward</h2>
+            <p className={rcStyles.paragraph}>{resultText}</p>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.secondaryButton} onClick={backToEntrance}>
+            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
               Back to Entrance
             </button>
           </div>
@@ -322,21 +352,21 @@ export default function RockClimbing() {
     if (scene === 'stretch') {
       if (step === 1) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Stretching and Warming Up</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Stretching and Warming Up</h2>
+            <p className={rcStyles.paragraph}>
               You find a quiet spot and start with simple movements—rolling your shoulders, circling your
               wrists, and gently waking up your legs.
             </p>
-            <p style={styles.paragraph}>
+            <p className={rcStyles.paragraph}>
               Instead of chasing “perfect form,” you focus on what feels supportive, letting your body set
               the pace and depth of each stretch.
             </p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.primaryButton} onClick={() => setStep(2)}>
+            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
               Continue
             </button>
           </div>
@@ -345,21 +375,21 @@ export default function RockClimbing() {
 
       if (step === 2) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Choosing How to Warm Up</h2>
-            <p style={styles.paragraph}>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Choosing How to Warm Up</h2>
+            <p className={rcStyles.paragraph}>
               You consider whether your body would appreciate more gentle mobility or whether it might feel
               good to move onto very easy holds. Either option is a valid way to care for yourself.
             </p>
-            <div style={styles.buttonGroup}>
+            <div className={rcStyles.buttonGroup}>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleStretchFollowup('mobility')}
               >
                 Do gentle mobility work
               </button>
               <button
-                style={styles.button}
+                className={rcStyles.button}
                 onClick={() => handleStretchFollowup('easyHolds')}
               >
                 Warm up on the easy holds
@@ -371,14 +401,14 @@ export default function RockClimbing() {
 
       if (step === 3) {
         return (
-          <div style={{ marginTop: 24 }}>
-            <h2 style={styles.title}>Stretching – Afterward</h2>
-            <p style={styles.paragraph}>{resultText}</p>
-            <div style={styles.deltaContainer}>
-              <h3 style={styles.subtitle}>Recent changes</h3>
-              <ul style={styles.deltaList}>{renderDeltaList()}</ul>
+          <div className={rcStyles.section}>
+            <h2 className={rcStyles.title}>Stretching – Afterward</h2>
+            <p className={rcStyles.paragraph}>{resultText}</p>
+            <div className={rcStyles.deltaContainer}>
+              <h3 className={rcStyles.subtitle}>Recent changes</h3>
+              <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button style={styles.secondaryButton} onClick={backToEntrance}>
+            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
               Back to Entrance
             </button>
           </div>
@@ -389,155 +419,63 @@ export default function RockClimbing() {
     return null;
   };
 
+  // Which image to show: whichRoute on wall step 1, climbingWall on easy/hard, warmupHolds when stretch + easy holds
+  const sceneImageKey =
+    scene === 'entrance'
+      ? 'entrance'
+      : scene === 'wall'
+        ? step === 1
+          ? 'whichRoute'
+          : 'climbingWall'
+        : scene === 'watch'
+          ? 'watch'
+          : scene === 'stretch'
+            ? step === 3 && stretchChoice === 'easyHolds'
+              ? 'warmupHolds'
+              : 'stretchingMats'
+            : 'entrance';
+
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.mainTitle}>Rock Climbing Gym</h1>
-        <button style={styles.resetButton} onClick={resetGame}>
+    <div className={rcStyles.container}>
+      <div className={rcStyles.header}>
+        <div className={rcStyles.headerLeft}>
+          <h1 className={rcStyles.mainTitle}>Rock Climbing Gym</h1>
+          <p className={rcStyles.headerSubtitle}>
+            Choose what feels right for your body today&mdash;every path here counts.
+          </p>
+          <div className={rcStyles.scenePill}>{SCENE_LABELS[scene]}</div>
+        </div>
+        <button className={rcStyles.resetButton} onClick={resetGame}>
           Reset Game
         </button>
       </div>
 
-      <div style={styles.statsContainer}>
-        {renderStatsBar('Energy', stats.energy, '#f97316')}
-        {renderStatsBar('Confidence', stats.confidence, '#22c55e')}
-        {renderStatsBar('Mood', stats.mood, '#3b82f6')}
-        {renderStatsBar('Mobility', stats.mobility, '#a855f7')}
+      <div className={rcStyles.topRow}>
+        <div className={rcStyles.statsContainer}>
+          <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
+          {renderStatsBar('Energy', stats.energy, '#facc15' /* yellow */)}
+          {renderStatsBar('Confidence', stats.confidence, '#ef4444' /* red */)}
+          {renderStatsBar('Mood', stats.mood, '#22c55e' /* green */)}
+          {renderStatsBar('Mobility', stats.mobility, '#3b82f6' /* blue */)}
+        </div>
+      </div>
+
+      <div className={rcStyles.sceneImageWrap}>
+        <img
+          src={SCENE_IMAGES[sceneImageKey]}
+          alt=""
+          className={rcStyles.sceneImage}
+          style={{
+            transform:
+              sceneImageKey === 'watch' || sceneImageKey === 'stretchingMats'
+                ? 'scaleX(-1)'
+                : 'none',
+          }}
+        />
       </div>
 
       {renderSceneContent()}
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: 720,
-    margin: '24px auto',
-    padding: 24,
-    borderRadius: 12,
-    backgroundColor: '#f9fafb',
-    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)',
-    fontFamily: '"Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
-    color: '#0f172a',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  mainTitle: {
-    margin: 0,
-    fontSize: 24,
-    fontWeight: 700,
-  },
-  resetButton: {
-    padding: '6px 12px',
-    borderRadius: 999,
-    border: '1px solid #cbd5f5',
-    backgroundColor: '#fff',
-    cursor: 'pointer',
-    fontSize: 12,
-    color: '#1f2937',
-  },
-  statsContainer: {
-    marginTop: 8,
-    marginBottom: 16,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#e5e7eb',
-  },
-  statRow: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statLabel: {
-    width: 90,
-    fontSize: 13,
-    fontWeight: 600,
-  },
-  barOuter: {
-    flex: 1,
-    height: 14,
-    borderRadius: 999,
-    backgroundColor: '#d1d5db',
-    overflow: 'hidden',
-    marginRight: 8,
-  },
-  barInner: {
-    height: '100%',
-    borderRadius: 999,
-    transition: 'width 0.25s ease',
-  },
-  statValue: {
-    width: 32,
-    textAlign: 'right',
-    fontSize: 12,
-    fontVariantNumeric: 'tabular-nums',
-  },
-  title: {
-    margin: '0 0 8px 0',
-    fontSize: 20,
-    fontWeight: 700,
-  },
-  subtitle: {
-    margin: '0 0 4px 0',
-    fontSize: 14,
-    fontWeight: 600,
-  },
-  paragraph: {
-    margin: '4px 0 8px 0',
-    fontSize: 14,
-    lineHeight: 1.5,
-  },
-  buttonGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-    marginTop: 12,
-  },
-  button: {
-    padding: '10px 14px',
-    borderRadius: 8,
-    border: 'none',
-    backgroundColor: '#3b82f6',
-    color: '#fff',
-    cursor: 'pointer',
-    fontSize: 14,
-    textAlign: 'left',
-  },
-  primaryButton: {
-    marginTop: 12,
-    padding: '10px 16px',
-    borderRadius: 8,
-    border: 'none',
-    backgroundColor: '#10b981',
-    color: '#fff',
-    cursor: 'pointer',
-    fontSize: 14,
-  },
-  secondaryButton: {
-    marginTop: 12,
-    padding: '10px 16px',
-    borderRadius: 8,
-    border: '1px solid #9ca3af',
-    backgroundColor: '#fff',
-    color: '#374151',
-    cursor: 'pointer',
-    fontSize: 14,
-  },
-  deltaContainer: {
-    marginTop: 8,
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#e0f2fe',
-  },
-  deltaList: {
-    margin: 0,
-    paddingLeft: 18,
-    fontSize: 13,
-  },
-};
 
