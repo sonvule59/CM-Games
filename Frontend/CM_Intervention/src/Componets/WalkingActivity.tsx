@@ -1,4 +1,4 @@
-import "./WalkingActivity.css";
+import "../Static/WalkingActivity.css";
 
 // Statistics types are defined in this file for now.
 type StatKind = "energy" | "mood" | "confidence" | "mobility";
