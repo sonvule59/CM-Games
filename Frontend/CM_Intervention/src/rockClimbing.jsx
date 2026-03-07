@@ -8,15 +8,23 @@ import whichRouteImg from "../images/whichRoute.png";
 import watchingClimbersImg from "../images/watchingClimbers.png";
 import stretchingMatsImg from "../images/stretchingMats.png";
 import warmupHoldsImg from "../images/warmupHolds.png";
+import cheerOnImg from "../images/cheerOn.png";
+import askRoutesImg from "../images/askRoutes.png";
+import gentleMobilityImg from "../images/gentleMobility.png";
+import hardRouteImg from "../images/hardRoute.png";
 import { rcStyles } from './rockClimbingStyles';
 
-// Map high‑level scene keys to illustration assets shown above the text.
+// Map scene/response keys to illustration assets shown above the text.
 const SCENE_IMAGES = {
   entrance: enteringGymImg,
   whichRoute: whichRouteImg,
   climbingWall: climbingWallImg,
+  hardRoute: hardRouteImg,
   watch: watchingClimbersImg,
+  cheerOn: cheerOnImg,
+  askRoutes: askRoutesImg,
   stretchingMats: stretchingMatsImg,
+  gentleMobility: gentleMobilityImg,
   warmupHolds: warmupHoldsImg,
 };
 
@@ -31,7 +39,7 @@ const SCENE_LABELS = {
 export default function RockClimbing() {
   // All four stats live on a 0‑100 scale and are clamped on update.
   const initialStats = {
-    energy: 50,
+    energy: 100,
     confidence: 50,
     mood: 50,
     mobility: 50,
@@ -50,6 +58,8 @@ export default function RockClimbing() {
   });
   const [resultText, setResultText] = useState('');
   const [stretchChoice, setStretchChoice] = useState(null); // 'mobility' | 'easyHolds' | null
+  const [watchChoice, setWatchChoice] = useState(null); // 'cheer' | 'ask' | null
+  const [wallChoice, setWallChoice] = useState(null); // 'easy' | 'hard' | null
 
   // Enforce 0‑100 range so bars and numbers never overflow.
   const clamp = (value) => Math.max(0, Math.min(100, value));
@@ -78,6 +88,8 @@ export default function RockClimbing() {
     setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
     setResultText('');
     setStretchChoice(null);
+    setWatchChoice(null);
+    setWallChoice(null);
   };
 
   // Soft reset used by "Back to Entrance" buttons after a branch.
@@ -87,6 +99,8 @@ export default function RockClimbing() {
     setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
     setResultText('');
     setStretchChoice(null);
+    setWatchChoice(null);
+    setWallChoice(null);
   };
 
   // Handle the very first choice from the entrance and move into a branch.
@@ -107,6 +121,7 @@ export default function RockClimbing() {
 
   // Wall follow‑ups: easier vs harder route trades energy vs confidence.
   const handleWallFollowup = (choice) => {
+    setWallChoice(choice);
     if (choice === 'easy') {
       applyDelta({ energy: -5, confidence: +6, mood: +4, mobility: +3 });
       setResultText(
@@ -123,6 +138,7 @@ export default function RockClimbing() {
 
   // Watching follow‑ups: social choices that mostly affect mood / confidence.
   const handleWatchFollowup = (choice) => {
+    setWatchChoice(choice);
     if (choice === 'cheer') {
       applyDelta({ energy: -1, confidence: +5, mood: +8, mobility: 0 });
       setResultText(
@@ -437,20 +453,28 @@ export default function RockClimbing() {
     return null;
   };
 
-  // Which image to show: whichRoute on wall step 1, climbingWall on easy/hard, warmupHolds when stretch + easy holds
+  // Pick image to show for current scene/step/choice (entrance, wall, watch, stretch paths).
   const sceneImageKey =
     scene === 'entrance'
       ? 'entrance'
       : scene === 'wall'
         ? step === 1
           ? 'whichRoute'
-          : 'climbingWall'
+          : step === 3 && wallChoice === 'hard'
+            ? 'hardRoute'
+            : 'climbingWall'
         : scene === 'watch'
-          ? 'watch'
+          ? step === 3 && watchChoice === 'cheer'
+            ? 'cheerOn'
+            : step === 3 && watchChoice === 'ask'
+              ? 'askRoutes'
+              : 'watch'
           : scene === 'stretch'
-            ? step === 3 && stretchChoice === 'easyHolds'
-              ? 'warmupHolds'
-              : 'stretchingMats'
+            ? step === 3 && stretchChoice === 'mobility'
+              ? 'gentleMobility'
+              : step === 3 && stretchChoice === 'easyHolds'
+                ? 'warmupHolds'
+                : 'stretchingMats'
             : 'entrance';
 
   return (
