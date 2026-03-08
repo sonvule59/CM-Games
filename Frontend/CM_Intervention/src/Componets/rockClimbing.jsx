@@ -2,13 +2,13 @@
 // This component owns the narrative flow and stat logic; layout / visuals
 // are handled via Tailwind utility sets in `rockClimbingStyles`.
 import React, { useState } from 'react';
-import enteringGymImg from "../images/enteringGym.png";
-import climbingWallImg from "../images/climbingWall.png";
-import whichRouteImg from "../images/whichRoute.png";
-import watchingClimbersImg from "../images/watchingClimbers.png";
-import stretchingMatsImg from "../images/stretchingMats.png";
-import warmupHoldsImg from "../images/warmupHolds.png";
-import { rcStyles } from './rockClimbingStyles';
+import enteringGymImg from "../../images/enteringGym.png";
+import climbingWallImg from "../../images/climbingWall.png";
+import whichRouteImg from "../../images/whichRoute.png";
+import watchingClimbersImg from "../../images/watchingClimbers.png";
+import stretchingMatsImg from "../../images/stretchingMats.png";
+import warmupHoldsImg from "../../images/warmupHolds.png";
+import { rcStyles } from '../rockClimbingStyles';
 
 // Map high‑level scene keys to illustration assets shown above the text.
 const SCENE_IMAGES = {
