@@ -4,9 +4,10 @@ import "../Static/WalkingActivity.css";
 // Statistics types are defined in this file for now.
 type StatKind = "energy" | "mood" | "confidence" | "mobility";
 
-type Stats = Record<StatKind, number>;
+type Stats = Readonly<Record<StatKind, number>>;
+type StatDelta = Partial<Readonly<Record<StatKind, number>>>;
 
-type StatChangeHandler = (kind: StatKind, newValue: number) => void;
+type StatChangeHandler = (newStats: Stats) => void;
 
 // StatsViewer component.
 type StatsViewerProps = {
@@ -70,13 +71,14 @@ type TaskSpec = {
 };
 
 type ActivityTasksProps = {
+    title: string;
     tasks: Array<TaskSpec>;
 };
 
-function ActivityTasks({ tasks }: ActivityTasksProps) {
+function ActivityTasks({ title, tasks }: ActivityTasksProps) {
     return (
         <>
-            <div className="og-tasks-title">Choose an Activity</div>
+            <div className="og-tasks-title">{title}</div>
             <section className="og-tasks">
                 {tasks.map((task) => (
                     <button
@@ -136,98 +138,141 @@ function clamp(value: number, min: number, max: number): number {
     return value;
 }
 
-function WalkingActivityScene({ stats, onStatChange }: WalkingActivityProps) {
-    const [feedback, setFeedback] = useState("");
-    const tasks: Array<TaskSpec> = [
-        {
-            id: "break",
-            label: "Break",
-            icon: "😮‍💨",
-            desc: "Take a short break",
-            action() {
-                onStatChange("energy", clamp(stats.energy + 50, 0, 100));
-                if (stats.energy <= 80) {
-                    onStatChange("mood", clamp(stats.mood + 20, 0, 80));
-                    setFeedback(
-                        positiveFeedback(
-                            "After you've relaxed, you feel much better.",
-                        ),
-                    );
-                } else {
-                    onStatChange("mood", clamp(stats.mood - 10, 0, 100));
-                    setFeedback(
-                        negativeFeedback(
-                            "You haven't done anything in a while, and you're starting to feel demotivated.",
-                        ),
-                    );
-                }
-            },
-        },
-        {
-            id: "stretch",
-            label: "Stretch",
-            icon: "🙆",
-            desc: "Take a stretch",
-            action() {
-                onStatChange("mobility", clamp(stats.mobility + 5, 0, 100));
-            },
-        },
-        {
-            id: "walk",
-            label: "Walk",
-            icon: "🚶",
-            desc: "Take a relaxing walk",
-            action() {
-                onStatChange("confidence", clamp(stats.confidence + 5, 0, 100));
-                onStatChange("mood", clamp(stats.mood + 5, 0, 100));
-                onStatChange("energy", clamp(stats.energy - 10, 0, 100));
-            },
-        },
-        {
-            id: "run",
-            label: "Run",
-            icon: "🏃",
-            desc: "Run for a little bit",
-            action() {
-                onStatChange("confidence", clamp(stats.confidence + 5, 0, 100));
-                onStatChange("energy", clamp(stats.energy - 50, 0, 100));
-            },
-        },
-    ];
-    return (
-        <>
-            <ActivityTasks tasks={tasks}></ActivityTasks>
-            {feedback && (
-                <div className="og-feedback" key={feedback}>
-                    {feedback}
-                </div>
-            )}
-        </>
-    );
-}
+const STARTING_STATS: Stats = Object.freeze({
+    energy: 50,
+    mood: 50,
+    confidence: 50,
+    mobility: 50,
+});
 
-function WalkingActivity() {
-    const [stats, setStats] = useState({
-        energy: 0,
-        mood: 0,
-        confidence: 0,
-        mobility: 0,
+function WalkingActivity({
+    stats,
+    onStatChange: onStatChange,
+}: WalkingActivityProps) {
+    function applyStatDelta(delta: StatDelta) {
+        onStatChange({
+            energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
+            mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
+            confidence: clamp(
+                stats.confidence + (delta.confidence ?? 0),
+                0,
+                100,
+            ),
+            mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
+        });
+    }
+
+    function givePositiveFeedback(message: string) {
+        setFeedback(positiveFeedback(message));
+    }
+
+    function giveNegativeFeedback(message: string) {
+        setFeedback(negativeFeedback(message));
+    }
+
+    // Represents the state of the entire component.
+    // Goal is to make invalid states unrepresentable using the type system.
+    type ScreenState =
+        | { screen: "chooseActivity" }
+        | { screen: "chooseLocation"; activity: "walk" | "bike" }
+        | {
+              screen: "game";
+              activity: "walk" | "bike";
+              location: "neighborhood" | "localPark";
+              stats: Stats;
+          };
+
+    const [feedback, setFeedback] = useState("");
+    const [screenState, setScreenState] = useState<ScreenState>({
+        screen: "chooseActivity",
     });
 
-    let currentStats = stats;
+    let tasks: Array<TaskSpec>;
+    let tasksPrompt: string;
 
-    function onStatChange(kind: StatKind, newValue: number) {
-        currentStats = { ...currentStats, [kind]: newValue };
-        setStats(currentStats);
+    if (screenState.screen === "chooseActivity") {
+        tasksPrompt = "Choose an Activity";
+        tasks = [
+            {
+                id: "chooseWalking",
+                label: "Walking",
+                icon: "🚶",
+                desc: "Take a relaxing walk",
+                action() {
+                    setScreenState({
+                        screen: "chooseLocation",
+                        activity: "walk",
+                    });
+                },
+            },
+            {
+                id: "chooseBiking",
+                label: "Cycling",
+                icon: "🚴",
+                desc: "Get out your bike and take a stroll",
+                action() {
+                    setScreenState({
+                        screen: "chooseLocation",
+                        activity: "bike",
+                    });
+                },
+            },
+        ];
+    } else if (screenState.screen === "chooseLocation") {
+        tasksPrompt = "Choose a Location";
+        tasks = [
+            {
+                id: "chooseNeighborhood",
+                label: "Neighborhood",
+                icon: "🏠",
+                desc: "Take a walk or bike in the neighborhood",
+                action() {
+                    setScreenState({
+                        screen: "game",
+                        activity: screenState.activity,
+                        location: "neighborhood",
+                        stats: STARTING_STATS,
+                    });
+                },
+            },
+            {
+                id: "chooseLocalPark",
+                label: "Local Park",
+                icon: "🌳",
+                desc: "Take a walk or bike in the local park",
+                action() {
+                    setScreenState({
+                        screen: "game",
+                        activity: screenState.activity,
+                        location: "localPark",
+                        stats: STARTING_STATS,
+                    });
+                },
+            },
+        ];
+    } else if (screenState.screen === "game") {
+        tasksPrompt = "Choose an Action";
+        tasks = [];
+    } else {
+        const _: never = screenState;
+        throw new Error();
     }
 
     return (
         <div className="walking-game">
-            <StatsViewer stats={stats}></StatsViewer>
-            <WalkingActivityScene
-                stats={stats}
-                onStatChange={onStatChange}
-            ></WalkingActivityScene>
+            {screenState.screen === "game" ? (
+                <StatsViewer stats={screenState.stats}></StatsViewer>
+            ) : (
+                <></>
+            )}
+            <ActivityTasks title={tasksPrompt} tasks={tasks}></ActivityTasks>
+            {feedback ? (
+                <div className="og-feedback" key={feedback}>
+                    {feedback}
+                </div>
+            ) : (
+                <></>
+            )}
         </div>
     );
 }
