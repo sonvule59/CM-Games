@@ -56,3 +56,9 @@ meter.stats-bar::-webkit-meter-optimum-value {
 .stats-viewer > .stats-item > .stats-number {
     justify-self: end;
 }
+
+.walking-game {
+    max-width: 620px;
+    margin: 48px auto;
+    padding: 0 16px 64px;
+}

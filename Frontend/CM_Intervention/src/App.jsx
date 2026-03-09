@@ -6,8 +6,8 @@ import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
-import WalkingActivityDemo from './Componets/WalkingActivityDemo'
 import RockClimbing from './Componets/rockClimbing'
+import WalkingActivity from './Componets/WalkingActivity'
 
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     <BrowserRouter>
     <Routes>
       <Route path="/office" element = {<OfficeGame/>} />
-      <Route path="/walk" element = {<WalkingActivityDemo />} />
+      <Route path="/walk" element = {<WalkingActivity />} />
       <Route path="/rock" element = {<RockClimbing /> } />
     </Routes>
     </BrowserRouter>

@@ -139,7 +139,7 @@ function clamp(value: number, min: number, max: number): number {
     return value;
 }
 
-function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
+function WalkingActivityScene({ stats, onStatChange }: WalkingActivityProps) {
     const [feedback, setFeedback] = useState("");
     const tasks: Array<TaskSpec> = [
         {
@@ -209,5 +209,31 @@ function WalkingActivity({ stats, onStatChange }: WalkingActivityProps) {
     );
 }
 
+function WalkingActivity() {
+    const [stats, setStats] = useState({
+        energy: 0,
+        mood: 0,
+        confidence: 0,
+        mobility: 0,
+    });
+
+    let currentStats = stats;
+
+    function onStatChange(kind: StatKind, newValue: number) {
+        currentStats = { ...currentStats, [kind]: newValue };
+        setStats(currentStats);
+    }
+
+    return (
+        <div className="walking-game">
+            <StatsViewer stats={stats}></StatsViewer>
+            <WalkingActivityScene
+                stats={stats}
+                onStatChange={onStatChange}
+            ></WalkingActivityScene>
+        </div>
+    );
+}
+
 // Exports.
-export { WalkingActivity, StatsViewer, StatKind, Stats, StatChangeHandler };
+export default WalkingActivity;
