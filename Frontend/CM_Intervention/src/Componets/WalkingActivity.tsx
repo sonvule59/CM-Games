@@ -13,52 +13,49 @@ type StatsViewerProps = {
     stats: Stats;
 };
 
+function StatsBar({
+    id,
+    label,
+    value,
+}: {
+    id: string;
+    label: string;
+    value: number;
+}) {
+    return (
+        <p className="stats-item">
+            <span className="stats-label">{label}</span>
+            <meter
+                className="stats-bar"
+                id={id}
+                max={100}
+                value={value}
+            ></meter>
+            <span className="stats-number">{value}%</span>
+        </p>
+    );
+}
+
 function StatsViewer({ stats }: StatsViewerProps) {
     return (
-        <>
-            <section className="stats-viewer">
-                <p className="stats-item">
-                    <span className="stats-label">Energy</span>
-                    <meter
-                        className="stats-bar"
-                        id="stat-bar-energy"
-                        max="100"
-                        value={stats.energy}
-                    ></meter>
-                    <span className="stats-number">{stats.energy}%</span>
-                </p>
-                <p className="stats-item">
-                    <span className="stats-label">Mood</span>
-                    <meter
-                        className="stats-bar"
-                        id="stat-bar-mood"
-                        max="100"
-                        value={stats.mood}
-                    ></meter>
-                    <span className="stats-number">{stats.mood}%</span>
-                </p>
-                <p className="stats-item">
-                    <span className="stats-label">Confidence</span>
-                    <meter
-                        className="stats-bar"
-                        id="stat-bar-confidence"
-                        max="100"
-                        value={stats.confidence}
-                    ></meter>
-                    <span className="stats-number">{stats.confidence}%</span>
-                </p>
-                <p className="stats-item">
-                    <span className="stats-label">Mobility</span>
-                    <meter
-                        className="stats-bar"
-                        id="stat-bar-mobility"
-                        max="100"
-                        value={stats.mobility}
-                    ></meter>
-                    <span className="stats-number">{stats.mobility}%</span>
-                </p>
-            </section>
-        </>
+        <section className="stats-viewer">
+            <StatsBar
+                id="stat-bar-energy"
+                label="Energy"
+                value={stats.energy}
+            />
+            <StatsBar id="stat-bar-mood" label="Mood" value={stats.mood} />
+            <StatsBar
+                id="stat-bar-confidence"
+                label="Confidence"
+                value={stats.confidence}
+            />
+            <StatsBar
+                id="stat-bar-mobility"
+                label="Mobility"
+                value={stats.mobility}
+            />
+        </section>
     );
 }
 
