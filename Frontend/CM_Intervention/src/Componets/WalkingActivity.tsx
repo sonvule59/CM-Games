@@ -71,15 +71,16 @@ type TaskSpec = {
 };
 
 type ActivityTasksProps = {
+    id?: string;
     title: string;
     tasks: Array<TaskSpec>;
 };
 
-function ActivityTasks({ title, tasks }: ActivityTasksProps) {
+function ActivityTasks({ id, title, tasks }: ActivityTasksProps) {
     return (
         <>
             <div className="og-tasks-title">{title}</div>
-            <section className="og-tasks">
+            <section className="og-tasks" id={id}>
                 {tasks.map((task) => (
                     <button
                         key={task.id}
@@ -105,10 +106,7 @@ function ActivityTasks({ title, tasks }: ActivityTasksProps) {
 }
 
 // WalkingActivity component.
-type WalkingActivityProps = {
-    stats: Stats;
-    onStatChange: StatChangeHandler;
-};
+type WalkingActivityProps = {};
 
 const POSITIVE_FEEDBACK_MESSAGES: readonly string[] = [
     "Good job!",
@@ -145,20 +143,22 @@ const STARTING_STATS: Stats = Object.freeze({
     mobility: 50,
 });
 
-function WalkingActivity({
-    stats,
-    onStatChange: onStatChange,
-}: WalkingActivityProps) {
+function WalkingActivity({}: WalkingActivityProps) {
     function applyStatDelta(delta: StatDelta) {
-        onStatChange({
-            energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
-            mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
-            confidence: clamp(
-                stats.confidence + (delta.confidence ?? 0),
-                0,
-                100,
-            ),
-            mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
+        if (screenState.screen !== "game") throw new Error();
+        const stats = screenState.stats;
+        setScreenState({
+            ...screenState,
+            stats: {
+                energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
+                mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
+                confidence: clamp(
+                    stats.confidence + (delta.confidence ?? 0),
+                    0,
+                    100,
+                ),
+                mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
+            },
         });
     }
 
@@ -168,6 +168,10 @@ function WalkingActivity({
 
     function giveNegativeFeedback(message: string) {
         setFeedback(negativeFeedback(message));
+    }
+
+    function giveNeutralFeedback(message: string) {
+        setFeedback(message);
     }
 
     // Represents the state of the entire component.
@@ -182,7 +186,7 @@ function WalkingActivity({
               stats: Stats;
           };
 
-    const [feedback, setFeedback] = useState("");
+    const [feedback, setFeedback] = useState<string | undefined>(undefined);
     const [screenState, setScreenState] = useState<ScreenState>({
         screen: "chooseActivity",
     });
@@ -251,8 +255,146 @@ function WalkingActivity({
             },
         ];
     } else if (screenState.screen === "game") {
+        let lightExerciseLabel;
+        let lightExerciseIcon;
+        switch (screenState.activity) {
+            case "walk":
+                lightExerciseLabel = "Walk";
+                lightExerciseIcon = "🚶";
+                break;
+            case "bike":
+                lightExerciseLabel = "Bike";
+                lightExerciseIcon = "🚴";
+                break;
+        }
+
         tasksPrompt = "Choose an Action";
-        tasks = [];
+        tasks = [
+            {
+                id: "break",
+                label: "Take Break",
+                icon: "⏲️",
+                desc: "Take a short break",
+                action() {
+                    if (screenState.stats.energy == 100) {
+                        applyStatDelta({
+                            energy: +100,
+                            mood: -20,
+                            mobility: -10,
+                        });
+                        giveNegativeFeedback(
+                            "You haven't moved in a while, and you're starting to feel bored.",
+                        );
+                    } else {
+                        applyStatDelta({
+                            energy: +100,
+                            mood: +20,
+                            mobility: -10,
+                        });
+                        if (screenState.stats.mobility >= 10) {
+                            givePositiveFeedback(
+                                "You feel refreshed and ready.",
+                            );
+                        } else {
+                            giveNeutralFeedback(
+                                "You feel refreshed, but not quite prepared. Maybe it's time to stretch.",
+                            );
+                        }
+                    }
+                },
+            },
+            {
+                id: "stretch",
+                label: "Stretch",
+                icon: "🙆",
+                action() {
+                    if (screenState.stats.energy <= 10) {
+                        applyStatDelta({
+                            energy: -10,
+                            mobility: +20,
+                        });
+                        giveNegativeFeedback(
+                            "You feel exhausted. Maybe it's time to take a short break.",
+                        );
+                    } else if (screenState.stats.mobility >= 90) {
+                        applyStatDelta({
+                            energy: -10,
+                            mobility: -100,
+                            mood: -50,
+                            confidence: -50,
+                        });
+                        giveNegativeFeedback(
+                            "You're starting to feel strained. Maybe it's time to work out.",
+                        );
+                    } else {
+                        applyStatDelta({
+                            energy: -10,
+                            mobility: +50,
+                            mood: +10,
+                        });
+                        givePositiveFeedback("You feel ready to work out.");
+                    }
+                },
+            },
+            {
+                id: "lightExercise",
+                label: lightExerciseLabel,
+                icon: lightExerciseIcon,
+                action() {
+                    if (screenState.stats.energy <= 20) {
+                        applyStatDelta({
+                            energy: -20,
+                            mobility: -10,
+                            confidence: -10,
+                            mood: -50,
+                        });
+                        giveNegativeFeedback(
+                            "You feel exhausted. Maybe it's time to take a short break.",
+                        );
+                    } else if (screenState.stats.mobility <= 10) {
+                        applyStatDelta({
+                            energy: -20,
+                            mobility: -10,
+                            confidence: -20,
+                            mood: -50,
+                        });
+                        giveNegativeFeedback(
+                            "You feel strained. Maybe it's time to stretch.",
+                        );
+                    } else {
+                        let locationSpecificWorkoutFeedback;
+                        switch (screenState.location) {
+                            case "localPark":
+                                locationSpecificWorkoutFeedback = [
+                                    "You appreciate the nice weather.",
+                                    "You appreciate the birds chirping.",
+                                    "Someone walks past you and says hi.",
+                                ];
+                                break;
+                            case "neighborhood":
+                                locationSpecificWorkoutFeedback = [
+                                    "You see the neighbors, and they say hi.",
+                                ];
+                                break;
+                        }
+                        applyStatDelta({
+                            energy: -20,
+                            mobility: -10,
+                            confidence: +50,
+                            mood: +10,
+                        });
+                        givePositiveFeedback(
+                            randomElement([
+                                "You feel relaxed.",
+                                "You feel accomplished.",
+                                "You feel proud.",
+                                ...locationSpecificWorkoutFeedback,
+                            ]),
+                        );
+                    }
+                },
+            },
+        ];
     } else {
         const _: never = screenState;
         throw new Error();
@@ -260,18 +402,14 @@ function WalkingActivity({
 
     return (
         <div className="walking-game">
-            {screenState.screen === "game" ? (
+            {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
-            ) : (
-                <></>
             )}
             <ActivityTasks title={tasksPrompt} tasks={tasks}></ActivityTasks>
-            {feedback ? (
+            {feedback != undefined && (
                 <div className="og-feedback" key={feedback}>
                     {feedback}
                 </div>
-            ) : (
-                <></>
             )}
         </div>
     );
