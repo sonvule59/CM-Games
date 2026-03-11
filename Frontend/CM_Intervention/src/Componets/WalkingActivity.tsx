@@ -1,6 +1,18 @@
 import { useState } from "react";
 import "../Static/WalkingActivity.css";
 
+import imgWalkingBikeNeighborhood from "../../images/walkingBikeNeighborhood.png";
+import imgWalkingBikePark from "../../images/walkingBikePark.png";
+import imgWalkingBreakNeighborhood from "../../images/walkingBreakNeighborhood.png";
+import imgWalkingBreakPark from "../../images/walkingBreakPark.png";
+import imgWalkingChooseLocation from "../../images/walkingChooseLocation.png";
+import imgWalkingRunNeighborhood from "../../images/walkingRunNeighborhood.png";
+import imgWalkingRunPark from "../../images/walkingRunPark.png";
+import imgWalkingStretchNeighborhood from "../../images/walkingStretchNeighborhood.png";
+import imgWalkingStretchPark from "../../images/walkingStretchPark.png";
+import imgWalkingWalkNeighborhood from "../../images/walkingWalkNeighborhood.png";
+import imgWalkingWalkPark from "../../images/walkingWalkPark.png";
+
 // Statistics types are defined in this file for now.
 type StatKind = "energy" | "mood" | "confidence" | "mobility";
 
@@ -105,6 +117,16 @@ function ActivityTasks({ id, title, tasks }: ActivityTasksProps) {
     );
 }
 
+// ActivityImage component.
+type ActivityImageProps = {
+    id?: string;
+    src: string;
+};
+
+function ActivityImage({ id, src }: ActivityImageProps) {
+    return (<img className="og-image" src={src}></img>);
+}
+
 // WalkingActivity component.
 type WalkingActivityProps = {};
 
@@ -143,12 +165,26 @@ const STARTING_STATS: Stats = Object.freeze({
     mobility: 50,
 });
 
+const IMAGE_ID_TO_SRC = {
+    walkingBikeNeighborhood: imgWalkingBikeNeighborhood,
+    walkingBikePark: imgWalkingBikePark,
+    walkingBreakNeighborhood: imgWalkingBreakNeighborhood,
+    walkingBreakPark: imgWalkingBreakPark,
+    walkingChooseLocation: imgWalkingChooseLocation,
+    walkingRunNeighborhood: imgWalkingRunNeighborhood,
+    walkingRunPark: imgWalkingRunPark,
+    walkingStretchNeighborhood: imgWalkingStretchNeighborhood,
+    walkingStretchPark: imgWalkingStretchPark,
+    walkingWalkNeighborhood: imgWalkingWalkNeighborhood,
+    walkingWalkPark: imgWalkingWalkPark,
+} satisfies Record<string, string>;
+
 function WalkingActivity({}: WalkingActivityProps) {
     function applyStatDelta(delta: StatDelta) {
-        if (screenState.screen !== "game") throw new Error();
-        const stats = screenState.stats;
-        setScreenState({
-            ...screenState,
+        if (newScreenState.screen !== "game") throw new Error();
+        const stats = newScreenState.stats;
+        newScreenState = {
+            ...newScreenState,
             stats: {
                 energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
                 mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
@@ -159,7 +195,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                 ),
                 mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
             },
-        });
+        };
     }
 
     function givePositiveFeedback(message: string) {
@@ -184,15 +220,18 @@ function WalkingActivity({}: WalkingActivityProps) {
               activity: "walk" | "bike";
               location: "neighborhood" | "localPark";
               stats: Stats;
+              lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
 
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
     const [screenState, setScreenState] = useState<ScreenState>({
         screen: "chooseActivity",
     });
+    let newScreenState: ScreenState = screenState;
 
     let tasks: Array<TaskSpec>;
     let tasksPrompt: string;
+    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
 
     if (screenState.screen === "chooseActivity") {
         tasksPrompt = "Choose an Activity";
@@ -203,10 +242,11 @@ function WalkingActivity({}: WalkingActivityProps) {
                 icon: "🚶",
                 desc: "Take a relaxing walk",
                 action() {
-                    setScreenState({
+                    newScreenState = {
                         screen: "chooseLocation",
                         activity: "walk",
-                    });
+                    };
+                    setScreenState(newScreenState);
                 },
             },
             {
@@ -215,13 +255,15 @@ function WalkingActivity({}: WalkingActivityProps) {
                 icon: "🚴",
                 desc: "Get out your bike and take a stroll",
                 action() {
-                    setScreenState({
+                    newScreenState = {
                         screen: "chooseLocation",
                         activity: "bike",
-                    });
+                    };
+                    setScreenState(newScreenState);
                 },
             },
         ];
+        imageId = undefined;
     } else if (screenState.screen === "chooseLocation") {
         tasksPrompt = "Choose a Location";
         tasks = [
@@ -231,12 +273,14 @@ function WalkingActivity({}: WalkingActivityProps) {
                 icon: "🏠",
                 desc: "Take a walk or bike in the neighborhood",
                 action() {
-                    setScreenState({
+                    newScreenState = {
                         screen: "game",
                         activity: screenState.activity,
                         location: "neighborhood",
                         stats: STARTING_STATS,
-                    });
+                        lastAction: undefined,
+                    };
+                    setScreenState(newScreenState);
                 },
             },
             {
@@ -245,15 +289,18 @@ function WalkingActivity({}: WalkingActivityProps) {
                 icon: "🌳",
                 desc: "Take a walk or bike in the local park",
                 action() {
-                    setScreenState({
+                    newScreenState = {
                         screen: "game",
                         activity: screenState.activity,
                         location: "localPark",
                         stats: STARTING_STATS,
-                    });
+                        lastAction: undefined,
+                    };
+                    setScreenState(newScreenState);
                 },
             },
         ];
+        imageId = "walkingChooseLocation";
     } else if (screenState.screen === "game") {
         let lightExerciseLabel;
         let lightExerciseIcon;
@@ -267,6 +314,62 @@ function WalkingActivity({}: WalkingActivityProps) {
                 lightExerciseIcon = "🚴";
                 break;
         }
+
+        switch (screenState.lastAction) {
+            case undefined:
+                imageId = "walkingChooseLocation";
+                break;
+            case "break":
+                switch (screenState.location) {
+                    case "localPark":
+                        imageId = "walkingBreakPark";
+                        break;
+                    case "neighborhood":
+                        imageId = "walkingBreakNeighborhood";
+                        break;
+                }
+                break;
+            case "lightExercise":
+                switch (screenState.location) {
+                    case "localPark":
+                        switch (screenState.activity) {
+                            case "walk":
+                                imageId = "walkingWalkPark";
+                                break;
+                            case "bike":
+                                imageId = "walkingBikePark";
+                                break;
+                        }
+                        break;
+                    case "neighborhood":
+                        switch (screenState.activity) {
+                            case "walk":
+                                imageId = "walkingWalkNeighborhood";
+                                break;
+                            case "bike":
+                                imageId = "walkingBikeNeighborhood";
+                                break;
+                        }
+                        break;
+                }
+                break;
+            case "stretch":
+                switch (screenState.location) {
+                    case "localPark":
+                        imageId = "walkingStretchPark";
+                        break;
+                    case "neighborhood":
+                        imageId = "walkingStretchNeighborhood";
+                        break;
+                }
+                break;
+        }
+        console.log(
+            screenState.lastAction,
+            screenState.location,
+            screenState.activity,
+            imageId,
+        );
 
         tasksPrompt = "Choose an Action";
         tasks = [
@@ -301,6 +404,12 @@ function WalkingActivity({}: WalkingActivityProps) {
                             );
                         }
                     }
+                    newScreenState = {
+                        ...newScreenState,
+                        lastAction: "break",
+                    } as any;
+                    if (screenState !== newScreenState)
+                        setScreenState(newScreenState);
                 },
             },
             {
@@ -334,6 +443,12 @@ function WalkingActivity({}: WalkingActivityProps) {
                         });
                         givePositiveFeedback("You feel ready to work out.");
                     }
+                    newScreenState = {
+                        ...newScreenState,
+                        lastAction: "stretch",
+                    } as any;
+                    if (screenState !== newScreenState)
+                        setScreenState(newScreenState);
                 },
             },
             {
@@ -392,6 +507,12 @@ function WalkingActivity({}: WalkingActivityProps) {
                             ]),
                         );
                     }
+                    newScreenState = {
+                        ...newScreenState,
+                        lastAction: "lightExercise",
+                    } as any;
+                    if (screenState !== newScreenState)
+                        setScreenState(newScreenState);
                 },
             },
         ];
@@ -404,6 +525,9 @@ function WalkingActivity({}: WalkingActivityProps) {
         <div className="walking-game">
             {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
+            )}
+            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
+                <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
             )}
             <ActivityTasks title={tasksPrompt} tasks={tasks}></ActivityTasks>
             {feedback != undefined && (
