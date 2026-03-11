@@ -523,11 +523,11 @@ function WalkingActivity({}: WalkingActivityProps) {
 
     return (
         <div className="walking-game">
-            {screenState.screen === "game" && (
-                <StatsViewer stats={screenState.stats}></StatsViewer>
-            )}
             {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
                 <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
+            )}
+            {screenState.screen === "game" && (
+                <StatsViewer stats={screenState.stats}></StatsViewer>
             )}
             <ActivityTasks title={tasksPrompt} tasks={tasks}></ActivityTasks>
             {feedback != undefined && (
