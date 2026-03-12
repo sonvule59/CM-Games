@@ -1,19 +1,5 @@
 import { useState } from "react";
 
-
-const atDeskImg = "/assets/Images/working.webp";
-const walkingImg    = "/assets/Images/Walking_to_printer.webp";
-const legLiftImg    = "/assets/Images/leg_raise.webp";
-const standingImg   = "/assets/Images/standing_desk.webp";
-
-const SCENE_IMAGES = {
-  office:   atDeskImg,
-  walk:     walkingImg,
-  leglift:  legLiftImg,
-  standing: standingImg,
-};
-
-// ── Styles (mirrors rcStyles from Rock Climbing) ─────────────────────────────
 const s = {
   container:
     "max-w-3xl mx-auto my-8 p-6 rounded-2xl bg-gradient-to-br from-amber-50 via-slate-50 to-orange-50 shadow-xl border border-slate-100 font-sans text-slate-900",
@@ -26,23 +12,14 @@ const s = {
   scenePill:
     "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200",
 
-  topRow: "mt-3 mb-5 flex flex-col gap-4",
-
   statsContainer:
     "w-full p-4 rounded-2xl bg-white border border-slate-100 shadow-sm flex flex-col gap-3",
-  statsTitle:
-    "text-xs font-semibold tracking-wide text-slate-500 uppercase mb-1",
+  statsTitle: "text-xs font-semibold tracking-wide text-slate-500 uppercase mb-1",
   statRow: "flex items-center gap-3",
-  statLabel:
-    "w-28 text-[11px] font-semibold uppercase tracking-wide text-slate-600",
+  statLabel: "w-28 text-[11px] font-semibold uppercase tracking-wide text-slate-600",
   barOuter: "flex-1 h-3 rounded-full bg-slate-100 overflow-hidden",
-  barInner:
-    "h-full rounded-full transition-[width] duration-200 ease-out",
+  barInner: "h-full rounded-full transition-[width] duration-200 ease-out",
   statValue: "w-10 text-right text-[11px] tabular-nums text-slate-700",
-
-  sceneImageWrap:
-  "w-full rounded-2xl overflow-hidden bg-amber-100 border border-amber-100 shadow-sm flex justify-center items-center",
-sceneImage: "h-[320px] w-auto object-contain",
 
   section: "mt-6",
   title: "m-0 mb-2 text-xl font-bold text-slate-900",
@@ -69,20 +46,20 @@ sceneImage: "h-[320px] w-auto object-contain",
   taskDesc: "text-[11px] text-slate-500 leading-snug",
 };
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-const INITIAL_STATS = { Energy: 100, Mood: 50, Confidence: 50, Mobility: 40 };
+// ── Constants ────────────────────────────────────────────────────────────────
+const INITIAL_STATS = { Energy: 50, Mood: 50, Confidence: 50, Mobility: 40 };
 const STAT_COLORS = {
-  Energy:     "#facc15",
-  Mood:       "#22c55e",
+  Energy: "#facc15",
+  Mood: "#22c55e",
   Confidence: "#ef4444",
-  Mobility:   "#3b82f6",
+  Mobility: "#3b82f6",
 };
 const STAT_KEYS = ["Energy", "Mood", "Confidence", "Mobility"];
 
 const SCENE_LABELS = {
-  office:   "At your desk",
-  walk:     "On a walk",
-  leglift:  "Sneaky desk workout",
+  office: "At your desk",
+  walk: "On a walk",
+  leglift: "Sneaky desk workout",
   standing: "Standing desk mode",
 };
 
@@ -93,14 +70,12 @@ const TASKS = [
     name: "Take a Walk",
     desc: "Step outside or lap the office",
     scene: "walk",
-    delta: () => ({
-      Energy: -5 ,
-      Mood:     +10 ,
-      Confidence: +5 ,
-      Mobility:  +10,
+    delta: (s) => ({
+      Energy: Math.round((s.Energy / 100) * 10) - s.Energy,
+      Mood: Math.round((s.Mood / 100) * 20),
+      Confidence: Math.round((s.Confidence / 100) * 20),
+      Mobility: Math.round((s.Mobility / 100) * 20),
     }),
-    intro:
-      "You push back from your chair and head out. The corridor opens up, or maybe it's outside — either way, your legs are grateful for the movement.",
     result:
       "You stepped away from the desk for a quick walk. Blood flowing, head clearing — your body thanks you.",
   },
@@ -111,13 +86,11 @@ const TASKS = [
     desc: "Sneak in some reps at your desk",
     scene: "leglift",
     delta: (s) => ({
-       Energy: -5 ,
-      Mood:     +10 ,
-      Confidence: +5 ,
-      Mobility:  +10,
+      Energy: Math.round((s.Energy / 100) * 5) - s.Energy,
+      Mood: Math.round((s.Mood / 100) * 15),
+      Confidence: Math.round((s.Confidence / 100) * 10),
+      Mobility: Math.round((s.Mobility / 100) * 20),
     }),
-    intro:
-      "You keep your screen expression neutral while quietly engaging your legs beneath the desk. A small, private act of care.",
     result:
       "A few seated leg lifts under the desk. Subtle, effective, and nobody even noticed.",
   },
@@ -128,24 +101,22 @@ const TASKS = [
     desc: "Rise up and keep working",
     scene: "standing",
     delta: (s) => ({
-       Energy: -1,
-      Mood:     +20 ,
-      Confidence: +10,
-      Mobility:  +10,
+      Energy: 0,
+      Mood: Math.round((s.Mood / 100) * 15),
+      Confidence: Math.round((s.Confidence / 100) * 10),
+      Mobility: 0,
     }),
-    intro:
-      "You raise the desk with a soft whirr and shift your weight onto your feet. The posture change alone feels like a tiny reset.",
     result:
       "Switched to the standing desk for a while. Posture improved, focus sharpened.",
   },
 ];
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ── Component ────────────────────────────────────────────────────────────────
 export default function OfficeGame() {
-  const [stats, setStats]           = useState(INITIAL_STATS);
-  const [scene, setScene]           = useState("office");
-  const [step, setStep]             = useState(0);
-  const [lastDelta, setLastDelta]   = useState({ Energy: 0, Mood: 0, Confidence: 0, Mobility: 0 });
+  const [stats, setStats] = useState(INITIAL_STATS);
+  const [scene, setScene] = useState("office");
+  const [step, setStep] = useState(0); // 0 = lobby, 1 = activity intro, 3 = result
+  const [lastDelta, setLastDelta] = useState({ Energy: 0, Mood: 0, Confidence: 0, Mobility: 0 });
   const [resultText, setResultText] = useState("");
   const [activeTask, setActiveTask] = useState(null);
 
@@ -157,16 +128,12 @@ export default function OfficeGame() {
       STAT_KEYS.forEach((k) => (next[k] = clamp(prev[k] + (delta[k] || 0))));
       return next;
     });
-    setLastDelta({
-      Energy:     delta.Energy     || 0,
-      Mood:       delta.Mood       || 0,
-      Confidence: delta.Confidence || 0,
-      Mobility:   delta.Mobility   || 0,
-    });
+    setLastDelta({ Energy: delta.Energy || 0, Mood: delta.Mood || 0, Confidence: delta.Confidence || 0, Mobility: delta.Mobility || 0 });
   };
 
   const handleTaskChoice = (task) => {
-    applyDelta(task.delta(stats));
+    const delta = task.delta(stats);
+    applyDelta(delta);
     setActiveTask(task);
     setScene(task.scene);
     setStep(1);
@@ -191,7 +158,7 @@ export default function OfficeGame() {
     backToOffice();
   };
 
-  // ── Helpers ──
+  // ── Delta list ──
   const renderDeltaList = () => {
     const items = STAT_KEYS.filter((k) => lastDelta[k] !== 0).map((k) => {
       const v = lastDelta[k];
@@ -201,11 +168,10 @@ export default function OfficeGame() {
         </li>
       );
     });
-    return items.length
-      ? items
-      : <li className={s.deltaItem}>No recent changes.</li>;
+    return items.length ? items : <li className={s.deltaItem}>No recent changes.</li>;
   };
 
+  // ── Stat bars ──
   const renderStatsBar = (label, value, color) => (
     <div className={s.statRow} key={label}>
       <div className={s.statLabel}>{label}</div>
@@ -243,10 +209,15 @@ export default function OfficeGame() {
     }
 
     if (step === 1 && activeTask) {
+      const intros = {
+        walk: "You push back from your chair and head out. The corridor opens up, or maybe it's outside — either way, your legs are grateful for the movement.",
+        leglift: "You keep your screen expression neutral while quietly engaging your legs beneath the desk. A small, private act of care.",
+        standing: "You raise the desk with a soft whirr and shift your weight onto your feet. The posture change alone feels like a tiny reset.",
+      };
       return (
         <div className={s.section}>
           <h2 className={s.title}>{activeTask.name}</h2>
-          <p className={s.paragraph}>{activeTask.intro}</p>
+          <p className={s.paragraph}>{intros[activeTask.id]}</p>
           <p className={s.paragraph}>
             There's no pressure to do this perfectly. Any amount of movement is a win.
           </p>
@@ -280,12 +251,11 @@ export default function OfficeGame() {
     return null;
   };
 
-  // ── Image key logic (mirrors Rock Climbing's sceneImageKey) ──
-  const sceneImageKey = scene;   // office | walk | leglift | standing
+  // ── Scene emoji banner ──
+  const sceneEmoji = { office: "🏢", walk: "🚶", leglift: "🦵", standing: "🧍" };
 
   return (
     <div className={s.container}>
-
       {/* Header */}
       <div className={s.header}>
         <div className={s.headerLeft}>
@@ -300,21 +270,18 @@ export default function OfficeGame() {
         </button>
       </div>
 
-      {/* Stats — same topRow wrapper as Rock Climbing */}
-      <div className={s.topRow}>
+      {/* Stats */}
+      <div className="mt-3 mb-5">
         <div className={s.statsContainer}>
           <div className={s.statsTitle}>How you're feeling</div>
           {STAT_KEYS.map((k) => renderStatsBar(k, stats[k], STAT_COLORS[k]))}
         </div>
       </div>
 
-      {/* Scene image — identical markup to Rock Climbing */}
-      <div className={s.sceneImageWrap}>
-        <img
-          src={SCENE_IMAGES[sceneImageKey]}
-          alt=""
-          className={s.sceneImage}
-        />
+      {/* Scene banner */}
+      <div className="w-full rounded-2xl overflow-hidden bg-amber-100 border border-amber-200 shadow-sm flex items-center justify-center"
+           style={{ height: 120, fontSize: 72 }}>
+        {sceneEmoji[scene]}
       </div>
 
       {/* Scene content */}

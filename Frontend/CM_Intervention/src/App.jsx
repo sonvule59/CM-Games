@@ -6,8 +6,9 @@ import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
-import WalkingActivityDemo from './WalkingActivityDemo'
-import RockClimbing from './rockClimbing'
+import WalkingActivityDemo from './Componets/WalkingActivityDemo.tsx'
+import RockClimbing from './Componets/rockClimbing'
+import OfficeGameStart from './Componets/OfficeGameStart.jsx'
 
 
 function App() {
@@ -16,9 +17,10 @@ function App() {
   return (
     <BrowserRouter>
     <Routes>
-      <Route path="/office" element = {<OfficeGame/>} />
+      <Route path="/office" element = {<OfficeGameStart/>} />
       <Route path="/walk" element = {<WalkingActivityDemo />} />
       <Route path="/rock" element = {<RockClimbing /> } />
+      <Route path='/office/test' element = {<OfficeGame/>} /> 
     </Routes>
     </BrowserRouter>
   
