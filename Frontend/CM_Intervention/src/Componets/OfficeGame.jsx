@@ -1,90 +1,106 @@
 import { useState } from "react";
-
-
-const atDeskImg = "/assets/Images/working.webp";
-const walkingImg    = "/assets/Images/Walking_to_printer.webp";
-const legLiftImg    = "/assets/Images/leg_raise.webp";
-const standingImg   = "/assets/Images/standing_desk.webp";
+import {s} from "../Static/officestyles.js"
+const atDeskImg        = "/assets/Images/working.webp";
+const legLiftImg       = "/assets/Images/leg_raise.webp";
+const standingImg      = "/assets/Images/standing_desk.webp";
+const armStretchImg    = "/assets/Images/arm_stretches.webp";
+const chairSquatImg    = "/assets/Images/chari_squat.webp";
+const walkMeetingImg   = "/assets/Images/walking_meeting.webp";
+const waterBreakImg    = "/assets/Images/water_break.webp";
+const printerWalkImg   = "/assets/Images/Walking_to_printer.webp";
+ "../Static/officestyles.js"
 
 const SCENE_IMAGES = {
-  office:   atDeskImg,
-  walk:     walkingImg,
-  leglift:  legLiftImg,
-  standing: standingImg,
+  office:          atDeskImg,
+  walk:            atDeskImg,
+  leglift:         legLiftImg,
+  standing:        standingImg,
+  deskexercise:    atDeskImg,
+  stretch:         armStretchImg,
+  chairsquat:      chairSquatImg,
+  wrist:           legLiftImg,
+  walkmeeting:     walkMeetingImg,
+  waterbreak:      waterBreakImg,
+  printer:         printerWalkImg,
 };
 
-// ── Styles (mirrors rcStyles from Rock Climbing) ─────────────────────────────
-const s = {
-  container:
-    "max-w-3xl mx-auto my-8 p-6 rounded-2xl bg-gradient-to-br from-amber-50 via-slate-50 to-orange-50 shadow-xl border border-slate-100 font-sans text-slate-900",
-  header: "flex items-start justify-between gap-3 mb-3",
-  headerLeft: "space-y-1",
-  mainTitle: "m-0 text-3xl font-extrabold tracking-tight text-slate-900",
-  headerSubtitle: "text-sm text-slate-600",
-  resetButton:
-    "px-3 py-1 rounded-full border border-amber-200 bg-white/80 text-xs font-medium text-amber-700 shadow-sm cursor-pointer hover:bg-amber-50 hover:border-amber-300 transition-colors",
-  scenePill:
-    "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200",
 
-  topRow: "mt-3 mb-5 flex flex-col gap-4",
-
-  statsContainer:
-    "w-full p-4 rounded-2xl bg-white border border-slate-100 shadow-sm flex flex-col gap-3",
-  statsTitle:
-    "text-xs font-semibold tracking-wide text-slate-500 uppercase mb-1",
-  statRow: "flex items-center gap-3",
-  statLabel:
-    "w-28 text-[11px] font-semibold uppercase tracking-wide text-slate-600",
-  barOuter: "flex-1 h-3 rounded-full bg-slate-100 overflow-hidden",
-  barInner:
-    "h-full rounded-full transition-[width] duration-200 ease-out",
-  statValue: "w-10 text-right text-[11px] tabular-nums text-slate-700",
-
-  sceneImageWrap:
-  "w-full rounded-2xl overflow-hidden bg-amber-100 border border-amber-100 shadow-sm flex justify-center items-center",
-sceneImage: "h-[320px] w-auto object-contain",
-
-  section: "mt-6",
-  title: "m-0 mb-2 text-xl font-bold text-slate-900",
-  subtitle: "m-0 mb-1 text-sm font-semibold text-slate-800",
-  paragraph: "my-1 mb-2 text-sm leading-relaxed text-slate-700",
-
-  buttonGroup: "flex flex-col gap-2 mt-3",
-  button:
-    "px-3 py-2 rounded-lg border-0 bg-blue-500 text-white cursor-pointer text-sm text-left shadow-sm hover:bg-blue-600 transition-colors",
-  primaryButton:
-    "mt-3 px-4 py-2 rounded-lg border-0 bg-amber-500 text-white cursor-pointer text-sm shadow-sm hover:bg-amber-600 transition-colors",
-  secondaryButton:
-    "mt-3 px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 cursor-pointer text-sm hover:bg-slate-50 transition-colors",
-
-  deltaContainer: "mt-2 p-3 rounded-xl bg-sky-50 border border-sky-100",
-  deltaList: "m-0 pl-5 text-xs text-slate-700",
-  deltaItem: "mb-1",
-
-  taskGrid: "grid grid-cols-3 gap-3 mt-3",
-  taskCard:
-    "flex flex-col items-center gap-1 p-4 rounded-xl border border-slate-200 bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-amber-300 transition-all text-center",
-  taskIcon: "text-3xl",
-  taskName: "text-sm font-semibold text-slate-800",
-  taskDesc: "text-[11px] text-slate-500 leading-snug",
-};
-
-// ── Constants ─────────────────────────────────────────────────────────────────
-const INITIAL_STATS = { Energy: 100, Mood: 50, Confidence: 50, Mobility: 40 };
+const INITIAL_STATS = { Confidence: 50, Mood: 50, Health: 50, Energy: 100 };
 const STAT_COLORS = {
-  Energy:     "#facc15",
+  Confidence: "#facc15",
   Mood:       "#22c55e",
-  Confidence: "#ef4444",
-  Mobility:   "#3b82f6",
+  Health:     "#3b82f6",
+  Energy:     "#ef4444",
 };
-const STAT_KEYS = ["Energy", "Mood", "Confidence", "Mobility"];
+const STAT_KEYS = ["Confidence", "Mood", "Health", "Energy"];
 
 const SCENE_LABELS = {
-  office:   "At your desk",
-  walk:     "On a walk",
-  leglift:  "Sneaky desk workout",
-  standing: "Standing desk mode",
+  office:       "At your desk",
+  walk:         "On a walk",
+  leglift:      "Sneaky desk workout",
+  standing:     "Standing desk mode",
+  deskexercise: "Desk exercise time!",
 };
+
+const WALK_OPTIONS = [
+  {
+    id: "walkmeeting",
+    label: "Walking meeting",
+    intro:
+      "You grab your phone and suggest taking the call outside. Fresh air, moving feet, still getting things done — best of both worlds.",
+    result:
+      "Productive and active? That's the dream combo. Your team loved it too. Let's do that again! 🚶📱",
+    delta: { Energy: -6, Mood: +12, Confidence: +12, Health: +8 },
+  },
+  {
+    id: "waterbreak",
+    label: "Water break walk",
+    intro:
+      "You grab your water bottle and take the long way to the kitchen. Hydration plus movement — your body's two favourite things.",
+    result:
+      "Hydrated and stretched out. That's a double win. Small detour, big payoff. 💧",
+    delta: { Energy: -3, Mood: +10, Confidence: +5, Health: +10 },
+  },
+  {
+    id: "printer",
+    label: "Walk to the printer",
+    intro:
+      "You send something to print and take your time getting there. Down the hall, a little loop — every step counts.",
+    result:
+      "Technically productive, secretly a wellness break. Nobody needs to know. 🖨️",
+    delta: { Energy: -2, Mood: +8, Confidence: +4, Health: +6 },
+  },
+];
+
+const DESK_EXERCISE_OPTIONS = [
+  {
+    id: "stretch",
+    label: "Arm & shoulder stretches",
+    intro:
+      "You extend your arms wide and roll your shoulders back. Tension you didn't even know was there starts to melt away.",
+    result:
+      "Those stretches just undid an hour of hunching. Your shoulders are officially grateful. 💪",
+    delta: { Energy: -3, Mood: +8, Health: +10, Confidence: +5 },
+  },
+  {
+    id: "chairsquat",
+    label: "Chair squats",
+    intro:
+      "You stand, lower yourself almost to the seat, then rise. Three reps in and you're already feeling it.",
+    result:
+      "Chair squats — who knew your desk could double as a gym? Legs activated. You did that! 🙌",
+    delta: { Energy: -8, Mood: +10, Health: +12, Confidence: +8 },
+  },
+  {
+    id: "wrist",
+    label: "Leg raises",
+    intro:
+      "You lift both legs slowly under the desk, hold for a beat, then lower. Nobody has any idea.",
+    result:
+      "Sneaky and effective. Core engaged, legs working — all from your chair. Keep it up! ✨",
+    delta: { Energy: -5, Mood: +8, Health: +10, Confidence: +6 },
+  },
+];
 
 const TASKS = [
   {
@@ -93,33 +109,10 @@ const TASKS = [
     name: "Take a Walk",
     desc: "Step outside or lap the office",
     scene: "walk",
-    delta: () => ({
-      Energy: -5 ,
-      Mood:     +10 ,
-      Confidence: +5 ,
-      Mobility:  +10,
-    }),
+    delta: () => ({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 }), 
     intro:
-      "You push back from your chair and head out. The corridor opens up, or maybe it's outside — either way, your legs are grateful for the movement.",
-    result:
-      "You stepped away from the desk for a quick walk. Blood flowing, head clearing — your body thanks you.",
-  },
-  {
-    id: "leglift",
-    icon: "🦵",
-    name: "Leg Lifts",
-    desc: "Sneak in some reps at your desk",
-    scene: "leglift",
-    delta: (s) => ({
-       Energy: -5 ,
-      Mood:     +10 ,
-      Confidence: +5 ,
-      Mobility:  +10,
-    }),
-    intro:
-      "You keep your screen expression neutral while quietly engaging your legs beneath the desk. A small, private act of care.",
-    result:
-      "A few seated leg lifts under the desk. Subtle, effective, and nobody even noticed.",
+      "You push back from your chair and stand up. Legs? Grateful. Brain? Already less foggy. Where to?",
+    result: "",
   },
   {
     id: "standing",
@@ -127,27 +120,34 @@ const TASKS = [
     name: "Standing Desk",
     desc: "Rise up and keep working",
     scene: "standing",
-    delta: (s) => ({
-       Energy: -1,
-      Mood:     +20 ,
-      Confidence: +10,
-      Mobility:  +10,
-    }),
+    delta: () => ({ Energy: -1, Mood: +10, Confidence: +10, Health: +5 }),
     intro:
       "You raise the desk with a soft whirr and shift your weight onto your feet. The posture change alone feels like a tiny reset.",
     result:
-      "Switched to the standing desk for a while. Posture improved, focus sharpened.",
+      "Posture improved, focus sharpened. You're standing tall — literally! 🧍",
+  },
+  {
+    id: "deskexercise",
+    icon: "🏋️",
+    name: "Desk Exercises",
+    desc: "Move without leaving your seat",
+    scene: "deskexercise",
+    delta: () => ({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 }), 
+    intro:
+      "You don't need a gym. You've got a chair, two arms, and two legs — let's use them.",
+    result: "",
   },
 ];
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function OfficeGame() {
   const [stats, setStats]           = useState(INITIAL_STATS);
   const [scene, setScene]           = useState("office");
   const [step, setStep]             = useState(0);
-  const [lastDelta, setLastDelta]   = useState({ Energy: 0, Mood: 0, Confidence: 0, Mobility: 0 });
+  const [lastDelta, setLastDelta]   = useState({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 });
   const [resultText, setResultText] = useState("");
   const [activeTask, setActiveTask] = useState(null);
+  const [deskOption, setDeskOption] = useState(null);
+  const [walkOption, setWalkOption] = useState(null);
 
   const clamp = (v) => Math.max(0, Math.min(100, Math.round(v)));
 
@@ -161,16 +161,18 @@ export default function OfficeGame() {
       Energy:     delta.Energy     || 0,
       Mood:       delta.Mood       || 0,
       Confidence: delta.Confidence || 0,
-      Mobility:   delta.Mobility   || 0,
+      Health:     delta.Health     || 0,
     });
   };
 
   const handleTaskChoice = (task) => {
-    applyDelta(task.delta(stats));
+    applyDelta(task.delta());
     setActiveTask(task);
     setScene(task.scene);
     setStep(1);
     setResultText("");
+    setDeskOption(null);
+    setWalkOption(null);
   };
 
   const handleConfirm = () => {
@@ -178,12 +180,34 @@ export default function OfficeGame() {
     setStep(3);
   };
 
+  const handleWalkOption = (option) => {
+    applyDelta(option.delta);
+    setWalkOption(option);
+    setResultText(option.result);
+    setStep(3);
+  };
+
+  const handleDeskOption = (option) => {
+    applyDelta(option.delta);
+    setDeskOption(option);
+    setResultText(option.result);
+    setStep(3);
+  };
+
+  const handleDoMoreDesk = () => {
+    setDeskOption(null);
+    setResultText("");
+    setStep(2);
+  };
+
   const backToOffice = () => {
     setScene("office");
     setStep(0);
-    setLastDelta({ Energy: 0, Mood: 0, Confidence: 0, Mobility: 0 });
+    setLastDelta({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 });
     setResultText("");
     setActiveTask(null);
+    setDeskOption(null);
+    setWalkOption(null);
   };
 
   const resetGame = () => {
@@ -191,7 +215,6 @@ export default function OfficeGame() {
     backToOffice();
   };
 
-  // ── Helpers ──
   const renderDeltaList = () => {
     const items = STAT_KEYS.filter((k) => lastDelta[k] !== 0).map((k) => {
       const v = lastDelta[k];
@@ -216,18 +239,17 @@ export default function OfficeGame() {
     </div>
   );
 
-  // ── Scene content ──
   const renderScene = () => {
+
     if (scene === "office") {
       return (
         <div className={s.section}>
           <h2 className={s.title}>The Office</h2>
           <p className={s.paragraph}>
-            You're at your desk. The day stretches ahead — meetings, emails, the usual hum. But right now
-            you have a moment. What would feel good for your body and mind?
+            You've got a moment. What would feel good for your body and mind right now?
           </p>
           <p className={s.paragraph}>
-            Every option here counts. Choose whatever fits your energy and capacity right now.
+            Every option counts — choose what fits your energy today.
           </p>
           <div className={s.taskGrid}>
             {TASKS.map((t) => (
@@ -243,36 +265,104 @@ export default function OfficeGame() {
     }
 
     if (step === 1 && activeTask) {
+      const isDeskEx = activeTask.id === "deskexercise";
+      const isWalk   = activeTask.id === "walk";
       return (
         <div className={s.section}>
           <h2 className={s.title}>{activeTask.name}</h2>
           <p className={s.paragraph}>{activeTask.intro}</p>
-          <p className={s.paragraph}>
-            There's no pressure to do this perfectly. Any amount of movement is a win.
-          </p>
+          {!isDeskEx && !isWalk && (
+            <p className={s.paragraph}>No pressure. Any movement is a win.</p>
+          )}
           <div className={s.deltaContainer}>
             <h3 className={s.subtitle}>Recent changes</h3>
             <ul className={s.deltaList}>{renderDeltaList()}</ul>
           </div>
-          <button className={s.primaryButton} onClick={handleConfirm}>
-            Continue
+          <button
+            className={s.primaryButton}
+            onClick={() => {
+              if (isDeskEx || isWalk) setStep(2);
+              else handleConfirm();
+            }}
+          >
+            {isWalk ? "Let's go! 🚶" : isDeskEx ? "Let's go! 💪" : "Continue"}
           </button>
         </div>
       );
     }
 
-    if (step === 3) {
+    if (step === 2 && activeTask?.id === "walk") {
       return (
         <div className={s.section}>
-          <h2 className={s.title}>Afterward</h2>
+          <h2 className={s.title}>Where to? 🚶</h2>
+          <p className={s.paragraph}>
+            Pick your walk — all three count. Go with what feels right.
+          </p>
+          <div className={s.buttonGroup}>
+            {WALK_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                className={s.button}
+                onClick={() => handleWalkOption(opt)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 2 && activeTask?.id === "deskexercise") {
+      return (
+        <div className={s.section}>
+          <h2 className={s.title}>Pick your move 🏋️</h2>
+          <p className={s.paragraph}>
+            What's calling to you right now? All three are great — pick the one that feels right.
+          </p>
+          <div className={s.buttonGroup}>
+            {DESK_EXERCISE_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                className={s.button}
+                onClick={() => handleDeskOption(opt)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 3) {
+      const isDeskEx = activeTask?.id === "deskexercise";
+      const isWalk   = activeTask?.id === "walk";
+      const activeOption = deskOption || walkOption;
+
+      return (
+        <div className={s.section}>
+          <h2 className={s.title}>
+            {isDeskEx ? "Nailed it! 🎉" : isWalk ? "Nice work! 🚶" : "Afterward"}
+          </h2>
+          {activeOption && (
+            <p className={s.paragraphItalic}>{activeOption.intro}</p>
+          )}
           <p className={s.paragraph}>{resultText}</p>
           <div className={s.deltaContainer}>
             <h3 className={s.subtitle}>Recent changes</h3>
             <ul className={s.deltaList}>{renderDeltaList()}</ul>
           </div>
-          <button className={s.secondaryButton} onClick={backToOffice}>
-            Back to Desk
-          </button>
+          <div className={s.buttonRow}>
+            {isDeskEx && (
+              <button className={s.primaryButton} onClick={handleDoMoreDesk}>
+                Do another exercise 💪
+              </button>
+            )}
+            <button className={s.secondaryButton} onClick={backToOffice}>
+              Back to Desk
+            </button>
+          </div>
         </div>
       );
     }
@@ -280,13 +370,14 @@ export default function OfficeGame() {
     return null;
   };
 
-  // ── Image key logic (mirrors Rock Climbing's sceneImageKey) ──
-  const sceneImageKey = scene;   // office | walk | leglift | standing
+  const sceneImageKey =
+    scene === "deskexercise" && deskOption ? deskOption.id
+    : scene === "walk"        && walkOption ? walkOption.id
+    : scene;
 
   return (
     <div className={s.container}>
 
-      {/* Header */}
       <div className={s.header}>
         <div className={s.headerLeft}>
           <h1 className={s.mainTitle}>Office Wellness</h1>
@@ -295,12 +386,10 @@ export default function OfficeGame() {
           </p>
           <div className={s.scenePill}>{SCENE_LABELS[scene]}</div>
         </div>
-        <button className={s.resetButton} onClick={resetGame}>
-          Reset Game
-        </button>
+        <button className={s.resetButton} onClick={resetGame}>Reset Game</button>
       </div>
 
-      {/* Stats — same topRow wrapper as Rock Climbing */}
+      {/* Stats */}
       <div className={s.topRow}>
         <div className={s.statsContainer}>
           <div className={s.statsTitle}>How you're feeling</div>
@@ -308,7 +397,7 @@ export default function OfficeGame() {
         </div>
       </div>
 
-      {/* Scene image — identical markup to Rock Climbing */}
+      {/* Scene image */}
       <div className={s.sceneImageWrap}>
         <img
           src={SCENE_IMAGES[sceneImageKey]}
@@ -317,7 +406,6 @@ export default function OfficeGame() {
         />
       </div>
 
-      {/* Scene content */}
       {renderScene()}
     </div>
   );
