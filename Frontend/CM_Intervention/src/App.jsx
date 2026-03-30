@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
 import RockClimbing from './Componets/rockClimbing'
 import WalkingActivity from './Componets/WalkingActivity'
+import IndoorDomesticActivity from './Componets/IndoorDomesticActivity'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Route path="/office" element = {<OfficeGame/>} />
       <Route path="/walk" element = {<WalkingActivity />} />
       <Route path="/rock" element = {<RockClimbing /> } />
+      <Route path="/indoor-domestic" element = {<IndoorDomesticActivity /> } />
     </Routes>
     </BrowserRouter>
   
