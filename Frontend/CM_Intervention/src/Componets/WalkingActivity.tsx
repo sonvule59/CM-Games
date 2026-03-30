@@ -12,151 +12,18 @@ import imgWalkingStretchNeighborhood from "../../images/walkingStretchNeighborho
 import imgWalkingStretchPark from "../../images/walkingStretchPark.png";
 import imgWalkingWalkNeighborhood from "../../images/walkingWalkNeighborhood.png";
 import imgWalkingWalkPark from "../../images/walkingWalkPark.png";
-
-// Statistics types are defined in this file for now.
-type StatKind = "energy" | "mood" | "confidence" | "mobility";
-
-type Stats = Readonly<Record<StatKind, number>>;
-type StatDelta = Partial<Readonly<Record<StatKind, number>>>;
-
-type StatChangeHandler = (newStats: Stats) => void;
-
-// StatsViewer component.
-type StatsViewerProps = {
-    stats: Stats;
-};
-
-function StatsBar({
-    id,
-    label,
-    value,
-}: {
-    id: string;
-    label: string;
-    value: number;
-}) {
-    return (
-        <p className="stats-item">
-            <span className="stats-label">{label}</span>
-            <meter
-                className="stats-bar"
-                id={id}
-                max={100}
-                value={value}
-            ></meter>
-            <span className="stats-number">{value}%</span>
-        </p>
-    );
-}
-
-function StatsViewer({ stats }: StatsViewerProps) {
-    return (
-        <section className="stats-viewer">
-            <StatsBar
-                id="stat-bar-energy"
-                label="Energy"
-                value={stats.energy}
-            />
-            <StatsBar id="stat-bar-mood" label="Mood" value={stats.mood} />
-            <StatsBar
-                id="stat-bar-confidence"
-                label="Confidence"
-                value={stats.confidence}
-            />
-            <StatsBar
-                id="stat-bar-mobility"
-                label="Mobility"
-                value={stats.mobility}
-            />
-        </section>
-    );
-}
-
-// ActivityTasks component.
-type TaskSpec = {
-    id: string;
-    className?: string;
-    label: string;
-    icon?: string;
-    desc?: string;
-    action: () => void;
-};
-
-type ActivityTasksProps = {
-    id?: string;
-    title: string;
-    tasks: Array<TaskSpec>;
-};
-
-function ActivityTasks({ id, title, tasks }: ActivityTasksProps) {
-    return (
-        <>
-            <div className="og-tasks-title">{title}</div>
-            <section className="og-tasks" id={id}>
-                {tasks.map((task) => (
-                    <button
-                        key={task.id}
-                        className={`task-card ${task.className ?? ""}`}
-                        onClick={task.action}
-                    >
-                        {task.icon === undefined ? (
-                            <></>
-                        ) : (
-                            <span className="task-icon">{task.icon}</span>
-                        )}
-                        <span className="task-name">{task.label}</span>
-                        {task.desc === undefined ? (
-                            <></>
-                        ) : (
-                            <span className="task-desc">{task.desc}</span>
-                        )}
-                    </button>
-                ))}
-            </section>
-        </>
-    );
-}
-
-// ActivityImage component.
-type ActivityImageProps = {
-    id?: string;
-    src: string;
-};
-
-function ActivityImage({ id, src }: ActivityImageProps) {
-    return (<img className="og-image" src={src}></img>);
-}
+import { StatDelta, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import { ActionPanel, ActionSpec } from "./ActionPanel";
+import ActivityImage from "./ActivityImage";
+import {
+    Feedback,
+    negativeFeedback,
+    positiveFeedback,
+    randomElement,
+} from "./Feedback";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
-
-const POSITIVE_FEEDBACK_MESSAGES: readonly string[] = [
-    "Good job!",
-    "Well done!",
-    "Awesome!",
-    "Great work!",
-    "Way to go!",
-    "Congratulations!",
-];
-const NEGATIVE_FEEDBACK_MESSAGES: readonly string[] = ["Oh no!", "Uh oh!"];
-
-function randomElement<T>(array: readonly T[]): T {
-    return array[Math.floor(Math.random() * array.length)];
-}
-
-function positiveFeedback(message: string): string {
-    return `${randomElement(POSITIVE_FEEDBACK_MESSAGES)} ${message}`;
-}
-
-function negativeFeedback(message: string): string {
-    return `${randomElement(NEGATIVE_FEEDBACK_MESSAGES)} ${message}`;
-}
-
-function clamp(value: number, min: number, max: number): number {
-    if (value < min) return min;
-    if (value > max) return max;
-    return value;
-}
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -185,16 +52,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         const stats = newScreenState.stats;
         newScreenState = {
             ...newScreenState,
-            stats: {
-                energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
-                mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
-                confidence: clamp(
-                    stats.confidence + (delta.confidence ?? 0),
-                    0,
-                    100,
-                ),
-                mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
-            },
+            stats: statsUpdate(stats, delta),
         };
     }
 
@@ -229,7 +87,7 @@ function WalkingActivity({}: WalkingActivityProps) {
     });
     let newScreenState: ScreenState = screenState;
 
-    let tasks: Array<TaskSpec>;
+    let tasks: Array<ActionSpec>;
     let tasksPrompt: string;
     let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
 
@@ -529,12 +387,8 @@ function WalkingActivity({}: WalkingActivityProps) {
             {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
             )}
-            <ActivityTasks title={tasksPrompt} tasks={tasks}></ActivityTasks>
-            {feedback != undefined && (
-                <div className="og-feedback" key={feedback}>
-                    {feedback}
-                </div>
-            )}
+            <ActionPanel title={tasksPrompt} tasks={tasks}></ActionPanel>
+            <Feedback feedback={feedback}></Feedback>
         </div>
     );
 }
