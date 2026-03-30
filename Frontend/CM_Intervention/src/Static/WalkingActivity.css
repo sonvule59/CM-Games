@@ -62,7 +62,8 @@ meter.stats-bar::-webkit-meter-optimum-value {
     justify-self: end;
 }
 
-.walking-game {
+.walking-game,
+.indoor-domestic-game {
     max-width: 620px;
     margin: 48px auto;
     padding: 0 16px 64px;
