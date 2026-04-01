@@ -2,11 +2,11 @@ import { useState } from "react";
 import ActivityImage from "./ActivityImage";
 
 // @ts-ignore
-import imgSwimBreak from "../../images/swimBreak.png";
+import imgSwimBreak from "../images/swimBreak.png";
 // @ts-ignore
-import imgSwimLap from "../../images/swimLap.png";
+import imgSwimLap from "../images/swimLap.png";
 // @ts-ignore
-import imgSwimTread from "../../images/swimTread.png";
+import imgSwimTread from "../images/swimTread.png";
 import { Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 
