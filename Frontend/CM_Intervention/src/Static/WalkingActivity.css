@@ -1,12 +1,18 @@
+.og-image {
+    margin: 20px 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+}
 .stats-viewer {
     display: inline-grid;
-    padding: 5px;
-    border-style: solid;
-    border-radius: 5px;
-    border-width: 1px;
-    border-color: gray;
+    padding: 20px 24px;
+    margin: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
     grid-template-columns: auto auto 3em;
     align-items: center;
+    background: var(--surface);
 }
 
 .stats-viewer > .stats-item {
@@ -25,8 +31,42 @@
 
 .stats-viewer > .stats-item > .stats-bar {
     justify-self: start;
+    width: 300px;
+    }
+    
+meter.stats-bar::-webkit-meter-bar {
+    background: var(--surface2);
+    border: none;
+}
+
+meter.stats-bar::-webkit-meter-optimum-value {
+    appearance: none;
+    border: none;
+    background: var(--stat-color);
+    transition: width 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#stat-bar-energy {
+    --stat-color: var(--energy-color);
+}
+#stat-bar-mood {
+    --stat-color: var(--mood-color);
+}
+#stat-bar-confidence {
+    --stat-color: var(--confidence-color);
+}
+#stat-bar-mobility {
+    --stat-color: var(--mobility-color);
 }
 
 .stats-viewer > .stats-item > .stats-number {
     justify-self: end;
+}
+
+.walking-game,
+.indoor-domestic-game,
+.swimming-game {
+    max-width: 620px;
+    margin: 48px auto;
+    padding: 0 16px 64px;
 }
