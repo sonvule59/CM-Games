@@ -45,7 +45,7 @@ export default function RockClimbing() {
     confidence: 50,
     mood: 50,
     health: 50,
-    energy: 50,
+    energy: 100,
   };
 
   const [stats, setStats] = useState(initialStats);
