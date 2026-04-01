@@ -235,6 +235,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             activityState.didMopping &&
                             activityState.didDusting
                         ) {
+                            setDidCleaning(true);
                             setActivityState({
                                 activity: "overview",
                             });
@@ -259,6 +260,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             activityState.didMopping &&
                             activityState.didDusting
                         ) {
+                            setDidCleaning(true);
                             setActivityState({
                                 activity: "overview",
                             });
@@ -283,6 +285,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             activityState.didSweeping &&
                             activityState.didDusting
                         ) {
+                            setDidCleaning(true);
                             setActivityState({
                                 activity: "overview",
                             });
@@ -307,6 +310,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             activityState.didSweeping &&
                             activityState.didMopping
                         ) {
+                            setDidCleaning(true);
                             setActivityState({
                                 activity: "overview",
                             });
