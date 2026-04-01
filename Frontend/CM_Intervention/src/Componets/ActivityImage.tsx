@@ -4,7 +4,7 @@ import type { JSX } from "react";
 type ActivityImageProps = {
     id?: string;
     key?: React.Key;
-} & ({ src: string } | { children: JSX.Element });
+} & ({ src: string } | { children: React.ReactNode });
 
 export default function ActivityImage(props: ActivityImageProps) {
     if ("children" in props) {
