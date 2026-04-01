@@ -1,11 +1,9 @@
 // Tailwind-powered class sets for the Rock Climbing UI.
-// These are collected here instead of inline so JSX stays readable
-// and we can keep the look & feel consistent across components.
-// Tailwind is enabled via @tailwindcss/vite and `@import "tailwindcss";`
-// in `index.css`.
+// These are collected here instead of inline so JSX stays readable and we can keep the look & feel consistent across components.
+// Tailwind is enabled via @tailwindcss/vite and `@import "tailwindcss";` in `index.css`.
 export const rcStyles = {
   container:
-    'max-w-3xl mx-auto my-8 p-6 rounded-2xl bg-gradient-to-br from-indigo-50 via-slate-50 to-emerald-50 shadow-xl border border-slate-100 font-sans text-slate-900',
+    'max-w-4xl mx-auto my-8 p-6 rounded-2xl bg-gradient-to-br from-indigo-50 via-slate-50 to-emerald-50 shadow-xl border border-slate-100 font-sans text-slate-900',
   header: 'flex items-start justify-between gap-3 mb-3',
   headerLeft: 'space-y-1',
   mainTitle: 'm-0 text-3xl font-extrabold tracking-tight text-slate-900',
@@ -21,14 +19,18 @@ export const rcStyles = {
     'w-full p-4 rounded-2xl bg-white border border-slate-100 shadow-sm flex flex-col gap-3',
   statsTitle: 'text-xs font-semibold tracking-wide text-slate-500 uppercase mb-1',
   statRow: 'flex items-center gap-3',
+  statRowPrimary: 'flex items-center gap-3',
   statLabel: 'w-28 text-[11px] font-semibold uppercase tracking-wide text-slate-600',
+  statLabelPrimary: 'w-28 text-sm font-bold uppercase tracking-wide text-slate-800',
   barOuter: 'flex-1 h-3 rounded-full bg-slate-100 overflow-hidden',
+  barOuterPrimary: 'flex-1 h-4 rounded-full bg-slate-100 overflow-hidden',
   barInner: 'h-full rounded-full transition-[width] duration-200 ease-out',
   statValue: 'w-10 text-right text-[11px] tabular-nums text-slate-700',
+  statValuePrimary: 'w-10 text-right text-sm font-semibold tabular-nums text-slate-800',
 
   sceneImageWrap:
-    'w-full rounded-2xl overflow-hidden bg-indigo-100 border border-indigo-100 shadow-sm',
-  sceneImage: 'block w-full h-[220px] object-cover',
+    'w-full rounded-2xl overflow-hidden bg-indigo-200 border border-indigo-200 shadow-sm',
+  sceneImage: 'block w-full h-[320px] object-contain',
 
   section: 'mt-6',
   title: 'm-0 mb-2 text-xl font-bold text-slate-900',

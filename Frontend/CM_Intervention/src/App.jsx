@@ -12,19 +12,23 @@ import OfficeGameStart from './Componets/OfficeGameStart.jsx'
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
     <BrowserRouter>
-    <Routes>
-      <Route path="/office" element = {<OfficeGameStart/>} />
-      <Route path="/walk" element = {<WalkingActivityDemo />} />
-      <Route path="/rock" element = {<RockClimbing /> } />
-      <Route path='/office/test' element = {<OfficeGame/>} /> 
+      <Routes>
+        {/* Default route when you hit "/" */}
+        <Route path="/" element={<LeisureHome Start/>} />
+        
+
+        {/* Individual routes for each mini‑game */}
+        <Route path="/outdoors" element={<OutdoorsActivities />} />
+        <Route path="/rock" element={<RockClimbing />} />
+        <Route path="/walk" element={<WalkingActivityDemo />} />
+        <Route path='/office/test' element = {<OfficeGame/>} /> 
     </Routes>
     </BrowserRouter>
-  
-  )
+  );
 }
 
-export default App
+export default App;
