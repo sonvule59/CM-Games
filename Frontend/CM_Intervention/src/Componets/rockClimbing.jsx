@@ -2,21 +2,30 @@
 // This component owns the narrative flow and stat logic; layout / visuals
 // are handled via Tailwind utility sets in `rockClimbingStyles`.
 import React, { useState } from 'react';
-import enteringGymImg from "../../images/enteringGym.png";
-import climbingWallImg from "../../images/climbingWall.png";
-import whichRouteImg from "../../images/whichRoute.png";
-import watchingClimbersImg from "../../images/watchingClimbers.png";
-import stretchingMatsImg from "../../images/stretchingMats.png";
-import warmupHoldsImg from "../../images/warmupHolds.png";
-import { rcStyles } from '../rockClimbingStyles';
+import { useNavigate } from 'react-router';
+import enteringGymImg from '../images/enteringGym.png';
+import climbingWallImg from '../images/climbingWall.png';
+import whichRouteImg from '../images/whichRoute.png';
+import watchingClimbersImg from '../images/watchingClimbers.png';
+import stretchingMatsImg from '../images/stretchingMats.png';
+import warmupHoldsImg from '../images/warmupHolds.png';
+import cheerOnImg from '../images/cheerOn.png';
+import askRoutesImg from '../images/askRoutes.png';
+import gentleMobilityImg from '../images/gentleMobility.png';
+import hardRouteImg from '../images/hardRoute.png';
+import { rcStyles } from '../Static/rockClimbingStyles';
 
-// Map high‑level scene keys to illustration assets shown above the text.
+// Map scene/response keys to illustration assets shown above the text.
 const SCENE_IMAGES = {
   entrance: enteringGymImg,
   whichRoute: whichRouteImg,
   climbingWall: climbingWallImg,
+  hardRoute: hardRouteImg,
   watch: watchingClimbersImg,
+  cheerOn: cheerOnImg,
+  askRoutes: askRoutesImg,
   stretchingMats: stretchingMatsImg,
+  gentleMobility: gentleMobilityImg,
   warmupHolds: warmupHoldsImg,
 };
 
@@ -29,12 +38,14 @@ const SCENE_LABELS = {
 };
 
 export default function RockClimbing() {
+  const navigate = useNavigate();
+
   // All four stats live on a 0‑100 scale and are clamped on update.
   const initialStats = {
-    energy: 50,
     confidence: 50,
     mood: 50,
-    mobility: 50,
+    health: 50,
+    energy: 100,
   };
 
   const [stats, setStats] = useState(initialStats);
@@ -43,13 +54,15 @@ export default function RockClimbing() {
   // step is a small state machine inside each scene (intro → choices → result).
   const [step, setStep] = useState(0); // 0 = entrance, 1 = path intro, 2 = path follow-up choices, 3 = path follow-up result
   const [lastDelta, setLastDelta] = useState({
-    energy: 0,
     confidence: 0,
     mood: 0,
-    mobility: 0,
+    health: 0,
+    energy: 0,
   });
   const [resultText, setResultText] = useState('');
   const [stretchChoice, setStretchChoice] = useState(null); // 'mobility' | 'easyHolds' | null
+  const [watchChoice, setWatchChoice] = useState(null); // 'cheer' | 'ask' | null
+  const [wallChoice, setWallChoice] = useState(null); // 'easy' | 'hard' | null
 
   // Enforce 0‑100 range so bars and numbers never overflow.
   const clamp = (value) => Math.max(0, Math.min(100, value));
@@ -57,16 +70,16 @@ export default function RockClimbing() {
   // Apply stat changes in one place; any missing fields default to 0.
   const applyDelta = (delta) => {
     setStats((prev) => ({
-      energy: clamp(prev.energy + (delta.energy || 0)),
       confidence: clamp(prev.confidence + (delta.confidence || 0)),
       mood: clamp(prev.mood + (delta.mood || 0)),
-      mobility: clamp(prev.mobility + (delta.mobility || 0)),
+      health: clamp(prev.health + (delta.health || 0)),
+      energy: clamp(prev.energy + (delta.energy || 0)),
     }));
     setLastDelta({
-      energy: delta.energy || 0,
       confidence: delta.confidence || 0,
       mood: delta.mood || 0,
-      mobility: delta.mobility || 0,
+      health: delta.health || 0,
+      energy: delta.energy || 0,
     });
   };
 
@@ -75,30 +88,34 @@ export default function RockClimbing() {
     setStats(initialStats);
     setScene('entrance');
     setStep(0);
-    setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
+    setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });
     setResultText('');
     setStretchChoice(null);
+    setWatchChoice(null);
+    setWallChoice(null);
   };
 
   // Soft reset used by "Back to Entrance" buttons after a branch.
   const backToEntrance = () => {
     setScene('entrance');
     setStep(0);
-    setLastDelta({ energy: 0, confidence: 0, mood: 0, mobility: 0 });
+    setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });
     setResultText('');
     setStretchChoice(null);
+    setWatchChoice(null);
+    setWallChoice(null);
   };
 
   // Handle the very first choice from the entrance and move into a branch.
   const handleEntranceChoice = (choice) => {
     if (choice === 'wall') {
-      applyDelta({ energy: -10, confidence: +8, mood: +5, mobility: +5 });
+      applyDelta({ confidence: +8, mood: +5, health: +5, energy: -10 });
       setScene('wall');
     } else if (choice === 'watch') {
-      applyDelta({ energy: -2, confidence: +4, mood: +6, mobility: 0 });
+      applyDelta({ confidence: +4, mood: +6, health: 0, energy: -2 });
       setScene('watch');
     } else if (choice === 'stretch') {
-      applyDelta({ energy: -3, confidence: +3, mood: +5, mobility: +10 });
+      applyDelta({ confidence: +3, mood: +5, health: +10, energy: -3 });
       setScene('stretch');
     }
     setStep(1);
@@ -107,13 +124,14 @@ export default function RockClimbing() {
 
   // Wall follow‑ups: easier vs harder route trades energy vs confidence.
   const handleWallFollowup = (choice) => {
+    setWallChoice(choice);
     if (choice === 'easy') {
-      applyDelta({ energy: -5, confidence: +6, mood: +4, mobility: +3 });
+      applyDelta({ confidence: +6, mood: +4, health: +3, energy: -5 });
       setResultText(
         'You pick a friendlier route, focusing on smooth movement and breathing. Each hold feels more approachable, and you notice small wins stacking up.'
       );
     } else if (choice === 'hard') {
-      applyDelta({ energy: -12, confidence: +10, mood: +3, mobility: +2 });
+      applyDelta({ confidence: +10, mood: +3, health: +2, energy: -12 });
       setResultText(
         'You step onto the harder route, taking your time and honoring where your body is today. Every attempt is valid effort, and you celebrate the courage it took to try.'
       );
@@ -123,13 +141,14 @@ export default function RockClimbing() {
 
   // Watching follow‑ups: social choices that mostly affect mood / confidence.
   const handleWatchFollowup = (choice) => {
+    setWatchChoice(choice);
     if (choice === 'cheer') {
-      applyDelta({ energy: -1, confidence: +5, mood: +8, mobility: 0 });
+      applyDelta({ confidence: +5, mood: +8, health: 0, energy: -1 });
       setResultText(
         'You cheer for another climber, noticing how their effort inspires you. The room feels warmer and more connected, and you feel proud of the support you offered.'
       );
     } else if (choice === 'ask') {
-      applyDelta({ energy: -2, confidence: +7, mood: +4, mobility: +2 });
+      applyDelta({ confidence: +7, mood: +4, health: +2, energy: -2 });
       setResultText(
         'You talk with staff about beginner routes, getting clear, kind guidance. Knowing there are options that meet you where you are makes the wall feel less intimidating.'
       );
@@ -141,12 +160,12 @@ export default function RockClimbing() {
   const handleStretchFollowup = (choice) => {
     setStretchChoice(choice);
     if (choice === 'mobility') {
-      applyDelta({ energy: -3, confidence: +4, mood: +6, mobility: +12 });
+      applyDelta({ confidence: +4, mood: +6, health: +12, energy: -3 });
       setResultText(
         'You move gently through your joints, paying attention to what feels good. Each stretch is a small act of care, reminding you that comfort matters as much as challenge.'
       );
     } else if (choice === 'easyHolds') {
-      applyDelta({ energy: -6, confidence: +7, mood: +7, mobility: +8 });
+      applyDelta({ confidence: +7, mood: +7, health: +8, energy: -6 });
       setResultText(
         'You warm up on easier holds, letting your body find its rhythm. The movements stay light and playful, and you notice tension slowly drifting away.'
       );
@@ -158,10 +177,10 @@ export default function RockClimbing() {
   const renderDeltaList = () => {
     const items = [];
     const labels = {
-      energy: 'Energy',
       confidence: 'Confidence',
       mood: 'Mood',
-      mobility: 'Mobility',
+      health: 'Health',
+      energy: 'Energy',
     };
 
     Object.keys(lastDelta).forEach((key) => {
@@ -184,17 +203,17 @@ export default function RockClimbing() {
   };
 
   // Single horizontal stat bar row; color is passed per stat.
-  const renderStatsBar = (label, value, color) => {
+  const renderStatsBar = (label, value, color, isPrimary = false) => {
     return (
-      <div className={rcStyles.statRow}>
-        <div className={rcStyles.statLabel}>{label}</div>
-        <div className={rcStyles.barOuter}>
+      <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
+        <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
+        <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
           <div
             className={rcStyles.barInner}
             style={{ width: `${value}%`, backgroundColor: color }}
           />
         </div>
-        <div className={rcStyles.statValue}>{value}</div>
+        <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
       </div>
     );
   };
@@ -437,20 +456,28 @@ export default function RockClimbing() {
     return null;
   };
 
-  // Which image to show: whichRoute on wall step 1, climbingWall on easy/hard, warmupHolds when stretch + easy holds
+  // Pick image to show for current scene/step/choice (entrance, wall, watch, stretch paths).
   const sceneImageKey =
     scene === 'entrance'
       ? 'entrance'
       : scene === 'wall'
         ? step === 1
           ? 'whichRoute'
-          : 'climbingWall'
+          : step === 3 && wallChoice === 'hard'
+            ? 'hardRoute'
+            : 'climbingWall'
         : scene === 'watch'
-          ? 'watch'
+          ? step === 3 && watchChoice === 'cheer'
+            ? 'cheerOn'
+            : step === 3 && watchChoice === 'ask'
+              ? 'askRoutes'
+              : 'watch'
           : scene === 'stretch'
-            ? step === 3 && stretchChoice === 'easyHolds'
-              ? 'warmupHolds'
-              : 'stretchingMats'
+            ? step === 3 && stretchChoice === 'mobility'
+              ? 'gentleMobility'
+              : step === 3 && stretchChoice === 'easyHolds'
+                ? 'warmupHolds'
+                : 'stretchingMats'
             : 'entrance';
 
   return (
@@ -463,18 +490,26 @@ export default function RockClimbing() {
           </p>
           <div className={rcStyles.scenePill}>{SCENE_LABELS[scene]}</div>
         </div>
-        <button className={rcStyles.resetButton} onClick={resetGame}>
-          Reset Game
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className={rcStyles.secondaryButton}
+            onClick={() => navigate('/')}
+          >
+            Back to Home
+          </button>
+          <button className={rcStyles.resetButton} onClick={resetGame}>
+            Reset Game
+          </button>
+        </div>
       </div>
 
       <div className={rcStyles.topRow}>
         <div className={rcStyles.statsContainer}>
           <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
-          {renderStatsBar('Energy', stats.energy, '#facc15' /* yellow */)}
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444' /* red */)}
+          {renderStatsBar('Confidence', stats.confidence, '#ef4444' /* red */, true)}
           {renderStatsBar('Mood', stats.mood, '#22c55e' /* green */)}
-          {renderStatsBar('Mobility', stats.mobility, '#3b82f6' /* blue */)}
+          {renderStatsBar('Health', stats.health, '#3b82f6' /* blue */)}
+          {renderStatsBar('Energy', stats.energy, '#facc15' /* yellow */)}
         </div>
       </div>
 
@@ -496,4 +531,3 @@ export default function RockClimbing() {
     </div>
   );
 }
-

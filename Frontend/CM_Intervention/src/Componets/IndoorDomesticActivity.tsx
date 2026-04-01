@@ -6,31 +6,31 @@ import { Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 
 // Source: https://www.freepik.com/free-vector/empty-room-with-light-yellow-wall-parquet-floor_21196882.htm
 // @ts-ignore
-import imgIndoorDomesticBgs from "../../images/indoorDomesticBg.jpg";
+import imgIndoorDomesticBgs from "../images/indoorDomesticBg.jpg";
 
 // Source: https://freesvg.org/basket-with-dirty-laundry-vector-clip-art
 // @ts-ignore
-import imgFullBasket from "../../images/foldedBasket.svg";
+import imgFullBasket from "../images/foldedBasket.svg";
 
 // Source: https://freesvg.org/plastic-laundry-basket-vector-drawing
 // @ts-ignore
-import imgEmptyBasket from "../../images/emptyBasket.svg";
+import imgEmptyBasket from "../images/emptyBasket.svg";
 
 // Source: https://freesvg.org/spilled-orange-drink
 // @ts-ignore
-import imgSpilledOrangeDrink from "../../images/spilledOrangeDrink.svg";
+import imgSpilledOrangeDrink from "../images/spilledOrangeDrink.svg";
 
 // Source: https://toppng.com/show_download/111868/dust-cloud-png
 // @ts-ignore
-import imgDustCloud from "../../images/dustCloud.png";
+import imgDustCloud from "../images/dustCloud.png";
 
 // Source: https://www.vecteezy.com/vector-art/1314090-cartoon-style-dirty-and-clean-dishes-set
 // @ts-ignore
-import imgDishes from "../../images/dishes.png";
+import imgDishes from "../images/dishes.png";
 
 // Source: https://commons.wikimedia.org/wiki/File:Dinner_table_side_pine_wood_large_table_front.png
 // @ts-ignore
-import imgTable from "../../images/table.png";
+import imgTable from "../images/table.png";
 
 type IndoorDomesticActivityProps = {};
 
