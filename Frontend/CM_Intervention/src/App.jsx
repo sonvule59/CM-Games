@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
 import RockClimbing from './Componets/rockClimbing'
 import WalkingActivity from './Componets/WalkingActivity'
+import SwimmingActivity from './Componets/SwimmingActivity'
 import OfficeGameStart from './Componets/OfficeGameStart.jsx'
 import LeisureHome from './Componets/leisureHome.jsx'
 import OutdoorsActivities from './Componets/leisureHome.jsx'
@@ -28,6 +29,7 @@ function App() {
         <Route path="/rock" element={<RockClimbing />} />
         <Route path="/walk" element={<WalkingActivity />} />
         <Route path='/office/test' element = {<OfficeGame/>} /> 
+        <Route path="/swim" element = {<SwimmingActivity /> } />
     </Routes>
     </BrowserRouter>
   );
