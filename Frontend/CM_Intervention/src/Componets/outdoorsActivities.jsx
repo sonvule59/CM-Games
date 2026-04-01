@@ -20,7 +20,7 @@ export default function OutdoorsActivities() {
     confidence: 50,
     mood: 50,
     health: 50,
-    energy: 50,
+    energy: 100,
   };
 
   const [activity, setActivity] = useState(null); // 'walk' | 'fish' | 'golf' | 'bocce' | null
