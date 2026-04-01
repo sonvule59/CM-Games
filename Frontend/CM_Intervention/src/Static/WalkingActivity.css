@@ -2,6 +2,7 @@
     margin: 20px 0;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     border-radius: 16px;
+    overflow: hidden;
 }
 .stats-viewer {
     display: inline-grid;

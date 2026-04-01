@@ -4,6 +4,34 @@ import { Feedback, negativeFeedback, positiveFeedback } from "./Feedback";
 import ActivityImage from "./ActivityImage";
 import { Stats, StatsViewer } from "./StatsPanel";
 
+// Source: https://www.freepik.com/free-vector/empty-room-with-light-yellow-wall-parquet-floor_21196882.htm
+// @ts-ignore
+import imgIndoorDomesticBgs from "../../images/indoorDomesticBg.jpg";
+
+// Source: https://freesvg.org/basket-with-dirty-laundry-vector-clip-art
+// @ts-ignore
+import imgFullBasket from "../../images/foldedBasket.svg";
+
+// Source: https://freesvg.org/plastic-laundry-basket-vector-drawing
+// @ts-ignore
+import imgEmptyBasket from "../../images/emptyBasket.svg";
+
+// Source: https://freesvg.org/spilled-orange-drink
+// @ts-ignore
+import imgSpilledOrangeDrink from "../../images/spilledOrangeDrink.svg";
+
+// Source: https://toppng.com/show_download/111868/dust-cloud-png
+// @ts-ignore
+import imgDustCloud from "../../images/dustCloud.png";
+
+// Source: https://www.vecteezy.com/vector-art/1314090-cartoon-style-dirty-and-clean-dishes-set
+// @ts-ignore
+import imgDishes from "../../images/dishes.png";
+
+// Source: https://commons.wikimedia.org/wiki/File:Dinner_table_side_pine_wood_large_table_front.png
+// @ts-ignore
+import imgTable from "../../images/table.png";
+
 type IndoorDomesticActivityProps = {};
 
 const IMAGE_ID_TO_SRC = {} satisfies Record<string, string | undefined>;
@@ -14,6 +42,73 @@ const STARTING_STATS: Stats = Object.freeze({
     confidence: 50,
     mobility: 50,
 });
+
+function HouseImage({
+    didCleaning,
+    didDishes,
+    didLaundry,
+    didCooking,
+    didDinner,
+}: {
+    didCleaning: boolean;
+    didDishes: boolean;
+    didLaundry: boolean;
+    didCooking: boolean;
+    didDinner: boolean;
+}) {
+    return (
+        <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg">
+            <image
+                x={0}
+                y={0}
+                width={720}
+                height={400}
+                href={imgIndoorDomesticBgs}
+            ></image>
+            <image
+                x={20}
+                y={220}
+                width={150}
+                height={150}
+                href={didLaundry ? imgEmptyBasket : imgFullBasket}
+            ></image>
+            <g>
+                <image x={400} y={200} width={300} href={imgTable}></image>
+                <svg
+                    x={450}
+                    y={100}
+                    width={100}
+                    height={200}
+                    viewBox={didDishes ? "3500 0 3500 5000" : "0 0 3500 5000"}
+                >
+                    <image
+                        x={0}
+                        y={0}
+                        width={7000}
+                        height={5000}
+                        href={imgDishes}
+                    ></image>
+                </svg>
+            </g>
+            <g display={didCleaning ? "none" : "inline"}>
+                <image
+                    x={600}
+                    y={300}
+                    width={50}
+                    height={50}
+                    href={imgSpilledOrangeDrink}
+                ></image>
+                <image
+                    x={0}
+                    y={50}
+                    width={800}
+                    href={imgDustCloud}
+                    opacity={0.8}
+                ></image>
+            </g>
+        </svg>
+    );
+}
 
 function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     function givePositiveFeedback(message: string) {
@@ -65,7 +160,8 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🧹",
                     desc: "Clean the house",
                     action() {
-                        setActivityState({ activity: "cleaning" });
+                        setDidCleaning(true);
+                        // setActivityState({ activity: "cleaning" });
                     },
                 },
                 {
@@ -74,7 +170,8 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🧽",
                     desc: "Clean the dishes",
                     action() {
-                        setActivityState({ activity: "dishes" });
+                        setDidDishes(true);
+                        // setActivityState({ activity: "dishes" });
                     },
                 },
                 {
@@ -83,7 +180,8 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🧺",
                     desc: "Do the laundry",
                     action() {
-                        setActivityState({ activity: "laundry" });
+                        setDidLaundry(true);
+                        // setActivityState({ activity: "laundry" });
                     },
                 },
                 {
@@ -92,7 +190,8 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🍲",
                     desc: "Cook some food",
                     action() {
-                        setActivityState({ activity: "cooking" });
+                        setDidCooking(true);
+                        // setActivityState({ activity: "cooking" });
                     },
                 },
                 {
@@ -101,7 +200,8 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🍽️",
                     desc: "Have dinner",
                     action() {
-                        setActivityState({ activity: "dinner" });
+                        setDidDinner(true);
+                        // setActivityState({ activity: "dinner" });
                     },
                 },
             ];
@@ -113,8 +213,18 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     return (
         <div className="indoor-domestic-game">
-            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
-                <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
+            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined ? (
+                <ActivityImage key={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
+            ) : (
+                <ActivityImage key="house-image">
+                    <HouseImage
+                        didCleaning={didCleaning}
+                        didDishes={didDishes}
+                        didLaundry={didLaundry}
+                        didCooking={didCooking}
+                        didDinner={didDinner}
+                    ></HouseImage>
+                </ActivityImage>
             )}
             <StatsViewer stats={stats}></StatsViewer>
             <ActionPanel title={actionPrompt} tasks={actions}></ActionPanel>
