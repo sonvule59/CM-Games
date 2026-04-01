@@ -6,9 +6,11 @@ import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import OfficeGame from './Componets/OfficeGame'
-import WalkingActivityDemo from './Componets/WalkingActivityDemo.tsx'
 import RockClimbing from './Componets/rockClimbing'
+import WalkingActivity from './Componets/WalkingActivity'
 import OfficeGameStart from './Componets/OfficeGameStart.jsx'
+import LeisureHome from './Componets/leisureHome.jsx'
+import OutdoorsActivities from './Componets/leisureHome.jsx'
 
 
 function App() {
@@ -24,7 +26,7 @@ function App() {
         {/* Individual routes for each mini‑game */}
         <Route path="/outdoors" element={<OutdoorsActivities />} />
         <Route path="/rock" element={<RockClimbing />} />
-        <Route path="/walk" element={<WalkingActivityDemo />} />
+        <Route path="/walk" element={<WalkingActivity />} />
         <Route path='/office/test' element = {<OfficeGame/>} /> 
     </Routes>
     </BrowserRouter>
