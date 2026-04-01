@@ -1,3 +1,5 @@
+import { rcStyles } from "../Static/rockClimbingStyles";
+
 const POSITIVE_FEEDBACK_MESSAGES: readonly string[] = [
     "Good job!",
     "Well done!",
@@ -26,9 +28,9 @@ function Feedback({ feedback }: FeedbackProps) {
     return (
         <>
             {feedback != undefined && (
-                <div className="og-feedback" key={feedback}>
+                <p className={rcStyles.paragraph} key={feedback}>
                     {feedback}
-                </div>
+                </p>
             )}
         </>
     );

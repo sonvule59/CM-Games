@@ -1,3 +1,5 @@
+import { rcStyles } from "../Static/rockClimbingStyles";
+
 // ActivityImage component.
 type ActivityImageProps = {
     id?: string;
@@ -5,5 +7,9 @@ type ActivityImageProps = {
 };
 
 export default function ActivityImage({ id, src }: ActivityImageProps) {
-    return <img className="og-image" src={src}></img>;
+    return (
+        <div className={rcStyles.sceneImageWrap}>
+            <img className={rcStyles.sceneImage} src={src}></img>
+        </div>
+    );
 }

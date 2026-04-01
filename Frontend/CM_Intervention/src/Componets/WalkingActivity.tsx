@@ -1,17 +1,17 @@
 import { useState } from "react";
 import "../Static/WalkingActivity.css";
 
-import imgWalkingBikeNeighborhood from "../../images/walkingBikeNeighborhood.png";
-import imgWalkingBikePark from "../../images/walkingBikePark.png";
-import imgWalkingBreakNeighborhood from "../../images/walkingBreakNeighborhood.png";
-import imgWalkingBreakPark from "../../images/walkingBreakPark.png";
-import imgWalkingChooseLocation from "../../images/walkingChooseLocation.png";
-import imgWalkingRunNeighborhood from "../../images/walkingRunNeighborhood.png";
-import imgWalkingRunPark from "../../images/walkingRunPark.png";
-import imgWalkingStretchNeighborhood from "../../images/walkingStretchNeighborhood.png";
-import imgWalkingStretchPark from "../../images/walkingStretchPark.png";
-import imgWalkingWalkNeighborhood from "../../images/walkingWalkNeighborhood.png";
-import imgWalkingWalkPark from "../../images/walkingWalkPark.png";
+import imgWalkingBikeNeighborhood from "../images/walkingBikeNeighborhood.png";
+import imgWalkingBikePark from "../images/walkingBikePark.png";
+import imgWalkingBreakNeighborhood from "../images/walkingBreakNeighborhood.png";
+import imgWalkingBreakPark from "../images/walkingBreakPark.png";
+import imgWalkingChooseLocation from "../images/walkingChooseLocation.png";
+import imgWalkingRunNeighborhood from "../images/walkingRunNeighborhood.png";
+import imgWalkingRunPark from "../images/walkingRunPark.png";
+import imgWalkingStretchNeighborhood from "../images/walkingStretchNeighborhood.png";
+import imgWalkingStretchPark from "../images/walkingStretchPark.png";
+import imgWalkingWalkNeighborhood from "../images/walkingWalkNeighborhood.png";
+import imgWalkingWalkPark from "../images/walkingWalkPark.png";
 import { StatDelta, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import ActivityImage from "./ActivityImage";
@@ -21,6 +21,7 @@ import {
     positiveFeedback,
     randomElement,
 } from "./Feedback";
+import { rcStyles } from "../Static/rockClimbingStyles";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -380,13 +381,15 @@ function WalkingActivity({}: WalkingActivityProps) {
     }
 
     return (
-        <div className="walking-game">
+        <div className={rcStyles.container}>
             {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
                 <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
             )}
-            {screenState.screen === "game" && (
-                <StatsViewer stats={screenState.stats}></StatsViewer>
-            )}
+            <div className={rcStyles.topRow}>
+                {screenState.screen === "game" && (
+                    <StatsViewer stats={screenState.stats}></StatsViewer>
+                )}
+            </div>
             <ActionPanel title={tasksPrompt} tasks={tasks}></ActionPanel>
             <Feedback feedback={feedback}></Feedback>
         </div>
