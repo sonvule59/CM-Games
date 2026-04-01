@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import { Feedback, negativeFeedback, positiveFeedback } from "./Feedback";
 import ActivityImage from "./ActivityImage";
-import { Stats, StatsViewer } from "./StatsPanel";
+import { Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 
 // Source: https://www.freepik.com/free-vector/empty-room-with-light-yellow-wall-parquet-floor_21196882.htm
 // @ts-ignore
@@ -129,7 +129,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     let actions: Array<ActionSpec>;
     let actionPrompt: string;
-    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
+    let imageId: "house" | keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
 
     const [stats, setStats] = useState<Stats>(STARTING_STATS);
     const [didCleaning, setDidCleaning] = useState<boolean>(false);
@@ -140,7 +140,13 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     type ActivityState = Readonly<
         | { activity: "overview" }
-        | { activity: "cleaning" }
+        | {
+              activity: "cleaning";
+              didVacuuming: boolean;
+              didSweeping: boolean;
+              didMopping: boolean;
+              didDusting: boolean;
+          }
         | { activity: "dishes" }
         | { activity: "laundry" }
         | { activity: "cooking" }
@@ -152,6 +158,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     switch (activityState.activity) {
         case "overview":
+            imageId = "house";
             actionPrompt = "Choose an activity";
             actions = [
                 {
@@ -160,8 +167,13 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     icon: "🧹",
                     desc: "Clean the house",
                     action() {
-                        setDidCleaning(true);
-                        // setActivityState({ activity: "cleaning" });
+                        setActivityState({
+                            activity: "cleaning",
+                            didVacuuming: false,
+                            didSweeping: false,
+                            didMopping: false,
+                            didDusting: false,
+                        });
                     },
                 },
                 {
@@ -201,10 +213,111 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     desc: "Have dinner",
                     action() {
                         setDidDinner(true);
+                        setStats(statsUpdate(stats, { energy: +100 }));
                         // setActivityState({ activity: "dinner" });
                     },
                 },
             ];
+            break;
+        case "cleaning":
+            actionPrompt = "Choose an activity";
+            actions = [];
+            if (!activityState.didVacuuming)
+                actions.push({
+                    id: "vacuum",
+                    label: "Vacuum",
+                    icon: "🌫️",
+                    desc: "Vacuum the house",
+                    action() {
+                        setStats(statsUpdate(stats, { energy: -10 }));
+                        if (
+                            activityState.didSweeping &&
+                            activityState.didMopping &&
+                            activityState.didDusting
+                        ) {
+                            setActivityState({
+                                activity: "overview",
+                            });
+                        } else {
+                            setActivityState({
+                                ...activityState,
+                                didVacuuming: true,
+                            });
+                        }
+                    },
+                });
+            if (!activityState.didSweeping)
+                actions.push({
+                    id: "sweep",
+                    label: "Sweep",
+                    icon: "🧹",
+                    desc: "Sweep the house",
+                    action() {
+                        setStats(statsUpdate(stats, { energy: -10 }));
+                        if (
+                            activityState.didVacuuming &&
+                            activityState.didMopping &&
+                            activityState.didDusting
+                        ) {
+                            setActivityState({
+                                activity: "overview",
+                            });
+                        } else {
+                            setActivityState({
+                                ...activityState,
+                                didSweeping: true,
+                            });
+                        }
+                    },
+                });
+            if (!activityState.didMopping)
+                actions.push({
+                    id: "mop",
+                    label: "Mop",
+                    icon: "🪣",
+                    desc: "Mop the house",
+                    action() {
+                        setStats(statsUpdate(stats, { energy: -10 }));
+                        if (
+                            activityState.didVacuuming &&
+                            activityState.didSweeping &&
+                            activityState.didDusting
+                        ) {
+                            setActivityState({
+                                activity: "overview",
+                            });
+                        } else {
+                            setActivityState({
+                                ...activityState,
+                                didMopping: true,
+                            });
+                        }
+                    },
+                });
+            if (!activityState.didDusting)
+                actions.push({
+                    id: "dust",
+                    label: "Dust",
+                    icon: "🧽",
+                    desc: "Dust the house",
+                    action() {
+                        setStats(statsUpdate(stats, { energy: -10 }));
+                        if (
+                            activityState.didVacuuming &&
+                            activityState.didSweeping &&
+                            activityState.didMopping
+                        ) {
+                            setActivityState({
+                                activity: "overview",
+                            });
+                        } else {
+                            setActivityState({
+                                ...activityState,
+                                didDusting: true,
+                            });
+                        }
+                    },
+                });
             break;
         default:
             throw new Error("unimplemented");
@@ -213,9 +326,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     return (
         <div className="indoor-domestic-game">
-            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined ? (
-                <ActivityImage key={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
-            ) : (
+            {imageId == "house" ? (
                 <ActivityImage key="house-image">
                     <HouseImage
                         didCleaning={didCleaning}
@@ -225,6 +336,14 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         didDinner={didDinner}
                     ></HouseImage>
                 </ActivityImage>
+            ) : (
+                imageId != undefined &&
+                IMAGE_ID_TO_SRC[imageId] != undefined && (
+                    <ActivityImage
+                        key={imageId}
+                        src={IMAGE_ID_TO_SRC[imageId]}
+                    />
+                )
             )}
             <StatsViewer stats={stats}></StatsViewer>
             <ActionPanel title={actionPrompt} tasks={actions}></ActionPanel>
