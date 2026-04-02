@@ -5,6 +5,8 @@ import fastWalkImg from "../images/walkingFast.png";
 import parkedImg from "../images/parked.png";
 import parkedCloseImg from "../images/parkedClose.png";
 import { rcStyles } from "../Static/rockClimbingStyles";
+import { useNavigate } from "react-router";
+
 
 export default function ParkingLot() {
   const initialStats = {
@@ -21,6 +23,8 @@ export default function ParkingLot() {
   const [lastDelta, setLastDelta] = useState({ energy: 0, confidence: 0, mood: 0, health: 0 });
   
   const [currentImage, setCurrentImage] = useState(parkingLotImg);
+  // @Kelly added navigate 
+  const navigate = useNavigate();
 
   const clamp = (v) => Math.max(0, Math.min(100, v));
 
@@ -156,8 +160,8 @@ export default function ParkingLot() {
             <h3 className={rcStyles.subtitle}>Total Changes</h3>
             <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
           </div>
-          <button onClick={resetGame} className={rcStyles.primaryButton}>
-            Restart Scenario
+          <button onClick={() => navigate("/office/test")} className={rcStyles.primaryButton}>
+            Go into the office
           </button>
         </div>
       );

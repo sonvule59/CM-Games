@@ -88,7 +88,7 @@ export default function OfficeGameStart() {
         {/* CTA button */}
         <button
           className={s.primaryButton}
-          onClick={() => {navigate("/office/test")}}
+          onClick={() => {navigate("/parking")}}
           style={{
             width: "100%",
             padding: "14px 24px",
