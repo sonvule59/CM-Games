@@ -5,6 +5,7 @@ import { rcStyles } from '../Static/rockClimbingStyles';
 import rockBg from '../images/enteringGym.png';
 import outdoorsBg from '../images/pullingUpLake.png';
 import walkBg from '../images/walkingLake.png';
+import swinBg from '../images/swimLap.png'
 
 export default function LeisureHome() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function LeisureHome() {
     if (hovered === 'rock') return rockBg;
     if (hovered === 'outdoors') return outdoorsBg;
     if (hovered === 'walk') return walkBg;
+    if (hovered === 'swim') return swinBg
     return null;
   }, [hovered]);
 
@@ -29,7 +31,8 @@ export default function LeisureHome() {
           backgroundImage: bg ? `url(${bg})` : 'none',
           // Make the preview feel "bigger" by scaling the background image up.
           backgroundSize: '170%',
-          backgroundPosition: 'center 35%',
+          // backgroundPosition: 'center 35%',
+          animation: 'background-scroll 10s infinite ease-in-out alternate',
           opacity: bg ? 0.14 : 0,
           filter: 'blur(0.25px)',
         }}
@@ -81,6 +84,17 @@ export default function LeisureHome() {
             >
               Walking Activities
             </button>
+            <button
+            className={rcStyles.button}
+              onMouseEnter={() => setHovered('swim')}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered('swim')}
+              onBlur={() => setHovered(null)}
+              onClick={() => navigate('/swim')}
+            >
+              Swimming Activities
+            </button>
+
           </div>
         </div>
       </div>
