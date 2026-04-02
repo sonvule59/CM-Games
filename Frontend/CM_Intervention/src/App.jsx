@@ -14,6 +14,7 @@ import OfficeGameStart from './Componets/OfficeGameStart.jsx'
 import OutdoorsActivities from './Componets/outdoorsActivities.jsx'
 import LeisureHome from './Componets/leisureHome.jsx'
 import TransportGame from './Componets/TransportGame.jsx'
+import ParkingLot from './Componets/ParkingLot.jsx'
 
 
 function App() {
@@ -35,6 +36,8 @@ function App() {
         <Route path="/swim" element = {<SwimmingActivity /> } />
         <Route path="/indoor-domestic" element = {<IndoorDomesticActivity /> } />
         <Route path='/transport' element={<TransportGame />} />
+        <Route path="/parking" element={<ParkingLot />} />
+
     </Routes>
     </BrowserRouter>
   );
