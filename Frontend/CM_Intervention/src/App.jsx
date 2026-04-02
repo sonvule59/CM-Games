@@ -11,10 +11,8 @@ import WalkingActivity from './Componets/WalkingActivity'
 import IndoorDomesticActivity from './Componets/IndoorDomesticActivity'
 import SwimmingActivity from './Componets/SwimmingActivity'
 import OfficeGameStart from './Componets/OfficeGameStart.jsx'
+import OutdoorsActivities from './Componets/outdoorsActivities.jsx'
 import LeisureHome from './Componets/leisureHome.jsx'
-import OutdoorsActivities from './Componets/leisureHome.jsx'
-import LeisureHome from './Componets/leisureHome.jsx'
-import OutdoorsActivities from "./Componets/outdoorsActivities"
 
 
 function App() {
