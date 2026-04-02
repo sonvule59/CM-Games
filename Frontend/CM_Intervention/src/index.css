@@ -16,3 +16,13 @@ body {
   justify-content: center;
   background: radial-gradient(circle at top, #eef2ff, #e5e7eb 40%, #d1fae5);
 }
+
+@keyframes background-scroll {
+  from {
+    background-position: center top;
+  }
+
+  to {
+    background-position: center bottom;
+  }
+}
