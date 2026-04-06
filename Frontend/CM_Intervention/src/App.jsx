@@ -15,6 +15,8 @@ import OutdoorsActivities from './Componets/outdoorsActivities.jsx'
 import LeisureHome from './Componets/leisureHome.jsx'
 import TransportGame from './Componets/TransportGame.jsx'
 import ParkingLot from './Componets/ParkingLot.jsx'
+import DomesticHome from './Componets/domesticHome.jsx'
+import OutsideDomestic from './Componets/outsideDomestic.jsx'
 
 
 function App() {
@@ -35,6 +37,8 @@ function App() {
         <Route path='/office/test' element = {<OfficeGame/>} /> 
         <Route path="/swim" element = {<SwimmingActivity /> } />
         <Route path="/indoor-domestic" element = {<IndoorDomesticActivity /> } />
+        <Route path="/domestic-home" element={<DomesticHome />} />
+        <Route path="/outside-domestic" element={<OutsideDomestic />} />
         <Route path='/transport' element={<TransportGame />} />
         <Route path="/parking" element={<ParkingLot />} />
 

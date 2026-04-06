@@ -6,6 +6,7 @@ import rockBg from '../images/enteringGym.png';
 import outdoorsBg from '../images/pullingUpLake.png';
 import walkBg from '../images/walkingLake.png';
 import swinBg from '../images/swimLap.png'
+import domesticBg from '../images/indoorDomesticBg.jpg';
 
 export default function LeisureHome() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function LeisureHome() {
     if (hovered === 'outdoors') return outdoorsBg;
     if (hovered === 'walk') return walkBg;
     if (hovered === 'swim') return swinBg
+    if (hovered === 'domestic') return domesticBg
     return null;
   }, [hovered]);
 
@@ -93,6 +95,17 @@ export default function LeisureHome() {
               onClick={() => navigate('/swim')}
             >
               Swimming Activities
+            </button>
+
+            <button
+              className={rcStyles.button}
+              onMouseEnter={() => setHovered('domestic')}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered('domestic')}
+              onBlur={() => setHovered(null)}
+              onClick={() => navigate('/domestic-home')}
+            >
+              Domestic Activities (Home)
             </button>
 
           </div>
