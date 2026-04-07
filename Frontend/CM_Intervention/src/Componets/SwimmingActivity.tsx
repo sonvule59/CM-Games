@@ -16,7 +16,7 @@ const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
     mood: 50,
     confidence: 50,
-    mobility: 50,
+    health: 50,
 });
 
 const IMAGE_ID_TO_SRC = {
@@ -65,7 +65,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             energy: -10,
                             mood: +10,
                             confidence: +10,
-                            mobility: +10,
+                            health: +10,
                         }),
                         lastActionImage: "swimLap",
                     });
@@ -83,7 +83,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             energy: -5,
                             mood: +10,
                             confidence: +10,
-                            mobility: +0,
+                            health: +0,
                         }),
                         lastActionImage: "swimTread",
                     });
@@ -101,7 +101,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             energy: +50,
                             mood: +10,
                             confidence: +0,
-                            mobility: +50,
+                            health: +50,
                         }),
                         lastActionImage: "swimBreak",
                     });

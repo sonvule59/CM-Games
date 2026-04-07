@@ -1,7 +1,7 @@
 import { rcStyles } from "../Static/rockClimbingStyles";
 
 // Statistics types are defined in this file for now.
-type StatKind = "energy" | "mood" | "confidence" | "mobility";
+type StatKind = "energy" | "mood" | "confidence" | "health";
 
 type Stats = Readonly<Record<StatKind, number>>;
 type StatDelta = Partial<Readonly<Record<StatKind, number>>>;
@@ -17,7 +17,7 @@ function statsUpdate(stats: Stats, delta: StatDelta): Stats {
         energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
         mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
         confidence: clamp(stats.confidence + (delta.confidence ?? 0), 0, 100),
-        mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
+        health: clamp(stats.health + (delta.health ?? 0), 0, 100),
     };
 }
 
@@ -90,7 +90,7 @@ function StatsViewer({ stats }: StatsViewerProps) {
             <StatsBar
                 id="stat-bar-health"
                 label="Health"
-                value={stats.mobility}
+                value={stats.health}
                 color={"#3b82f6"}
                 isPrimary={false}
             />

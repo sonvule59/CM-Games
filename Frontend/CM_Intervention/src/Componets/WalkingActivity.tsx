@@ -30,7 +30,7 @@ const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
     mood: 50,
     confidence: 50,
-    mobility: 50,
+    health: 50,
 });
 
 const IMAGE_ID_TO_SRC = {
@@ -242,7 +242,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         applyStatDelta({
                             energy: +100,
                             mood: -20,
-                            mobility: -10,
+                            health: -10,
                         });
                         giveNegativeFeedback(
                             "You haven't moved in a while, and you're starting to feel bored.",
@@ -251,9 +251,9 @@ function WalkingActivity({}: WalkingActivityProps) {
                         applyStatDelta({
                             energy: +100,
                             mood: +20,
-                            mobility: -10,
+                            health: -10,
                         });
-                        if (screenState.stats.mobility >= 10) {
+                        if (screenState.stats.health >= 10) {
                             givePositiveFeedback(
                                 "You feel refreshed and ready.",
                             );
@@ -279,15 +279,15 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy <= 10) {
                         applyStatDelta({
                             energy: -10,
-                            mobility: +20,
+                            health: +20,
                         });
                         giveNegativeFeedback(
                             "You feel exhausted. Maybe it's time to take a short break.",
                         );
-                    } else if (screenState.stats.mobility >= 90) {
+                    } else if (screenState.stats.health >= 90) {
                         applyStatDelta({
                             energy: -10,
-                            mobility: -100,
+                            health: -100,
                             mood: -50,
                             confidence: -50,
                         });
@@ -297,7 +297,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                     } else {
                         applyStatDelta({
                             energy: -10,
-                            mobility: +50,
+                            health: +50,
                             mood: +10,
                         });
                         givePositiveFeedback("You feel ready to work out.");
@@ -318,17 +318,17 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy <= 20) {
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: -10,
                             mood: -50,
                         });
                         giveNegativeFeedback(
                             "You feel exhausted. Maybe it's time to take a short break.",
                         );
-                    } else if (screenState.stats.mobility <= 10) {
+                    } else if (screenState.stats.health <= 10) {
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: -20,
                             mood: -50,
                         });
@@ -353,7 +353,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         }
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: +50,
                             mood: +10,
                         });
