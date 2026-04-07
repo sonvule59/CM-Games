@@ -350,7 +350,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                 )
             )}
             <StatsViewer stats={stats}></StatsViewer>
-            <ActionPanel title={actionPrompt} tasks={actions}></ActionPanel>
+            <ActionPanel title={actionPrompt} actions={actions}></ActionPanel>
             <Feedback feedback={feedback}></Feedback>
         </div>
     );

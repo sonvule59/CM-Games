@@ -3,6 +3,7 @@ import { rcStyles } from "../Static/rockClimbingStyles";
 // ActionPanel component.
 type ActionSpec = {
     id: string;
+    key?: React.Key;
     className?: string;
     label: string;
     icon?: string;
@@ -12,25 +13,30 @@ type ActionSpec = {
 
 type ActionPanelProps = {
     id?: string;
+    key?: React.Key;
     title?: string;
-    tasks: Array<ActionSpec>;
+    actions: Array<ActionSpec>;
 };
 
-function ActionPanel({ id, title, tasks }: ActionPanelProps) {
+function ActionPanel({ id, key, title, actions }: ActionPanelProps) {
     return (
         <>
             {title !== undefined && (
                 <div className={rcStyles.title}>{title}</div>
             )}
-            <section className={rcStyles.buttonGroup} id={id}>
-                {tasks.map((task) => (
+            <section className={rcStyles.buttonGroup} id={id} key={key}>
+                {actions.map((action) => (
                     <button
-                        key={task.id}
-                        className={`${rcStyles.button} ${task.className ?? ""}`}
-                        onClick={task.action}
+                        key={action.key}
+                        className={`${rcStyles.button} ${action.className ?? ""}`}
+                        onClick={action.action}
                     >
-                        {task.icon === undefined ? <></> : <>{task.icon} </>}
-                        <>{task.desc ?? task.label}</>
+                        {action.icon === undefined ? (
+                            <></>
+                        ) : (
+                            <>{action.icon} </>
+                        )}
+                        <>{action.desc ?? action.label}</>
                     </button>
                 ))}
             </section>

@@ -28,19 +28,25 @@ type StatsViewerProps = {
 
 function StatsBar({
     id,
+    key,
     label,
     value,
     color,
     isPrimary,
 }: {
     id: string;
+    key?: React.Key;
     label: string;
     value: number;
     color: string;
     isPrimary: boolean;
 }) {
     return (
-        <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
+        <div
+            id={id}
+            key={key}
+            className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}
+        >
             <div
                 className={
                     isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel

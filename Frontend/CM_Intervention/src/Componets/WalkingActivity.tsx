@@ -390,7 +390,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                     <StatsViewer stats={screenState.stats}></StatsViewer>
                 )}
             </div>
-            <ActionPanel title={tasksPrompt} tasks={tasks}></ActionPanel>
+            <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
             <Feedback feedback={feedback}></Feedback>
         </div>
     );

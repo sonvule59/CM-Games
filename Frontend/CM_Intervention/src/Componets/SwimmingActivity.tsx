@@ -122,7 +122,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
             {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
             )}
-            <ActionPanel title={actionPrompt} tasks={actions}></ActionPanel>
+            <ActionPanel title={actionPrompt} actions={actions}></ActionPanel>
             {feedback != undefined && (
                 <div className="og-feedback" key={feedback}>
                     {feedback}
