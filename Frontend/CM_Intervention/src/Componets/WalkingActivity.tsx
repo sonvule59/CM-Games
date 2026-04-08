@@ -22,6 +22,7 @@ import {
     randomElement,
 } from "./Feedback";
 import { rcStyles } from "../Static/rockClimbingStyles";
+import { Container, TopRow } from "./Layout";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -381,18 +382,18 @@ function WalkingActivity({}: WalkingActivityProps) {
     }
 
     return (
-        <div className={rcStyles.container}>
+        <Container>
             {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
                 <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
             )}
-            <div className={rcStyles.topRow}>
+            <TopRow>
                 {screenState.screen === "game" && (
                     <StatsViewer stats={screenState.stats}></StatsViewer>
                 )}
-            </div>
+            </TopRow>
             <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
             <Feedback feedback={feedback}></Feedback>
-        </div>
+        </Container>
     );
 }
 

@@ -1,4 +1,5 @@
 import { rcStyles } from "../Static/rockClimbingStyles";
+import { Title } from "./Layout";
 
 // ActionPanel component.
 type ActionSpec = {
@@ -21,9 +22,7 @@ type ActionPanelProps = {
 function ActionPanel({ id, key, title, actions }: ActionPanelProps) {
     return (
         <>
-            {title !== undefined && (
-                <div className={rcStyles.title}>{title}</div>
-            )}
+            {title !== undefined && <Title>{title}</Title>}
             <section className={rcStyles.buttonGroup} id={id} key={key}>
                 {actions.map((action) => (
                     <button
