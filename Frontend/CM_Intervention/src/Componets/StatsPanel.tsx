@@ -22,10 +22,19 @@ function statsUpdate(stats: Stats, delta: StatDelta): Stats {
     };
 }
 
+function statsSubtract(newStats: Stats, oldStats: Stats): StatDelta {
+    return {
+        energy: newStats.energy - oldStats.energy,
+        mood: newStats.mood - oldStats.mood,
+        confidence: newStats.confidence - oldStats.confidence,
+        health: newStats.health - oldStats.health,
+    };
+}
+
 // StatsViewer component.
 type StatsViewerProps = {
     stats: Stats;
-} & React.ComponentPropsWithoutRef<"section">;
+} & Omit<React.ComponentPropsWithoutRef<"section">, "children">;
 
 function StatsBar({
     id,
@@ -115,10 +124,14 @@ function StatsViewer(props: StatsViewerProps) {
 
 type StatDeltaViewerProps = {
     subtitle?: React.ReactNode;
-    delta: StatDelta;
-} & React.ComponentPropsWithoutRef<"div">;
+} & ({ delta: StatDelta } | { newStats: Stats; oldStats: Stats }) &
+    Omit<React.ComponentPropsWithoutRef<"div">, "children">;
 function StatDeltaViewer(props: StatDeltaViewerProps) {
-    const { subtitle, delta } = props;
+    const { subtitle } = props;
+    const delta =
+        "newStats" in props && "oldStats" in props
+            ? statsSubtract(props.newStats, props.oldStats)
+            : props.delta;
     return (
         <div {...addClassNameToProps(props, rcStyles.deltaContainer)}>
             {subtitle != undefined ? <Subtitle>{subtitle}</Subtitle> : <></>}
@@ -184,6 +197,7 @@ function StatDeltaItem({ key, label, value }: StatDeltaItemProps) {
 
 export {
     statsUpdate,
+    statsSubtract,
     StatsViewer,
     StatDeltaViewer,
     Stats,
