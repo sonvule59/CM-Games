@@ -22,7 +22,14 @@ import {
     randomElement,
 } from "./Feedback";
 import { rcStyles } from "../Static/rockClimbingStyles";
-import { Container, TopRow } from "./Layout";
+import {
+    Container,
+    Paragraph,
+    PrimaryButton,
+    Section,
+    Title,
+    TopRow,
+} from "./Layout";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -48,6 +55,8 @@ const IMAGE_ID_TO_SRC = {
     walkingWalkPark: imgWalkingWalkPark,
 } satisfies Record<string, string>;
 
+// TODO: make feedback phrases longer.
+
 function WalkingActivity({}: WalkingActivityProps) {
     function applyStatDelta(delta: StatDelta) {
         if (newScreenState.screen !== "game") throw new Error();
@@ -55,6 +64,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         newScreenState = {
             ...newScreenState,
             stats: statsUpdate(stats, delta),
+            lastDelta: delta,
         };
     }
 
@@ -80,6 +90,7 @@ function WalkingActivity({}: WalkingActivityProps) {
               activity: "walk" | "bike";
               location: "neighborhood" | "localPark";
               stats: Stats;
+              lastDelta: StatDelta | undefined;
               lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
 
@@ -138,6 +149,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "neighborhood",
                         stats: STARTING_STATS,
+                        lastDelta: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -154,6 +166,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "localPark",
                         stats: STARTING_STATS,
+                        lastDelta: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -391,8 +404,21 @@ function WalkingActivity({}: WalkingActivityProps) {
                     <StatsViewer stats={screenState.stats}></StatsViewer>
                 )}
             </TopRow>
-            <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
-            <Feedback feedback={feedback}></Feedback>
+            {feedback === undefined ? (
+                <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
+            ) : (
+                <Section>
+                    <Title>How it plays out</Title>
+                    <Paragraph>{feedback}</Paragraph>
+                    <PrimaryButton
+                        onClick={() => {
+                            setFeedback(undefined);
+                        }}
+                    >
+                        Continue
+                    </PrimaryButton>
+                </Section>
+            )}
         </Container>
     );
 }
