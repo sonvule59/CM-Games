@@ -12,7 +12,13 @@ import imgWalkingStretchNeighborhood from "../images/walkingStretchNeighborhood.
 import imgWalkingStretchPark from "../images/walkingStretchPark.png";
 import imgWalkingWalkNeighborhood from "../images/walkingWalkNeighborhood.png";
 import imgWalkingWalkPark from "../images/walkingWalkPark.png";
-import { StatDelta, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import {
+    StatDelta,
+    StatDeltaViewer,
+    Stats,
+    statsUpdate,
+    StatsViewer,
+} from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import ActivityImage from "./ActivityImage";
 import {
@@ -64,7 +70,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         newScreenState = {
             ...newScreenState,
             stats: statsUpdate(stats, delta),
-            lastDelta: delta,
+            lastStats: stats,
         };
     }
 
@@ -90,7 +96,7 @@ function WalkingActivity({}: WalkingActivityProps) {
               activity: "walk" | "bike";
               location: "neighborhood" | "localPark";
               stats: Stats;
-              lastDelta: StatDelta | undefined;
+              lastStats: Stats | undefined;
               lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
 
@@ -149,7 +155,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "neighborhood",
                         stats: STARTING_STATS,
-                        lastDelta: undefined,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -166,7 +172,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "localPark",
                         stats: STARTING_STATS,
-                        lastDelta: undefined,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -410,6 +416,13 @@ function WalkingActivity({}: WalkingActivityProps) {
                 <Section>
                     <Title>How it plays out</Title>
                     <Paragraph>{feedback}</Paragraph>
+                    {screenState.screen === "game" &&
+                        screenState.lastStats !== undefined && (
+                            <StatDeltaViewer
+                                newStats={screenState.stats}
+                                oldStats={screenState.lastStats}
+                            />
+                        )}
                     <PrimaryButton
                         onClick={() => {
                             setFeedback(undefined);
