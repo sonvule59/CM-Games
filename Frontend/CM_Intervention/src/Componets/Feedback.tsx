@@ -15,11 +15,13 @@ function randomElement<T>(array: readonly T[]): T {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-function positiveFeedback(message: string): string {
+function positiveFeedback(message?: string): string {
+    if (message === undefined) return randomElement(POSITIVE_FEEDBACK_MESSAGES);
     return `${randomElement(POSITIVE_FEEDBACK_MESSAGES)} ${message}`;
 }
 
-function negativeFeedback(message: string): string {
+function negativeFeedback(message?: string): string {
+    if (message === undefined) return randomElement(NEGATIVE_FEEDBACK_MESSAGES);
     return `${randomElement(NEGATIVE_FEEDBACK_MESSAGES)} ${message}`;
 }
 
