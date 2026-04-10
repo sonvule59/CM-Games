@@ -1,3 +1,6 @@
+const ACTION_BUTTON_STYLE: "dylan" | "kelly" = "dylan";
+
+import { s } from "../Static/officestyles";
 import { rcStyles } from "../Static/rockClimbingStyles";
 import { addClassNameToProps, Title } from "./Layout";
 
@@ -98,25 +101,76 @@ function* parseActionSpecs(actions: Iterable<ActionSpec>) {
 
 export function ActionPanel(props: ActionPanelProps) {
     const { title, actions, ...otherProps } = props;
-    return (
-        <>
-            {title != undefined && <Title>{title}</Title>}
-            <section {...addClassNameToProps(otherProps, rcStyles.buttonGroup)}>
-                {Array.from(
-                    parseActionSpecs(actions),
-                    ({ key, icon, label, desc, callback, eventListeners }) => (
-                        <button
-                            key={key}
-                            className={rcStyles.button}
-                            onClick={callback}
-                            {...eventListeners}
-                        >
-                            {icon != undefined && <>{icon} </>}
-                            {desc ?? label}
-                        </button>
-                    ),
-                )}
-            </section>
-        </>
-    );
+    switch (ACTION_BUTTON_STYLE) {
+        default:
+            ACTION_BUTTON_STYLE satisfies never;
+            console.warn(
+                "unrecognized ACTION_BUTTON_STYLE in ActionPanel.tsx:",
+                ACTION_BUTTON_STYLE,
+            );
+        case "dylan":
+            return (
+                <>
+                    {title != undefined && <Title>{title}</Title>}
+                    <section
+                        {...addClassNameToProps(
+                            otherProps,
+                            rcStyles.buttonGroup,
+                        )}
+                    >
+                        {Array.from(
+                            parseActionSpecs(actions),
+                            ({
+                                key,
+                                icon,
+                                label,
+                                desc,
+                                callback,
+                                eventListeners,
+                            }) => (
+                                <button
+                                    key={key}
+                                    className={rcStyles.button}
+                                    onClick={callback}
+                                    {...eventListeners}
+                                >
+                                    {icon != undefined && <>{icon} </>}
+                                    {desc ?? label}
+                                </button>
+                            ),
+                        )}
+                    </section>
+                </>
+            );
+        case "kelly":
+            return (
+                <>
+                    {title != undefined && <Title>{title}</Title>}
+                    <section {...addClassNameToProps(otherProps, s.taskGrid)}>
+                        {Array.from(
+                            parseActionSpecs(actions),
+                            ({
+                                key,
+                                icon,
+                                label,
+                                desc,
+                                callback,
+                                eventListeners,
+                            }) => (
+                                <button
+                                    key={key}
+                                    className={s.taskCard}
+                                    onClick={callback}
+                                    {...eventListeners}
+                                >
+                                    <span className={s.taskIcon}>{icon}</span>
+                                    <span className={s.taskName}>{label}</span>
+                                    <span className={s.taskDesc}>{desc}</span>
+                                </button>
+                            ),
+                        )}
+                    </section>
+                </>
+            );
+    }
 }
