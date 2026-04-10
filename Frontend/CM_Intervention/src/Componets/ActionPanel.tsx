@@ -135,7 +135,7 @@ export function ActionPanel(props: ActionPanelProps) {
                                     {...eventListeners}
                                 >
                                     {icon != undefined && <>{icon} </>}
-                                    {desc ?? label}
+                                    {label ?? desc}
                                 </button>
                             ),
                         )}
