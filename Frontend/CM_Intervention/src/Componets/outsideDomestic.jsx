@@ -2,11 +2,34 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { rcStyles } from '../Static/rockClimbingStyles';
 
+import outdoorDomesticHubImg from '../images/walkingHome.png';
+import groceryShoppingImg from '../images/groceryShopping.png';
+import bringingGroceriesInImg from '../images/bringingGroceriesIn.png';
+import gardeningImg from '../images/gardening.png';
+import gardenWateringImg from '../images/gardenWatering.png';
+import plantingandWeedingImg from '../images/plantingandWeeding.png';
+import takingOutTrashImg from '../images/takingOutTrash.png';
+import recylingImg from '../images/recyling.png';
+import cleaningWindowsImg from '../images/cleaningWindows.png';
+import washingDogsImg from '../images/washingDogs.png';
+import walkingDogsImg from '../images/walkingDogs.png';
+import washingOutsideofCarImg from '../images/washingOutsideofCar.png';
+import cleaningInsideCarImg from '../images/cleaningInsideCar.png';
+import tableImg from '../images/table.png';
+import indoorDomesticBgImg from '../images/indoorDomesticBg.jpg';
+import maintainanceRepairImg from '../images/maintainanceRepair.png';
+import paintingHouseImg from '../images/paintingHouse.png';
+
 const ACTIVITIES = [
   {
     id: 'grocery',
     title: 'Grocery Shopping',
     icon: '🛒',
+    image: groceryShoppingImg,
+    choiceImages: {
+      steady: groceryShoppingImg,
+      extra: bringingGroceriesInImg,
+    },
     intro:
       'You head to the store with a short list. The aisles are busy, but you can move at your own pace—one item at a time.',
     choices: [
@@ -30,6 +53,11 @@ const ACTIVITIES = [
     id: 'gardening',
     title: 'Gardening',
     icon: '🌱',
+    image: gardeningImg,
+    choiceImages: {
+      light: gardenWateringImg,
+      dig: plantingandWeedingImg,
+    },
     intro:
       'Outside, you notice the plants could use a little attention. Gardening is small movements that add up—gentle and steady.',
     choices: [
@@ -53,6 +81,11 @@ const ACTIVITIES = [
     id: 'trash',
     title: 'Taking Out the Trash',
     icon: '🗑️',
+    image: takingOutTrashImg,
+    choiceImages: {
+      single: takingOutTrashImg,
+      double: recylingImg,
+    },
     intro:
       'It’s trash day. This one is quick, practical, and surprisingly good for building momentum.',
     choices: [
@@ -76,6 +109,11 @@ const ACTIVITIES = [
     id: 'windows',
     title: 'Cleaning Windows',
     icon: '🪟',
+    image: cleaningWindowsImg,
+    choiceImages: {
+      spot: cleaningWindowsImg,
+      all: cleaningWindowsImg,
+    },
     intro:
       'Sunlight shows the smudges. Window cleaning is a mix of reaching, wiping, and little resets that make a room feel brighter.',
     choices: [
@@ -96,32 +134,14 @@ const ACTIVITIES = [
     ],
   },
   {
-    id: 'declutter',
-    title: 'Decluttering',
-    icon: '📦',
-    intro:
-      'You pick a space that feels “too much.” Decluttering is less about perfection and more about making the next moment easier.',
-    choices: [
-      {
-        id: 'drawer',
-        label: 'One drawer / one shelf',
-        delta: { energy: -4, confidence: +5, mood: +5, mobility: +1 },
-        result:
-          'You focus on one small area and finish it. The before/after is clear, and it feels like your space is helping you again.',
-      },
-      {
-        id: 'donate',
-        label: 'Fill one donation bag',
-        delta: { energy: -8, confidence: +7, mood: +6, mobility: +2 },
-        result:
-          'You let go of a few things and make a donation bag. It’s freeing—like you made room in your head, not just your home.',
-      },
-    ],
-  },
-  {
     id: 'pet',
     title: 'Pet Care',
     icon: '🐾',
+    image: washingDogsImg,
+    choiceImages: {
+      feed: washingDogsImg,
+      walk: walkingDogsImg,
+    },
     intro:
       'Your pet is ready for attention. The goal is simple: care + connection—movement comes naturally.',
     choices: [
@@ -145,6 +165,11 @@ const ACTIVITIES = [
     id: 'carwash',
     title: 'Car Washing',
     icon: '🚗',
+    image: washingOutsideofCarImg,
+    choiceImages: {
+      quick: washingOutsideofCarImg,
+      detail: cleaningInsideCarImg,
+    },
     intro:
       'The car could use a refresh. A wash is repetitive movement with a clear finish line—very satisfying.',
     choices: [
@@ -168,6 +193,11 @@ const ACTIVITIES = [
     id: 'maintenance',
     title: 'Home Maintenance',
     icon: '🛠️',
+    image: maintainanceRepairImg,
+    choiceImages: {
+      tiny: maintainanceRepairImg,
+      project: paintingHouseImg,
+    },
     intro:
       'A small repair or project is calling your name. This is practical skill-building—slow, careful progress is the win.',
     choices: [
@@ -212,6 +242,7 @@ export default function OutsideDomestic() {
   const [stats, setStats] = useState(initialStats);
   const [step, setStep] = useState('intro'); // 'intro' | 'activityIntro' | 'activityChoice' | 'result'
   const [activityId, setActivityId] = useState(null);
+  const [lastChoiceId, setLastChoiceId] = useState(null);
   const [resultText, setResultText] = useState('');
 
   const clamp = (value) => Math.max(0, Math.min(100, value));
@@ -226,22 +257,33 @@ export default function OutsideDomestic() {
 
   const activity = ACTIVITIES.find((a) => a.id === activityId) || null;
 
+  const sceneImageSrc = useMemo(() => {
+    if (!activity) return outdoorDomesticHubImg;
+    if (step === 'result' && lastChoiceId && activity.choiceImages?.[lastChoiceId]) {
+      return activity.choiceImages[lastChoiceId];
+    }
+    return activity.image;
+  }, [activity, step, lastChoiceId]);
+
   const reset = () => {
     setStats(initialStats);
     setStep('intro');
     setActivityId(null);
+    setLastChoiceId(null);
     setResultText('');
   };
 
   const backToActivities = () => {
     setStep('intro');
     setActivityId(null);
+    setLastChoiceId(null);
     setResultText('');
   };
 
   const startActivity = (id) => {
     setActivityId(id);
     setStep('activityIntro');
+    setLastChoiceId(null);
     setResultText('');
   };
 
@@ -250,6 +292,7 @@ export default function OutsideDomestic() {
     const choice = activity.choices.find((c) => c.id === choiceId);
     if (!choice) return;
     applyDelta(choice.delta);
+    setLastChoiceId(choiceId);
     setResultText(choice.result);
     setStep('result');
   };
@@ -276,6 +319,9 @@ export default function OutsideDomestic() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button className={rcStyles.secondaryButton} onClick={() => navigate('/')}>
+            Main Menu
+          </button>
           <button className={rcStyles.secondaryButton} onClick={() => navigate('/domestic-home')}>
             Back
           </button>
@@ -296,15 +342,13 @@ export default function OutsideDomestic() {
       </div>
 
       <div className={rcStyles.sceneImageWrap}>
-        <div className="w-full h-[220px] flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl">
-              {activity ? activity.icon : '🏡'}
-            </div>
-            <div className="mt-2 text-sm font-semibold text-slate-800">
-              {activity ? activity.title : 'Choose an activity'}
-            </div>
-          </div>
+        <img
+          src={sceneImageSrc}
+          alt=""
+          className={rcStyles.sceneImage}
+        />
+        <div className="px-3 py-2 border-t border-indigo-100 bg-white/70 text-center text-sm font-semibold text-slate-800">
+          {activity ? `${activity.icon} ${activity.title}` : 'Around the home'}
         </div>
       </div>
 
@@ -316,7 +360,12 @@ export default function OutsideDomestic() {
           </p>
           <div className={rcStyles.buttonGroup}>
             {ACTIVITIES.map((a) => (
-              <button key={a.id} className={rcStyles.button} onClick={() => startActivity(a.id)}>
+              <button
+                key={a.id}
+                type="button"
+                className={rcStyles.button}
+                onClick={() => startActivity(a.id)}
+              >
                 {a.icon} {a.title}
               </button>
             ))}
@@ -361,11 +410,8 @@ export default function OutsideDomestic() {
           <h2 className={rcStyles.title}>How it went</h2>
           <p className={rcStyles.paragraph}>{resultText}</p>
           <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.secondaryButton} onClick={backToActivities}>
-              Choose another activity
-            </button>
-            <button className={rcStyles.primaryButton} onClick={() => navigate('/')}>
-              Back to Game Center
+            <button className={rcStyles.primaryButton} onClick={backToActivities}>
+              Back to activities
             </button>
           </div>
         </div>
