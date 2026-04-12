@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { rcStyles } from '../Static/rockClimbingStyles';
+import { ActionPanel } from './ActionPanel.tsx';
+import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 
 import outdoorDomesticHubImg from '../images/walkingHome.png';
 import groceryShoppingImg from '../images/groceryShopping.png';
@@ -15,8 +17,6 @@ import washingDogsImg from '../images/washingDogs.png';
 import walkingDogsImg from '../images/walkingDogs.png';
 import washingOutsideofCarImg from '../images/washingOutsideofCar.png';
 import cleaningInsideCarImg from '../images/cleaningInsideCar.png';
-import tableImg from '../images/table.png';
-import indoorDomesticBgImg from '../images/indoorDomesticBg.jpg';
 import maintainanceRepairImg from '../images/maintainanceRepair.png';
 import paintingHouseImg from '../images/paintingHouse.png';
 
@@ -245,14 +245,15 @@ export default function OutsideDomestic() {
   const [lastChoiceId, setLastChoiceId] = useState(null);
   const [resultText, setResultText] = useState('');
 
-  const clamp = (value) => Math.max(0, Math.min(100, value));
   const applyDelta = (delta) => {
-    setStats((prev) => ({
-      energy: clamp(prev.energy + (delta.energy || 0)),
-      confidence: clamp(prev.confidence + (delta.confidence || 0)),
-      mood: clamp(prev.mood + (delta.mood || 0)),
-      mobility: clamp(prev.mobility + (delta.mobility || 0)),
-    }));
+    setStats((prev) =>
+      statsUpdate(prev, {
+        energy: delta.energy ?? 0,
+        confidence: delta.confidence ?? 0,
+        mood: delta.mood ?? 0,
+        mobility: delta.mobility ?? 0,
+      }),
+    );
   };
 
   const activity = ACTIVITIES.find((a) => a.id === activityId) || null;
@@ -297,16 +298,6 @@ export default function OutsideDomestic() {
     setStep('result');
   };
 
-  const renderStatsBar = (label, value, color, isPrimary = false) => (
-    <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
-      <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
-      <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
-        <div className={rcStyles.barInner} style={{ width: `${value}%`, backgroundColor: color }} />
-      </div>
-      <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
-    </div>
-  );
-
   return (
     <div className={rcStyles.container}>
       <div className={rcStyles.header}>
@@ -332,13 +323,7 @@ export default function OutsideDomestic() {
       </div>
 
       <div className={rcStyles.topRow}>
-        <div className={rcStyles.statsContainer}>
-          <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
-          {renderStatsBar('Energy', stats.energy, '#facc15' /* yellow */, true)}
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444' /* red */)}
-          {renderStatsBar('Mood', stats.mood, '#22c55e' /* green */)}
-          {renderStatsBar('Mobility', stats.mobility, '#3b82f6' /* blue */)}
-        </div>
+        <StatsPanel stats={stats} />
       </div>
 
       <div className={rcStyles.sceneImageWrap}>
@@ -358,18 +343,14 @@ export default function OutsideDomestic() {
           <p className={rcStyles.paragraph}>
             You can keep it small and get a quick win, or do a bigger version and feel the progress.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            {ACTIVITIES.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                className={rcStyles.button}
-                onClick={() => startActivity(a.id)}
-              >
-                {a.icon} {a.title}
-              </button>
-            ))}
-          </div>
+          <ActionPanel
+            tasks={ACTIVITIES.map((a) => ({
+              id: a.id,
+              icon: a.icon,
+              label: a.title,
+              action: () => startActivity(a.id),
+            }))}
+          />
         </div>
       )}
 
@@ -377,12 +358,22 @@ export default function OutsideDomestic() {
         <div className={rcStyles.section}>
           <h2 className={rcStyles.title}>{activity.title}</h2>
           <p className={rcStyles.paragraph}>{activity.intro}</p>
-          <button className={rcStyles.primaryButton} onClick={() => setStep('activityChoice')}>
-            Continue
-          </button>
-          <button className={rcStyles.secondaryButton} onClick={backToActivities}>
-            Back to activities
-          </button>
+          <ActionPanel
+            tasks={[
+              {
+                id: `${activity.id}-continue`,
+                className: rcStyles.primaryButton,
+                label: 'Continue',
+                action: () => setStep('activityChoice'),
+              },
+              {
+                id: `${activity.id}-intro-back`,
+                className: rcStyles.secondaryButton,
+                label: 'Back to activities',
+                action: backToActivities,
+              },
+            ]}
+          />
         </div>
       )}
 
@@ -392,16 +383,21 @@ export default function OutsideDomestic() {
           <p className={rcStyles.paragraph}>
             Pick the version that matches your energy today.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            {activity.choices.map((c) => (
-              <button key={c.id} className={rcStyles.button} onClick={() => chooseActivityOption(c.id)}>
-                {c.label}
-              </button>
-            ))}
-          </div>
-          <button className={rcStyles.secondaryButton} onClick={backToActivities}>
-            Back to activities
-          </button>
+          <ActionPanel
+            tasks={[
+              ...activity.choices.map((c) => ({
+                id: `${activity.id}-${c.id}`,
+                label: c.label,
+                action: () => chooseActivityOption(c.id),
+              })),
+              {
+                id: `${activity.id}-choice-back`,
+                className: rcStyles.secondaryButton,
+                label: 'Back to activities',
+                action: backToActivities,
+              },
+            ]}
+          />
         </div>
       )}
 
@@ -409,11 +405,16 @@ export default function OutsideDomestic() {
         <div className={rcStyles.section}>
           <h2 className={rcStyles.title}>How it went</h2>
           <p className={rcStyles.paragraph}>{resultText}</p>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.primaryButton} onClick={backToActivities}>
-              Back to activities
-            </button>
-          </div>
+          <ActionPanel
+            tasks={[
+              {
+                id: 'result-back',
+                className: rcStyles.primaryButton,
+                label: 'Back to activities',
+                action: backToActivities,
+              },
+            ]}
+          />
         </div>
       )}
     </div>

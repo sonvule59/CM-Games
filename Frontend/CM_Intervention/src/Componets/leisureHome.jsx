@@ -5,8 +5,6 @@ import { rcStyles } from '../Static/rockClimbingStyles';
 import rockBg from '../images/enteringGym.png';
 import outdoorsBg from '../images/pullingUpLake.png';
 import walkBg from '../images/walkingLake.png';
-import swinBg from '../images/swimLap.png'
-import domesticBg from '../images/indoorDomesticBg.jpg';
 
 export default function LeisureHome() {
   const navigate = useNavigate();
@@ -16,8 +14,6 @@ export default function LeisureHome() {
     if (hovered === 'rock') return rockBg;
     if (hovered === 'outdoors') return outdoorsBg;
     if (hovered === 'walk') return walkBg;
-    if (hovered === 'swim') return swinBg
-    if (hovered === 'domestic') return domesticBg
     return null;
   }, [hovered]);
 
@@ -49,6 +45,13 @@ export default function LeisureHome() {
               Pick a mini-game to play. Hover a button to preview the vibe.
             </p>
           </div>
+          <button
+            type="button"
+            className={rcStyles.secondaryButton}
+            onClick={() => navigate('/')}
+          >
+            Back to hub
+          </button>
         </div>
 
         <div className={rcStyles.section}>
@@ -86,28 +89,6 @@ export default function LeisureHome() {
             >
               Walking Activities
             </button>
-            <button
-            className={rcStyles.button}
-              onMouseEnter={() => setHovered('swim')}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered('swim')}
-              onBlur={() => setHovered(null)}
-              onClick={() => navigate('/swim')}
-            >
-              Swimming Activities
-            </button>
-
-            <button
-              className={rcStyles.button}
-              onMouseEnter={() => setHovered('domestic')}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered('domestic')}
-              onBlur={() => setHovered(null)}
-              onClick={() => navigate('/domestic-home')}
-            >
-              Domestic Activities (Home)
-            </button>
-
           </div>
         </div>
       </div>

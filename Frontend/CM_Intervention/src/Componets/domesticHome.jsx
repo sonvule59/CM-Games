@@ -15,8 +15,8 @@ export default function DomesticHome() {
           </p>
           <div className={rcStyles.scenePill}>Home base</div>
         </div>
-        <button className={rcStyles.secondaryButton} onClick={() => navigate('/')}>
-          Back to Home
+        <button type="button" className={rcStyles.secondaryButton} onClick={() => navigate('/')}>
+          Back to hub
         </button>
       </div>
 
