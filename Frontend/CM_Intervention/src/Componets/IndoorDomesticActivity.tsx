@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import { Feedback, negativeFeedback, positiveFeedback } from "./Feedback";
 import ActivityImage from "./ActivityImage";
-import { Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 
 // Source: https://www.freepik.com/free-vector/empty-room-with-light-yellow-wall-parquet-floor_21196882.htm
 // @ts-ignore
@@ -31,6 +31,7 @@ import imgDishes from "../images/dishes.png";
 // Source: https://commons.wikimedia.org/wiki/File:Dinner_table_side_pine_wood_large_table_front.png
 // @ts-ignore
 import imgTable from "../images/table.png";
+import { Container, Paragraph, PrimaryButton, Section, Title } from "./Layout";
 
 type IndoorDomesticActivityProps = {};
 
@@ -40,7 +41,7 @@ const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
     mood: 50,
     confidence: 50,
-    mobility: 50,
+    health: 50,
 });
 
 function HouseImage({
@@ -111,32 +112,25 @@ function HouseImage({
 }
 
 function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
-    function givePositiveFeedback(message: string) {
-        setFeedback(positiveFeedback(message));
-    }
-
-    function giveNegativeFeedback(message: string) {
-        setFeedback(negativeFeedback(message));
-    }
-
-    function giveNeutralFeedback(message: string) {
-        setFeedback(message);
-    }
-
-    const [feedback, setFeedback] = useState<string | undefined>(
-        "You're back home, but your house is looking pretty messy. It's probably time to do some chores.",
-    );
+    type ImageID = "house" | keyof typeof IMAGE_ID_TO_SRC | undefined;
 
     let actions: Array<ActionSpec>;
     let actionPrompt: string;
-    let imageId: "house" | keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
+    let imageId: ImageID = undefined;
+    let message: React.ReactNode = undefined;
 
-    const [stats, setStats] = useState<Stats>(STARTING_STATS);
+    const [stats, _setStats] = useState<Stats>(STARTING_STATS);
+    const [oldStats, _setOldStats] = useState<Stats | undefined>(undefined);
     const [didCleaning, setDidCleaning] = useState<boolean>(false);
     const [didDishes, setDidDishes] = useState<boolean>(false);
     const [didLaundry, setDidLaundry] = useState<boolean>(false);
     const [didCooking, setDidCooking] = useState<boolean>(false);
     const [didDinner, setDidDinner] = useState<boolean>(false);
+
+    function setStats(newStats: Stats) {
+        _setOldStats(stats);
+        _setStats(newStats);
+    }
 
     type ActivityState = Readonly<
         | { activity: "overview" }
@@ -155,6 +149,14 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     const [activityState, setActivityState] = useState<ActivityState>({
         activity: "overview",
     });
+
+    type FeedbackState = Readonly<{
+        message: React.ReactNode;
+        imageId?: ImageID;
+    }>;
+    const [feedback, setFeedback] = useState<FeedbackState | undefined>(
+        undefined,
+    );
 
     switch (activityState.activity) {
         case "overview":
@@ -220,140 +222,202 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
             ];
             break;
         case "cleaning":
-            actionPrompt = "Choose an activity";
-            actions = [];
-            if (!activityState.didVacuuming)
-                actions.push({
-                    id: "vacuum",
-                    label: "Vacuum",
-                    icon: "🌫️",
-                    desc: "Vacuum the house",
-                    action() {
-                        setStats(statsUpdate(stats, { energy: -10 }));
-                        if (
-                            activityState.didSweeping &&
-                            activityState.didMopping &&
-                            activityState.didDusting
-                        ) {
-                            setDidCleaning(true);
-                            setActivityState({
-                                activity: "overview",
-                            });
-                        } else {
-                            setActivityState({
-                                ...activityState,
-                                didVacuuming: true,
-                            });
-                        }
-                    },
-                });
-            if (!activityState.didSweeping)
-                actions.push({
-                    id: "sweep",
-                    label: "Sweep",
-                    icon: "🧹",
-                    desc: "Sweep the house",
-                    action() {
-                        setStats(statsUpdate(stats, { energy: -10 }));
-                        if (
-                            activityState.didVacuuming &&
-                            activityState.didMopping &&
-                            activityState.didDusting
-                        ) {
-                            setDidCleaning(true);
-                            setActivityState({
-                                activity: "overview",
-                            });
-                        } else {
-                            setActivityState({
-                                ...activityState,
-                                didSweeping: true,
-                            });
-                        }
-                    },
-                });
-            if (!activityState.didMopping)
-                actions.push({
-                    id: "mop",
-                    label: "Mop",
-                    icon: "🪣",
-                    desc: "Mop the house",
-                    action() {
-                        setStats(statsUpdate(stats, { energy: -10 }));
-                        if (
-                            activityState.didVacuuming &&
-                            activityState.didSweeping &&
-                            activityState.didDusting
-                        ) {
-                            setDidCleaning(true);
-                            setActivityState({
-                                activity: "overview",
-                            });
-                        } else {
-                            setActivityState({
-                                ...activityState,
-                                didMopping: true,
-                            });
-                        }
-                    },
-                });
-            if (!activityState.didDusting)
-                actions.push({
-                    id: "dust",
-                    label: "Dust",
-                    icon: "🧽",
-                    desc: "Dust the house",
-                    action() {
-                        setStats(statsUpdate(stats, { energy: -10 }));
-                        if (
-                            activityState.didVacuuming &&
-                            activityState.didSweeping &&
-                            activityState.didMopping
-                        ) {
-                            setDidCleaning(true);
-                            setActivityState({
-                                activity: "overview",
-                            });
-                        } else {
-                            setActivityState({
-                                ...activityState,
-                                didDusting: true,
-                            });
-                        }
-                    },
-                });
+            {
+                function setActivityStateForCleaning(
+                    newActivityState: ActivityState & { activity: "cleaning" },
+                    feedbackMessage: React.ReactNode,
+                ) {
+                    const numActivitiesCompleted: 0 | 1 | 2 | 3 | 4 =
+                        ((newActivityState.didVacuuming ? 1 : 0) +
+                            (newActivityState.didSweeping ? 1 : 0) +
+                            (newActivityState.didMopping ? 1 : 0) +
+                            (newActivityState.didDusting ? 1 : 0)) as any;
+                    const allActivitiesCompleted = numActivitiesCompleted === 4;
+                    if (allActivitiesCompleted) {
+                        setActivityState({
+                            activity: "overview",
+                        });
+                    } else {
+                        setActivityState(newActivityState);
+                    }
+                    let genericFeedbackMessage: React.ReactNode;
+                    switch (numActivitiesCompleted) {
+                        case 0:
+                            genericFeedbackMessage = <></>;
+                            break;
+                        case 1:
+                            genericFeedbackMessage = (
+                                <>
+                                    It took a while, but it was totally worth
+                                    it. You feel ready to continue cleaning.
+                                </>
+                            );
+                            break;
+                        case 2:
+                            genericFeedbackMessage = (
+                                <>
+                                    You look around your home, and marvel at how
+                                    clean it looks. You feel confident and proud
+                                    of yourself.
+                                </>
+                            );
+                            break;
+                        case 3:
+                            genericFeedbackMessage = (
+                                <>
+                                    You're almost done cleaning your home, and
+                                    you can't wait to finish.
+                                </>
+                            );
+                            break;
+                        case 4:
+                            genericFeedbackMessage = (
+                                <>
+                                    Phew! You're finally done cleaning your
+                                    home. You feel accomplished.
+                                </>
+                            );
+                            break;
+                        default:
+                            numActivitiesCompleted satisfies never;
+                            throw new Error();
+                    }
+                    setFeedback({
+                        message: (
+                            <>
+                                <Title>What happens next</Title>
+                                <Paragraph>
+                                    {positiveFeedback()} {feedbackMessage}{" "}
+                                    {genericFeedbackMessage}
+                                </Paragraph>
+                            </>
+                        ),
+                    });
+                }
+
+                actionPrompt = "Choose an activity";
+                actions = [];
+                if (!activityState.didVacuuming)
+                    actions.push({
+                        id: "vacuum",
+                        label: "Vacuum",
+                        icon: "🌫️",
+                        desc: "Vacuum the house",
+                        action() {
+                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setActivityStateForCleaning(
+                                {
+                                    ...activityState,
+                                    didVacuuming: true,
+                                },
+                                <>You vaccumed away the dust.</>,
+                            );
+                        },
+                    });
+                if (!activityState.didSweeping)
+                    actions.push({
+                        id: "sweep",
+                        label: "Sweep",
+                        icon: "🧹",
+                        desc: "Sweep the house",
+                        action() {
+                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setActivityStateForCleaning(
+                                {
+                                    ...activityState,
+                                    didSweeping: true,
+                                },
+                                <>You sweeped the floor.</>,
+                            );
+                        },
+                    });
+                if (!activityState.didMopping)
+                    actions.push({
+                        id: "mop",
+                        label: "Mop",
+                        icon: "🪣",
+                        desc: "Mop the house",
+                        action() {
+                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setActivityStateForCleaning(
+                                {
+                                    ...activityState,
+                                    didMopping: true,
+                                },
+                                <>You mopped the floor.</>,
+                            );
+                        },
+                    });
+                if (!activityState.didDusting)
+                    actions.push({
+                        id: "dust",
+                        label: "Dust",
+                        icon: "🧽",
+                        desc: "Dust the house",
+                        action() {
+                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setActivityStateForCleaning(
+                                {
+                                    ...activityState,
+                                    didDusting: true,
+                                },
+                                <>You dusted the furniture and other items.</>,
+                            );
+                        },
+                    });
+            }
             break;
         default:
             throw new Error("unimplemented");
             activityState satisfies never;
     }
 
-    return (
-        <div className="indoor-domestic-game">
-            {imageId == "house" ? (
-                <ActivityImage key="house-image">
-                    <HouseImage
-                        didCleaning={didCleaning}
-                        didDishes={didDishes}
-                        didLaundry={didLaundry}
-                        didCooking={didCooking}
-                        didDinner={didDinner}
-                    ></HouseImage>
-                </ActivityImage>
-            ) : (
-                imageId != undefined &&
-                IMAGE_ID_TO_SRC[imageId] != undefined && (
-                    <ActivityImage
-                        key={imageId}
-                        src={IMAGE_ID_TO_SRC[imageId]}
-                    />
-                )
-            )}
-            <StatsViewer stats={stats}></StatsViewer>
-            <ActionPanel title={actionPrompt} actions={actions}></ActionPanel>
-            <Feedback feedback={feedback}></Feedback>
-        </div>
-    );
+    {
+        const _imageId = feedback?.imageId ?? imageId;
+        return (
+            <Container>
+                {_imageId == "house" ? (
+                    <ActivityImage key={_imageId}>
+                        <HouseImage
+                            didCleaning={didCleaning}
+                            didDishes={didDishes}
+                            didLaundry={didLaundry}
+                            didCooking={didCooking}
+                            didDinner={didDinner}
+                        />
+                    </ActivityImage>
+                ) : (
+                    _imageId != undefined &&
+                    IMAGE_ID_TO_SRC[_imageId] != undefined && (
+                        <ActivityImage
+                            key={_imageId}
+                            src={IMAGE_ID_TO_SRC[_imageId]}
+                        />
+                    )
+                )}
+                <StatsViewer stats={stats} />
+                <Section>
+                    {feedback === undefined && message !== undefined && message}
+                    {feedback !== undefined && feedback.message}
+                    {feedback !== undefined && oldStats !== undefined && (
+                        <StatDeltaViewer oldStats={oldStats} newStats={stats} />
+                    )}
+                    {feedback === undefined && actions !== undefined && (
+                        <ActionPanel title={actionPrompt} actions={actions} />
+                    )}
+                    {feedback !== undefined && (
+                        <>
+                            <PrimaryButton
+                                onClick={() => setFeedback(undefined)}
+                            >
+                                Continue
+                            </PrimaryButton>
+                        </>
+                    )}
+                </Section>
+            </Container>
+        );
+    }
 }
 
 export default IndoorDomesticActivity;

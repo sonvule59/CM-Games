@@ -7,10 +7,12 @@ import imgSwimBreak from "../images/swimBreak.png";
 import imgSwimLap from "../images/swimLap.png";
 // @ts-ignore
 import imgSwimTread from "../images/swimTread.png";
-import { Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 
 import "../Static/WalkingActivity.css";
+import { Container, Paragraph, PrimaryButton, Section, Title } from "./Layout";
+import { negativeFeedback, positiveFeedback } from "./Feedback";
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -27,9 +29,19 @@ const IMAGE_ID_TO_SRC = {
 
 type SwimmingActivityProps = {};
 export default function SwimmingActivity({}: SwimmingActivityProps) {
-    const [feedback, setFeedback] = useState<string | undefined>(
-        "Welcome to the pool! Feel free to try some exercises.",
-    );
+    const [feedback, setFeedback] = useState<string | undefined>(undefined);
+
+    function givePositiveFeedback(message: string) {
+        setFeedback(positiveFeedback(message));
+    }
+
+    function giveNegativeFeedback(message: string) {
+        setFeedback(negativeFeedback(message));
+    }
+
+    function giveNeutralFeedback(message: string) {
+        setFeedback(message);
+    }
 
     let actions: Array<ActionSpec>;
     let actionPrompt: string;
@@ -41,12 +53,14 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
         screen: "game";
         activity: "lapSwim";
         stats: Stats;
+        lastStats: Stats | undefined;
         lastActionImage: keyof typeof IMAGE_ID_TO_SRC | undefined;
     };
     const [screenState, setScreenState] = useState<ScreenState>({
         screen: "game",
         activity: "lapSwim",
         stats: STARTING_STATS,
+        lastStats: undefined,
         lastActionImage: undefined,
     });
 
@@ -67,8 +81,12 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             confidence: +10,
                             health: +10,
                         }),
+                        lastStats: screenState.stats,
                         lastActionImage: "swimLap",
                     });
+                    givePositiveFeedback(
+                        "After swimming a lap, you feel better and more confident.",
+                    );
                 },
             },
             {
@@ -85,8 +103,10 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             confidence: +10,
                             health: +0,
                         }),
+                        lastStats: screenState.stats,
                         lastActionImage: "swimTread",
                     });
+                    givePositiveFeedback("You feel more confident.");
                 },
             },
             {
@@ -103,8 +123,12 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             confidence: +0,
                             health: +50,
                         }),
+                        lastStats: screenState.stats,
                         lastActionImage: "swimBreak",
                     });
+                    givePositiveFeedback(
+                        "After resting for a bit, you feel relaxed, refreshed, and ready for more activity.",
+                    );
                 },
             },
         ];
@@ -114,20 +138,52 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
         throw new Error();
     }
 
+    const firstTime =
+        screenState.screen === "game" && screenState.lastStats === undefined;
+
     return (
-        <div className="swimming-game">
+        <Container>
             {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
                 <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
             )}
             {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
             )}
-            <ActionPanel title={actionPrompt} actions={actions}></ActionPanel>
-            {feedback != undefined && (
-                <div className="og-feedback" key={feedback}>
-                    {feedback}
-                </div>
-            )}
-        </div>
+            <Section>
+                {firstTime && (
+                    <>
+                        <Title>Welcome to the pool!</Title>
+                        <Paragraph>
+                            Feel free to try some activities while you're here.
+                        </Paragraph>
+                    </>
+                )}
+                {feedback === undefined ? (
+                    <ActionPanel
+                        title={firstTime ? undefined : actionPrompt}
+                        actions={actions}
+                    />
+                ) : (
+                    <>
+                        <Title>How it plays out</Title>
+                        <Paragraph>{feedback}</Paragraph>
+                        {screenState.screen === "game" &&
+                            screenState.lastStats !== undefined && (
+                                <StatDeltaViewer
+                                    newStats={screenState.stats}
+                                    oldStats={screenState.lastStats}
+                                />
+                            )}
+                        <PrimaryButton
+                            onClick={() => {
+                                setFeedback(undefined);
+                            }}
+                        >
+                            Continue
+                        </PrimaryButton>
+                    </>
+                )}
+            </Section>
+        </Container>
     );
 }
