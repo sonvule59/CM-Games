@@ -8,7 +8,6 @@ const chairSquatImg    = "/assets/Images/chari_squat.webp";
 const walkMeetingImg   = "/assets/Images/walking_meeting.webp";
 const waterBreakImg    = "/assets/Images/water_break.webp";
 const printerWalkImg   = "/assets/Images/Walking_to_printer.webp";
- "../Static/officestyles.js"
 
 const SCENE_IMAGES = {
   office:          atDeskImg,

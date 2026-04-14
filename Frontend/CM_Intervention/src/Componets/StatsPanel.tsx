@@ -111,4 +111,11 @@ function StatsViewer({ stats }: StatsViewerProps) {
     );
 }
 
-export { statsUpdate, StatsViewer, Stats, StatKind, StatDelta };
+export {
+    statsUpdate,
+    StatsViewer,
+    StatsViewer as StatsPanel,
+    Stats,
+    StatKind,
+    StatDelta,
+};
