@@ -35,7 +35,25 @@ import { Container, Paragraph, PrimaryButton, Section, Title } from "./Layout";
 
 type IndoorDomesticActivityProps = {};
 
-const IMAGE_ID_TO_SRC = {} satisfies Record<string, string | undefined>;
+// Undefined means image isn't available yet,
+// a placeholder will be shown for now.
+const IMAGE_ID_TO_SRC = {
+    cleaningThinking: undefined,
+    vacuuming: undefined,
+    sweeping: undefined,
+    dusting: undefined,
+    mopping: undefined,
+    pickUpDirtyDishes: undefined,
+    putDishesInDishwasher: undefined,
+    getDishesOutOfDishwasher: undefined,
+    pickUpDirtyLaundry: undefined,
+    washClothes: undefined,
+    dryClothes: undefined,
+    foldCleanClothes: undefined,
+    makeBed: undefined,
+    cookDinner: undefined,
+    eatDinner: undefined,
+} satisfies Record<string, string | undefined>;
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -116,7 +134,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
 
     let actions: Array<ActionSpec>;
     let actionPrompt: string;
-    let imageId: ImageID = undefined;
+    let imageId: ImageID;
     let message: React.ReactNode = undefined;
 
     const [stats, _setStats] = useState<Stats>(STARTING_STATS);
@@ -153,6 +171,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     type FeedbackState = Readonly<{
         message: React.ReactNode;
         imageId?: ImageID;
+        isFinalForActivity?: boolean;
     }>;
     const [feedback, setFeedback] = useState<FeedbackState | undefined>(
         undefined,
@@ -162,8 +181,9 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
         case "overview":
             imageId = "house";
             actionPrompt = "Choose an activity";
-            actions = [
-                {
+            actions = [];
+            if (!didCleaning)
+                actions.push({
                     id: "startCleaning",
                     label: "Cleaning",
                     icon: "🧹",
@@ -176,9 +196,24 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             didMopping: false,
                             didDusting: false,
                         });
+                        setFeedback({
+                            imageId: "cleaningThinking",
+                            message: (
+                                <>
+                                    <Title>Cleaning the house</Title>
+                                    <Paragraph>
+                                        You've decided to start cleaning your
+                                        home. It looks pretty messy right now,
+                                        but you're determined to make it clean.
+                                        What should you do first?
+                                    </Paragraph>
+                                </>
+                            ),
+                        });
                     },
-                },
-                {
+                });
+            if (!didDishes)
+                actions.push({
                     id: "startDishes",
                     label: "Dishes",
                     icon: "🧽",
@@ -187,8 +222,9 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setDidDishes(true);
                         // setActivityState({ activity: "dishes" });
                     },
-                },
-                {
+                });
+            if (!didLaundry)
+                actions.push({
                     id: "startLaundry",
                     label: "Laundry",
                     icon: "🧺",
@@ -197,8 +233,9 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setDidLaundry(true);
                         // setActivityState({ activity: "laundry" });
                     },
-                },
-                {
+                });
+            if (!didCooking)
+                actions.push({
                     id: "startCooking",
                     label: "Cook",
                     icon: "🍲",
@@ -207,8 +244,9 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setDidCooking(true);
                         // setActivityState({ activity: "cooking" });
                     },
-                },
-                {
+                });
+            if (!didDinner)
+                actions.push({
                     id: "startDinner",
                     label: "Eat",
                     icon: "🍽️",
@@ -218,13 +256,14 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setStats(statsUpdate(stats, { energy: +100 }));
                         // setActivityState({ activity: "dinner" });
                     },
-                },
-            ];
+                });
             break;
         case "cleaning":
+            imageId = "cleaningThinking";
             {
                 function setActivityStateForCleaning(
                     newActivityState: ActivityState & { activity: "cleaning" },
+                    imageId: ImageID,
                     feedbackMessage: React.ReactNode,
                 ) {
                     const numActivitiesCompleted: 0 | 1 | 2 | 3 | 4 =
@@ -237,6 +276,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setActivityState({
                             activity: "overview",
                         });
+                        setDidCleaning(true);
                     } else {
                         setActivityState(newActivityState);
                     }
@@ -288,11 +328,20 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                                 <Title>What happens next</Title>
                                 <Paragraph>
                                     {positiveFeedback()} {feedbackMessage}{" "}
-                                    {genericFeedbackMessage}
                                 </Paragraph>
+                                <Paragraph>{genericFeedbackMessage}</Paragraph>
                             </>
                         ),
+                        imageId,
+                        isFinalForActivity: allActivitiesCompleted,
                     });
+                    setStats(
+                        statsUpdate(stats, {
+                            energy: -10,
+                            mood: +5,
+                            confidence: +5,
+                        }),
+                    );
                 }
 
                 actionPrompt = "Choose an activity";
@@ -304,12 +353,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🌫️",
                         desc: "Vacuum the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didVacuuming: true,
                                 },
+                                "vacuuming",
                                 <>You vaccumed away the dust.</>,
                             );
                         },
@@ -321,12 +370,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🧹",
                         desc: "Sweep the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didSweeping: true,
                                 },
+                                "sweeping",
                                 <>You sweeped the floor.</>,
                             );
                         },
@@ -338,12 +387,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🪣",
                         desc: "Mop the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didMopping: true,
                                 },
+                                "mopping",
                                 <>You mopped the floor.</>,
                             );
                         },
@@ -355,12 +404,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🧽",
                         desc: "Dust the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didDusting: true,
                                 },
+                                "dusting",
                                 <>You dusted the furniture and other items.</>,
                             );
                         },
@@ -386,14 +435,17 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             didDinner={didDinner}
                         />
                     </ActivityImage>
+                ) : !(_imageId != undefined && _imageId in IMAGE_ID_TO_SRC) ? (
+                    <></>
+                ) : IMAGE_ID_TO_SRC[_imageId] != undefined ? (
+                    <ActivityImage
+                        key={_imageId}
+                        src={IMAGE_ID_TO_SRC[_imageId]}
+                    />
                 ) : (
-                    _imageId != undefined &&
-                    IMAGE_ID_TO_SRC[_imageId] != undefined && (
-                        <ActivityImage
-                            key={_imageId}
-                            src={IMAGE_ID_TO_SRC[_imageId]}
-                        />
-                    )
+                    <ActivityImage key={_imageId}>
+                        Placeholder: {_imageId}
+                    </ActivityImage>
                 )}
                 <StatsViewer stats={stats} />
                 <Section>
@@ -410,7 +462,11 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             <PrimaryButton
                                 onClick={() => setFeedback(undefined)}
                             >
-                                Continue
+                                {feedback.isFinalForActivity ? (
+                                    <>Finish</>
+                                ) : (
+                                    <>Continue</>
+                                )}
                             </PrimaryButton>
                         </>
                     )}
