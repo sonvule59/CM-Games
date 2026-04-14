@@ -1,4 +1,5 @@
 import { rcStyles } from "../Static/rockClimbingStyles";
+import { Paragraph } from "./Layout";
 
 const POSITIVE_FEEDBACK_MESSAGES: readonly string[] = [
     "Good job!",
@@ -14,11 +15,13 @@ function randomElement<T>(array: readonly T[]): T {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-function positiveFeedback(message: string): string {
+function positiveFeedback(message?: string): string {
+    if (message === undefined) return randomElement(POSITIVE_FEEDBACK_MESSAGES);
     return `${randomElement(POSITIVE_FEEDBACK_MESSAGES)} ${message}`;
 }
 
-function negativeFeedback(message: string): string {
+function negativeFeedback(message?: string): string {
+    if (message === undefined) return randomElement(NEGATIVE_FEEDBACK_MESSAGES);
     return `${randomElement(NEGATIVE_FEEDBACK_MESSAGES)} ${message}`;
 }
 
@@ -28,9 +31,7 @@ function Feedback({ feedback }: FeedbackProps) {
     return (
         <>
             {feedback != undefined && (
-                <p className={rcStyles.paragraph} key={feedback}>
-                    {feedback}
-                </p>
+                <Paragraph key={feedback}>{feedback}</Paragraph>
             )}
         </>
     );
