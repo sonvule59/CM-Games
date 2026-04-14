@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import "./Componets/OfficeGame" 
 import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
@@ -15,6 +14,11 @@ import OutdoorsActivities from './Componets/outdoorsActivities.jsx'
 import LeisureHome from './Componets/leisureHome.jsx'
 import TransportGame from './Componets/TransportGame.jsx'
 import ParkingLot from './Componets/ParkingLot.jsx'
+import DomesticHome from './Componets/domesticHome.jsx'
+import OutsideDomestic from './Componets/outsideDomestic.jsx'
+import HomeOfHomePages from './Componets/homeOfHomePages.jsx'
+import MindfulnessHome from './Componets/mindfulnessHome.jsx'
+import MindfulnessGame from './Componets/mindfulnessGame.jsx'
 
 
 function App() {
@@ -23,10 +27,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home page routes */}
-        <Route path="/" element={<LeisureHome Start/>} />
+        {/* Top-level hub */}
+        <Route path="/" element={<HomeOfHomePages />} />
+        <Route path="/leisure" element={<LeisureHome />} />
         <Route path='/office' element={<OfficeGameStart />} />
-        
+        <Route path="/mindfulness-home" element={<MindfulnessHome />} />
+        <Route path="/mindfulness" element={<MindfulnessGame />} />
 
         {/* Individual routes for each mini‑game */}
         <Route path="/outdoors" element={<OutdoorsActivities />} />
@@ -35,6 +41,8 @@ function App() {
         <Route path='/office/test' element = {<OfficeGame/>} /> 
         <Route path="/swim" element = {<SwimmingActivity /> } />
         <Route path="/indoor-domestic" element = {<IndoorDomesticActivity /> } />
+        <Route path="/domestic-home" element={<DomesticHome />} />
+        <Route path="/outside-domestic" element={<OutsideDomestic />} />
         <Route path='/transport' element={<TransportGame />} />
         <Route path="/parking" element={<ParkingLot />} />
 

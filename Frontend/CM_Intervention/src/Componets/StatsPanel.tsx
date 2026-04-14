@@ -199,8 +199,9 @@ export {
     statsUpdate,
     statsSubtract,
     StatsViewer,
+    StatsViewer as StatsPanel,
     StatDeltaViewer,
-    Stats,
-    StatKind,
-    StatDelta,
+    type Stats,
+    type StatKind,
+    type StatDelta,
 };

@@ -14,6 +14,8 @@ import askRoutesImg from '../images/askRoutes.png';
 import gentleMobilityImg from '../images/gentleMobility.png';
 import hardRouteImg from '../images/hardRoute.png';
 import { rcStyles } from '../Static/rockClimbingStyles';
+import { ActionPanel } from './ActionPanel.tsx';
+import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 
 // Map scene/response keys to illustration assets shown above the text.
 const SCENE_IMAGES = {
@@ -44,7 +46,7 @@ export default function RockClimbing() {
   const initialStats = {
     confidence: 50,
     mood: 50,
-    health: 50,
+    mobility: 50,
     energy: 100,
   };
 
@@ -56,7 +58,7 @@ export default function RockClimbing() {
   const [lastDelta, setLastDelta] = useState({
     confidence: 0,
     mood: 0,
-    health: 0,
+    mobility: 0,
     energy: 0,
   });
   const [resultText, setResultText] = useState('');
@@ -64,21 +66,20 @@ export default function RockClimbing() {
   const [watchChoice, setWatchChoice] = useState(null); // 'cheer' | 'ask' | null
   const [wallChoice, setWallChoice] = useState(null); // 'easy' | 'hard' | null
 
-  // Enforce 0‑100 range so bars and numbers never overflow.
-  const clamp = (value) => Math.max(0, Math.min(100, value));
-
   // Apply stat changes in one place; any missing fields default to 0.
   const applyDelta = (delta) => {
-    setStats((prev) => ({
-      confidence: clamp(prev.confidence + (delta.confidence || 0)),
-      mood: clamp(prev.mood + (delta.mood || 0)),
-      health: clamp(prev.health + (delta.health || 0)),
-      energy: clamp(prev.energy + (delta.energy || 0)),
-    }));
+    setStats((prev) =>
+      statsUpdate(prev, {
+        confidence: delta.confidence ?? 0,
+        mood: delta.mood ?? 0,
+        mobility: delta.mobility ?? 0,
+        energy: delta.energy ?? 0,
+      }),
+    );
     setLastDelta({
       confidence: delta.confidence || 0,
       mood: delta.mood || 0,
-      health: delta.health || 0,
+      mobility: delta.mobility || 0,
       energy: delta.energy || 0,
     });
   };
@@ -88,7 +89,7 @@ export default function RockClimbing() {
     setStats(initialStats);
     setScene('entrance');
     setStep(0);
-    setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });
+    setLastDelta({ confidence: 0, mood: 0, mobility: 0, energy: 0 });
     setResultText('');
     setStretchChoice(null);
     setWatchChoice(null);
@@ -99,7 +100,7 @@ export default function RockClimbing() {
   const backToEntrance = () => {
     setScene('entrance');
     setStep(0);
-    setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });
+    setLastDelta({ confidence: 0, mood: 0, mobility: 0, energy: 0 });
     setResultText('');
     setStretchChoice(null);
     setWatchChoice(null);
@@ -109,13 +110,13 @@ export default function RockClimbing() {
   // Handle the very first choice from the entrance and move into a branch.
   const handleEntranceChoice = (choice) => {
     if (choice === 'wall') {
-      applyDelta({ confidence: +8, mood: +5, health: +5, energy: -10 });
+      applyDelta({ confidence: +8, mood: +5, mobility: +5, energy: -10 });
       setScene('wall');
     } else if (choice === 'watch') {
-      applyDelta({ confidence: +4, mood: +6, health: 0, energy: -2 });
+      applyDelta({ confidence: +4, mood: +6, mobility: 0, energy: -2 });
       setScene('watch');
     } else if (choice === 'stretch') {
-      applyDelta({ confidence: +3, mood: +5, health: +10, energy: -3 });
+      applyDelta({ confidence: +3, mood: +5, mobility: +10, energy: -3 });
       setScene('stretch');
     }
     setStep(1);
@@ -126,12 +127,12 @@ export default function RockClimbing() {
   const handleWallFollowup = (choice) => {
     setWallChoice(choice);
     if (choice === 'easy') {
-      applyDelta({ confidence: +6, mood: +4, health: +3, energy: -5 });
+      applyDelta({ confidence: +6, mood: +4, mobility: +3, energy: -5 });
       setResultText(
         'You pick a friendlier route, focusing on smooth movement and breathing. Each hold feels more approachable, and you notice small wins stacking up.'
       );
     } else if (choice === 'hard') {
-      applyDelta({ confidence: +10, mood: +3, health: +2, energy: -12 });
+      applyDelta({ confidence: +10, mood: +3, mobility: +2, energy: -12 });
       setResultText(
         'You step onto the harder route, taking your time and honoring where your body is today. Every attempt is valid effort, and you celebrate the courage it took to try.'
       );
@@ -143,12 +144,12 @@ export default function RockClimbing() {
   const handleWatchFollowup = (choice) => {
     setWatchChoice(choice);
     if (choice === 'cheer') {
-      applyDelta({ confidence: +5, mood: +8, health: 0, energy: -1 });
+      applyDelta({ confidence: +5, mood: +8, mobility: 0, energy: -1 });
       setResultText(
         'You cheer for another climber, noticing how their effort inspires you. The room feels warmer and more connected, and you feel proud of the support you offered.'
       );
     } else if (choice === 'ask') {
-      applyDelta({ confidence: +7, mood: +4, health: +2, energy: -2 });
+      applyDelta({ confidence: +7, mood: +4, mobility: +2, energy: -2 });
       setResultText(
         'You talk with staff about beginner routes, getting clear, kind guidance. Knowing there are options that meet you where you are makes the wall feel less intimidating.'
       );
@@ -160,12 +161,12 @@ export default function RockClimbing() {
   const handleStretchFollowup = (choice) => {
     setStretchChoice(choice);
     if (choice === 'mobility') {
-      applyDelta({ confidence: +4, mood: +6, health: +12, energy: -3 });
+      applyDelta({ confidence: +4, mood: +6, mobility: +12, energy: -3 });
       setResultText(
         'You move gently through your joints, paying attention to what feels good. Each stretch is a small act of care, reminding you that comfort matters as much as challenge.'
       );
     } else if (choice === 'easyHolds') {
-      applyDelta({ confidence: +7, mood: +7, health: +8, energy: -6 });
+      applyDelta({ confidence: +7, mood: +7, mobility: +8, energy: -6 });
       setResultText(
         'You warm up on easier holds, letting your body find its rhythm. The movements stay light and playful, and you notice tension slowly drifting away.'
       );
@@ -179,7 +180,7 @@ export default function RockClimbing() {
     const labels = {
       confidence: 'Confidence',
       mood: 'Mood',
-      health: 'Health',
+      mobility: 'Health',
       energy: 'Energy',
     };
 
@@ -202,22 +203,6 @@ export default function RockClimbing() {
     return items;
   };
 
-  // Single horizontal stat bar row; color is passed per stat.
-  const renderStatsBar = (label, value, color, isPrimary = false) => {
-    return (
-      <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
-        <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
-        <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
-          <div
-            className={rcStyles.barInner}
-            style={{ width: `${value}%`, backgroundColor: color }}
-          />
-        </div>
-        <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
-      </div>
-    );
-  };
-
   const renderSceneContent = () => {
     if (scene === 'entrance') {
       return (
@@ -228,26 +213,17 @@ export default function RockClimbing() {
             squeaking on the mats. Today, your goal is simply to notice what feels right for your body and
             energy, without judgment.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleEntranceChoice('wall')}
-            >
-              Hop on the wall
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleEntranceChoice('watch')}
-            >
-              Sit and watch
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleEntranceChoice('stretch')}
-            >
-              Go stretch and warm up
-            </button>
-          </div>
+          <ActionPanel
+            tasks={[
+              { id: 'wall', label: 'Hop on the wall', action: () => handleEntranceChoice('wall') },
+              { id: 'watch', label: 'Sit and watch', action: () => handleEntranceChoice('watch') },
+              {
+                id: 'stretch',
+                label: 'Go stretch and warm up',
+                action: () => handleEntranceChoice('stretch'),
+              },
+            ]}
+          />
         </div>
       );
     }
@@ -269,9 +245,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
-              Continue
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'wall-continue',
+                  className: rcStyles.primaryButton,
+                  label: 'Continue',
+                  action: () => setStep(2),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -284,20 +267,20 @@ export default function RockClimbing() {
               Looking at the wall, you notice both gentler lines and more demanding climbs. You’re free to
               choose what fits your capacity right now, without needing to prove anything.
             </p>
-            <div className={rcStyles.buttonGroup}>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleWallFollowup('easy')}
-              >
-                Try an easier route
-              </button>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleWallFollowup('hard')}
-              >
-                Try a harder route
-              </button>
-            </div>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'wall-easy',
+                  label: 'Try an easier route',
+                  action: () => handleWallFollowup('easy'),
+                },
+                {
+                  id: 'wall-hard',
+                  label: 'Try a harder route',
+                  action: () => handleWallFollowup('hard'),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -311,9 +294,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
-              Back to Entrance
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'wall-back',
+                  className: rcStyles.secondaryButton,
+                  label: 'Back to Entrance',
+                  action: backToEntrance,
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -336,9 +326,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
-              Continue
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'watch-continue',
+                  className: rcStyles.primaryButton,
+                  label: 'Continue',
+                  action: () => setStep(2),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -351,20 +348,20 @@ export default function RockClimbing() {
               As you keep watching, you notice chances to connect—either by offering encouragement or asking
               for guidance. Both are valid, grounded ways to participate.
             </p>
-            <div className={rcStyles.buttonGroup}>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleWatchFollowup('cheer')}
-              >
-                Cheer someone on
-              </button>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleWatchFollowup('ask')}
-              >
-                Ask staff about beginner routes
-              </button>
-            </div>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'watch-cheer',
+                  label: 'Cheer someone on',
+                  action: () => handleWatchFollowup('cheer'),
+                },
+                {
+                  id: 'watch-ask',
+                  label: 'Ask staff about beginner routes',
+                  action: () => handleWatchFollowup('ask'),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -378,9 +375,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
-              Back to Entrance
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'watch-back',
+                  className: rcStyles.secondaryButton,
+                  label: 'Back to Entrance',
+                  action: backToEntrance,
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -403,9 +407,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.primaryButton} onClick={() => setStep(2)}>
-              Continue
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'stretch-continue',
+                  className: rcStyles.primaryButton,
+                  label: 'Continue',
+                  action: () => setStep(2),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -418,20 +429,20 @@ export default function RockClimbing() {
               You consider whether your body would appreciate more gentle mobility or whether it might feel
               good to move onto very easy holds. Either option is a valid way to care for yourself.
             </p>
-            <div className={rcStyles.buttonGroup}>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleStretchFollowup('mobility')}
-              >
-                Do gentle mobility work
-              </button>
-              <button
-                className={rcStyles.button}
-                onClick={() => handleStretchFollowup('easyHolds')}
-              >
-                Warm up on the easy holds
-              </button>
-            </div>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'stretch-mobility',
+                  label: 'Do gentle mobility work',
+                  action: () => handleStretchFollowup('mobility'),
+                },
+                {
+                  id: 'stretch-holds',
+                  label: 'Warm up on the easy holds',
+                  action: () => handleStretchFollowup('easyHolds'),
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -445,9 +456,16 @@ export default function RockClimbing() {
               <h3 className={rcStyles.subtitle}>Recent changes</h3>
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
-            <button className={rcStyles.secondaryButton} onClick={backToEntrance}>
-              Back to Entrance
-            </button>
+            <ActionPanel
+              tasks={[
+                {
+                  id: 'stretch-back',
+                  className: rcStyles.secondaryButton,
+                  label: 'Back to Entrance',
+                  action: backToEntrance,
+                },
+              ]}
+            />
           </div>
         );
       }
@@ -504,13 +522,7 @@ export default function RockClimbing() {
       </div>
 
       <div className={rcStyles.topRow}>
-        <div className={rcStyles.statsContainer}>
-          <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444' /* red */, true)}
-          {renderStatsBar('Mood', stats.mood, '#22c55e' /* green */)}
-          {renderStatsBar('Health', stats.health, '#3b82f6' /* blue */)}
-          {renderStatsBar('Energy', stats.energy, '#facc15' /* yellow */)}
-        </div>
+        <StatsPanel stats={stats} />
       </div>
 
       <div className={rcStyles.sceneImageWrap}>
