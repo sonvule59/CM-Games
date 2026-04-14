@@ -3,6 +3,23 @@ import { useNavigate } from "react-router";
 import { rcStyles } from "../Static/rockClimbingStyles";
 import { ActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from "./StatsPanel.tsx";
+import {
+    BackButton,
+    Container,
+    Header,
+    HeaderLeft,
+    HeaderRight,
+    HeaderSubtitle,
+    MainTitle,
+    Paragraph,
+    ResetButton,
+    ScenePill,
+    SecondaryButton,
+    Section,
+    Subtitle,
+    Title,
+    TopRow,
+} from "./Layout.tsx";
 
 const INITIAL_STATS = {
     confidence: 50,
@@ -144,53 +161,41 @@ export default function MindfulnessGame() {
     };
 
     return (
-        <div className={rcStyles.container}>
-            <div className={rcStyles.header}>
-                <div className={rcStyles.headerLeft}>
-                    <h1 className={rcStyles.mainTitle}>Mindfulness phrases</h1>
-                    <p className={rcStyles.headerSubtitle}>
+        <Container>
+            <Header>
+                <HeaderLeft>
+                    <MainTitle>Mindfulness phrases</MainTitle>
+                    <HeaderSubtitle>
                         Tap any line that fits you right now. Your stats shift a
                         little to reflect the mood of each choice.
-                    </p>
-                    <div className={rcStyles.scenePill}>Gentle practice</div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 justify-end">
-                    <button
-                        type="button"
-                        className={rcStyles.secondaryButton}
-                        onClick={() => navigate("/mindfulness-home")}
-                    >
-                        Back
-                    </button>
-                    <button
-                        type="button"
-                        className={rcStyles.resetButton}
-                        onClick={reset}
-                    >
-                        Reset
-                    </button>
-                </div>
-            </div>
+                    </HeaderSubtitle>
+                    <ScenePill>Gentle practice</ScenePill>
+                </HeaderLeft>
+                <HeaderRight>
+                    <BackButton onClick={() => navigate("/mindfulness-home")} />
+                    <ResetButton onClick={reset} />
+                </HeaderRight>
+            </Header>
 
-            <div className={rcStyles.topRow}>
+            <TopRow>
                 <StatsPanel stats={stats} />
-            </div>
+            </TopRow>
 
-            <div className={rcStyles.section}>
-                <h2 className={rcStyles.title}>Choose a phrase</h2>
-                <p className={rcStyles.paragraph}>
+            <Section>
+                <Title>Choose a phrase</Title>
+                <Paragraph>
                     There is no wrong pick—only what feels honest in this
                     moment.
-                </p>
+                </Paragraph>
                 <ActionPanel id="mindfulness-phrases" actions={tasks} />
-            </div>
+            </Section>
 
             {reflection !== "" && (
-                <div className={rcStyles.section}>
-                    <h2 className={rcStyles.subtitle}>Why this helps</h2>
-                    <p className={rcStyles.paragraph}>{reflection}</p>
-                </div>
+                <Section>
+                    <Subtitle>Why this helps</Subtitle>
+                    <Paragraph>{reflection}</Paragraph>
+                </Section>
             )}
-        </div>
+        </Container>
     );
 }
