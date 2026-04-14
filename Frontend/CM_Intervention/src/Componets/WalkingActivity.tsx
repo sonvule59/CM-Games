@@ -12,7 +12,13 @@ import imgWalkingStretchNeighborhood from "../images/walkingStretchNeighborhood.
 import imgWalkingStretchPark from "../images/walkingStretchPark.png";
 import imgWalkingWalkNeighborhood from "../images/walkingWalkNeighborhood.png";
 import imgWalkingWalkPark from "../images/walkingWalkPark.png";
-import { StatDelta, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import {
+    StatDelta,
+    StatDeltaViewer,
+    Stats,
+    statsUpdate,
+    StatsViewer,
+} from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import ActivityImage from "./ActivityImage";
 import {
@@ -22,7 +28,14 @@ import {
     randomElement,
 } from "./Feedback";
 import { rcStyles } from "../Static/rockClimbingStyles";
-import { Container, TopRow } from "./Layout";
+import {
+    Container,
+    Paragraph,
+    PrimaryButton,
+    Section,
+    Title,
+    TopRow,
+} from "./Layout";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -48,6 +61,8 @@ const IMAGE_ID_TO_SRC = {
     walkingWalkPark: imgWalkingWalkPark,
 } satisfies Record<string, string>;
 
+// TODO: make feedback phrases longer.
+
 function WalkingActivity({}: WalkingActivityProps) {
     function applyStatDelta(delta: StatDelta) {
         if (newScreenState.screen !== "game") throw new Error();
@@ -55,6 +70,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         newScreenState = {
             ...newScreenState,
             stats: statsUpdate(stats, delta),
+            lastStats: stats,
         };
     }
 
@@ -80,6 +96,7 @@ function WalkingActivity({}: WalkingActivityProps) {
               activity: "walk" | "bike";
               location: "neighborhood" | "localPark";
               stats: Stats;
+              lastStats: Stats | undefined;
               lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
 
@@ -138,6 +155,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "neighborhood",
                         stats: STARTING_STATS,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -154,6 +172,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "localPark",
                         stats: STARTING_STATS,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -391,8 +410,28 @@ function WalkingActivity({}: WalkingActivityProps) {
                     <StatsViewer stats={screenState.stats}></StatsViewer>
                 )}
             </TopRow>
-            <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
-            <Feedback feedback={feedback}></Feedback>
+            {feedback === undefined ? (
+                <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
+            ) : (
+                <Section>
+                    <Title>How it plays out</Title>
+                    <Paragraph>{feedback}</Paragraph>
+                    {screenState.screen === "game" &&
+                        screenState.lastStats !== undefined && (
+                            <StatDeltaViewer
+                                newStats={screenState.stats}
+                                oldStats={screenState.lastStats}
+                            />
+                        )}
+                    <PrimaryButton
+                        onClick={() => {
+                            setFeedback(undefined);
+                        }}
+                    >
+                        Continue
+                    </PrimaryButton>
+                </Section>
+            )}
         </Container>
     );
 }
