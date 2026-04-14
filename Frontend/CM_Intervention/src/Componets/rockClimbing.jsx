@@ -214,7 +214,7 @@ export default function RockClimbing() {
             energy, without judgment.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               { id: 'wall', label: 'Hop on the wall', action: () => handleEntranceChoice('wall') },
               { id: 'watch', label: 'Sit and watch', action: () => handleEntranceChoice('watch') },
               {
@@ -246,7 +246,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'wall-continue',
                   className: rcStyles.primaryButton,
@@ -268,7 +268,7 @@ export default function RockClimbing() {
               choose what fits your capacity right now, without needing to prove anything.
             </p>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'wall-easy',
                   label: 'Try an easier route',
@@ -295,7 +295,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'wall-back',
                   className: rcStyles.secondaryButton,
@@ -327,7 +327,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'watch-continue',
                   className: rcStyles.primaryButton,
@@ -349,7 +349,7 @@ export default function RockClimbing() {
               for guidance. Both are valid, grounded ways to participate.
             </p>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'watch-cheer',
                   label: 'Cheer someone on',
@@ -376,7 +376,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'watch-back',
                   className: rcStyles.secondaryButton,
@@ -408,7 +408,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'stretch-continue',
                   className: rcStyles.primaryButton,
@@ -430,7 +430,7 @@ export default function RockClimbing() {
               good to move onto very easy holds. Either option is a valid way to care for yourself.
             </p>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'stretch-mobility',
                   label: 'Do gentle mobility work',
@@ -457,7 +457,7 @@ export default function RockClimbing() {
               <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
             </div>
             <ActionPanel
-              tasks={[
+              actions={[
                 {
                   id: 'stretch-back',
                   className: rcStyles.secondaryButton,

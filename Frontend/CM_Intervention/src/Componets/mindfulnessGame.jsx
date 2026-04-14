@@ -172,7 +172,7 @@ export default function MindfulnessGame() {
         <p className={rcStyles.paragraph}>
           There is no wrong pick—only what feels honest in this moment.
         </p>
-        <ActionPanel id="mindfulness-phrases" tasks={tasks} />
+        <ActionPanel id="mindfulness-phrases" actions={tasks} />
       </div>
 
       {reflection !== '' && (

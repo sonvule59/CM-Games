@@ -26,7 +26,7 @@ export default function MindfulnessHome() {
           Open the phrase game whenever you want a moment to check in with yourself.
         </p>
         <ActionPanel
-          tasks={[
+          actions={[
             {
               id: 'start-mindfulness',
               className: rcStyles.primaryButton,
