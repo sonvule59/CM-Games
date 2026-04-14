@@ -104,7 +104,7 @@ export function ResetButton(props: InheritProps<"button">) {
 
 export function BackButton(props: InheritProps<"button">) {
     return (
-        <SecondaryButton>
+        <SecondaryButton {...props}>
             {"children" in props ? props.children : <>Back</>}
         </SecondaryButton>
     );
