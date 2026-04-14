@@ -150,7 +150,7 @@ export default function OutdoorsActivities() {
         today.
       </p>
       <ActionPanel
-        tasks={[
+        actions={[
           {
             id: 'act-walk',
             label: 'Walk a lakeside trail',
@@ -205,7 +205,7 @@ export default function OutdoorsActivities() {
         <h2 className={rcStyles.title}>{title}</h2>
         <p className={rcStyles.paragraph}>{body}</p>
         <ActionPanel
-          tasks={[
+          actions={[
             {
               id: 'intro-continue',
               className: rcStyles.primaryButton,
@@ -236,7 +236,7 @@ export default function OutdoorsActivities() {
             brief, depending on what feels best.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: 'fish-catch',
                 label: 'Try to catch a fish',
@@ -262,7 +262,7 @@ export default function OutdoorsActivities() {
             good fit&mdash;it just depends on what your body is asking for today.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: 'walk-short',
                 label: 'Take a shorter, slower loop',
@@ -288,7 +288,7 @@ export default function OutdoorsActivities() {
             focusing on one part of your swing.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: 'golf-drives',
                 label: 'Hit some easy drives',
@@ -314,7 +314,7 @@ export default function OutdoorsActivities() {
             it as relaxed or as structured as you want.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: 'bocce-casual',
                 label: 'Play a casual, low‑key game',
@@ -339,7 +339,7 @@ export default function OutdoorsActivities() {
       <h2 className={rcStyles.title}>How it plays out</h2>
       <p className={rcStyles.paragraph}>{resultText}</p>
       <ActionPanel
-        tasks={[
+        actions={[
           {
             id: 'result-back',
             className: rcStyles.secondaryButton,

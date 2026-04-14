@@ -344,7 +344,7 @@ export default function OutsideDomestic() {
             You can keep it small and get a quick win, or do a bigger version and feel the progress.
           </p>
           <ActionPanel
-            tasks={ACTIVITIES.map((a) => ({
+            actions={ACTIVITIES.map((a) => ({
               id: a.id,
               icon: a.icon,
               label: a.title,
@@ -359,7 +359,7 @@ export default function OutsideDomestic() {
           <h2 className={rcStyles.title}>{activity.title}</h2>
           <p className={rcStyles.paragraph}>{activity.intro}</p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: `${activity.id}-continue`,
                 className: rcStyles.primaryButton,
@@ -384,7 +384,7 @@ export default function OutsideDomestic() {
             Pick the version that matches your energy today.
           </p>
           <ActionPanel
-            tasks={[
+            actions={[
               ...activity.choices.map((c) => ({
                 id: `${activity.id}-${c.id}`,
                 label: c.label,
@@ -406,7 +406,7 @@ export default function OutsideDomestic() {
           <h2 className={rcStyles.title}>How it went</h2>
           <p className={rcStyles.paragraph}>{resultText}</p>
           <ActionPanel
-            tasks={[
+            actions={[
               {
                 id: 'result-back',
                 className: rcStyles.primaryButton,
