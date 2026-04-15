@@ -5,7 +5,7 @@ export default function DomesticGameStart() {
   const navigate = useNavigate();
   const games = [
     { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
-    { path: "/domestic-home",   text: "Around the house",   color: "#6366f1" },
+    { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },
   ];
 
   return (
