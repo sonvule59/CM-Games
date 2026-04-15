@@ -11,8 +11,24 @@ import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 
 import "../Static/WalkingActivity.css";
-import { Container, Paragraph, PrimaryButton, Section, Title } from "./Layout";
+import {
+    BackButton,
+    Container,
+    Header,
+    HeaderLeft,
+    HeaderRight,
+    HeaderSubtitle,
+    MainTitle,
+    Paragraph,
+    PrimaryButton,
+    ResetButton,
+    ScenePill,
+    Section,
+    Title,
+    TopRow,
+} from "./Layout";
 import { negativeFeedback, positiveFeedback } from "./Feedback";
+import { useNavigate } from "react-router";
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -34,6 +50,8 @@ const IMAGE_ID_TO_SRC = {
 
 type SwimmingActivityProps = {};
 export default function SwimmingActivity({}: SwimmingActivityProps) {
+    const navigate = useNavigate();
+    
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
 
     function givePositiveFeedback(message: string) {
@@ -217,15 +235,29 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
 
     return (
         <Container>
+            <Header>
+                <HeaderLeft>
+                    <MainTitle>Swimming</MainTitle>
+                    <HeaderSubtitle>
+                        A day at the pool to do some activities and have fun.
+                    </HeaderSubtitle>
+                    <ScenePill>Water activities</ScenePill>
+                </HeaderLeft>
+                <HeaderRight>
+                    <BackButton onClick={() => navigate("/leisure")} />
+                </HeaderRight>
+            </Header>
+            <TopRow>
+                {screenState.screen === "game" && (
+                    <StatsViewer stats={screenState.stats}></StatsViewer>
+                )}
+            </TopRow>
             {imageId != undefined &&
                 (IMAGE_ID_TO_SRC[imageId] != undefined ? (
                     <ActivityImage src={IMAGE_ID_TO_SRC[imageId]!} />
                 ) : (
                     <ActivityImage>Placeholder: {imageId}</ActivityImage>
                 ))}
-            {screenState.screen === "game" && (
-                <StatsViewer stats={screenState.stats}></StatsViewer>
-            )}
             <Section>
                 {firstTime && (
                     <>
