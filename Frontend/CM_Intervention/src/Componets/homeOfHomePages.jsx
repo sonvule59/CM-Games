@@ -57,6 +57,13 @@ export default function HomeOfHomePages() {
                 navigate("/mindfulness-home");
               },
             },
+            {
+              key: "/transport-home",
+              label: "Transport game",
+              callback() {
+                navigate("/transport-home");
+              },
+            },
           ]}
         />
       </Section>

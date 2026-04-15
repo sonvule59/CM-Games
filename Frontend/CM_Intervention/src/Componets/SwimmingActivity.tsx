@@ -7,6 +7,10 @@ import imgSwimBreak from "../images/swimBreak.png";
 import imgSwimLap from "../images/swimLap.png";
 // @ts-ignore
 import imgSwimTread from "../images/swimTread.png";
+import imgSwimChoice from "../images/swimchoice.png";
+import imgPoolWalking from "../images/poolwalking.png";
+import imgPoolJogging from "../images/pooljogging.png";
+import imgPoolCycling from "../images/poolcycling.png";
 import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 
@@ -42,10 +46,10 @@ const IMAGE_ID_TO_SRC = {
     break: imgSwimBreak,
     lap: imgSwimLap,
     tread: imgSwimTread,
-    visitingPool: undefined,
-    poolWalking: undefined,
-    poolJogging: undefined,
-    poolCycling: undefined,
+    visitingPool: imgSwimChoice,
+    poolWalking: imgPoolWalking,
+    poolJogging: imgPoolJogging,
+    poolCycling: imgPoolCycling,
 } satisfies Record<string, string | undefined>;
 
 type SwimmingActivityProps = {};
