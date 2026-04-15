@@ -1,38 +1,17 @@
 stages:
-  - install
   - build
   - deploy
 
 variables:
   NODE_ENV: production
-  GIT_CLEAN_FLAGS: -ffdx --exclude=Frontend/CM_Intervention/node_modules/
-
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - Frontend/CM_Intervention/node_modules/
-
-install:
-  stage: install
-  tags:
-    - ReactRunner
-  script:
-    - cd Frontend/CM_Intervention
-    - npm install
-  artifacts:
-    paths:
-      - Frontend/CM_Intervention/node_modules/
-    expire_in: 1 hour
 
 build:
   stage: build
   tags:
     - ReactRunner
-  dependencies:
-    - install
   script:
     - cd Frontend/CM_Intervention
-    - ls node_modules/.bin/vite  # debug line hopfully I dont need 
+    - npm install
     - ./node_modules/.bin/vite build
   artifacts:
     paths:
