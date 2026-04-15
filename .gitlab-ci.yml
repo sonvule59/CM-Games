@@ -1,0 +1,48 @@
+stages:
+  - install
+  - build
+  - deploy
+
+variables:
+  NODE_ENV: production
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - Frontend/CM_Intervention/node_modules/
+
+install:
+  stage: install
+  tags:
+    - ReactRunner
+  script:
+    - cd Frontend/CM_Intervention
+    - npm install
+  artifacts:
+    paths:
+      - Frontend/CM_Intervention/node_modules/
+    expire_in: 1 hour
+
+build:
+  stage: build
+  tags:
+    - ReactRunner
+  script:
+    - cd Frontend/CM_Intervention
+    - npm run build
+  artifacts:
+    paths:
+      - Frontend/CM_Intervention/dist/
+    expire_in: 1 hour
+
+deploy:
+  stage: deploy
+  tags:
+    - ReactRunner
+  script:
+    - cd Frontend/CM_Intervention
+    - pm2 delete cm-app || true
+    - pm2 serve dist 8080 --spa --name cm-app --time
+    - pm2 save
+  only:
+    - main
