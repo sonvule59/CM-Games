@@ -1,7 +1,13 @@
 import { s } from "../Static/officestyles.js";
 import { useNavigate } from "react-router";
+
 export default function TransportGameStart() {
   const navigate = useNavigate();
+  const games = [
+    { path: "/transport",  text: "Go to work",             color: "#10b981" },
+    { path: "/transport2", text: "Going to get groceries", color: "#3b82f6" },
+  ];
+
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
 
@@ -17,34 +23,23 @@ export default function TransportGameStart() {
             display: "block",
           }}
         />
-        {/* Gradient fade so image bleeds into the card content below */}
         <div style={{
           position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
+          bottom: 0, left: 0, right: 0,
           height: 120,
           background: "linear-gradient(to bottom, transparent, #f8fafc)",
         }} />
       </div>
 
-      {/* Card content */}
       <div style={{ padding: "0 28px 32px", marginTop: -16, position: "relative" }}>
 
-        {/* Scene pill */}
         <div style={{ marginBottom: 12 }}>
           <span className={s.scenePill}>Active Transport</span>
         </div>
 
-        {/* Title */}
         <h1
           className={s.mainTitle}
-          style={{
-            fontSize: "2.4rem",
-            lineHeight: 1.1,
-            marginBottom: 10,
-            letterSpacing: "-0.03em",
-          }}
+          style={{ fontSize: "2.4rem", lineHeight: 1.1, marginBottom: 10, letterSpacing: "-0.03em" }}
         >
           Healthy Moves,{" "}
           <span style={{
@@ -56,19 +51,16 @@ export default function TransportGameStart() {
           </span>
         </h1>
 
-        {/* Subtitle */}
         <p className={s.paragraph} style={{ maxWidth: 840, marginBottom: 24, fontSize: "0.95rem" }}>
           Make every move count. Choose the active path today. Small changes in how you move lead to big changes in how you feel.
         </p>
 
-        {/* Stat preview pills */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 28 }}>
           {[
             { label: "Confidence", color: "#fef9c3", text: "#9d174d" },
             { label: "Mood",       color: "#dcfce7", text: "#166534" },
             { label: "Health",     color: "#dbeafe", text: "#1e40af" },
-            { label: "Energy",     color: "#fce7f3", text: "#854d0e" }, 
-
+            { label: "Energy",     color: "#fce7f3", text: "#854d0e" },
           ].map(({ label, color, text }) => (
             <span key={label} style={{
               padding: "3px 10px",
@@ -85,26 +77,31 @@ export default function TransportGameStart() {
           ))}
         </div>
 
-        {/* CTA button */}
-        <button
-          className={s.primaryButton}
-          onClick={() => {navigate("/transport2")}}
-          style={{
-            width: "100%",
-            padding: "14px 24px",
-            fontSize: "1rem",
-            fontWeight: 700,
-            borderRadius: 14,
-            letterSpacing: "-0.01em",
-            marginTop: 0,
-            cursor: "pointer",
-            background: "#3b82f6",
-            color: "white",
-            border: "none"
-          }}
-        >
-          Let's Start Moving 🚶‍♂️
-        </button>
+        {/* CTA buttons — one per game */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {games.map((game) => (
+            <button
+              key={game.path}
+              className={s.primaryButton}
+              onClick={() => navigate(game.path)}
+              style={{
+                width: "100%",
+                padding: "14px 24px",
+                fontSize: "1rem",
+                fontWeight: 700,
+                borderRadius: 14,
+                letterSpacing: "-0.01em",
+                marginTop: 0,
+                cursor: "pointer",
+                background: game.color,
+                color: "white",
+                border: "none",
+              }}
+            >
+              {game.text}
+            </button>
+          ))}
+        </div>
 
       </div>
     </div>
