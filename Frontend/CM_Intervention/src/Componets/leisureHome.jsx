@@ -124,6 +124,6 @@ export default function leisureHome() {
         </div>
 
       </div>
-    </Container>
+    </div>
   );
 }
