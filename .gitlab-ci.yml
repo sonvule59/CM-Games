@@ -1,31 +1,14 @@
 stages:
-  - build
-  - deploy
+  - build_and_deploy
 
-variables:
-  NODE_ENV: production
-
-build:
-  stage: build
+build_and_deploy:
+  stage: build_and_deploy
   tags:
     - ReactRunner
   script:
     - cd Frontend/CM_Intervention
     - npm install --include=dev
     - ./node_modules/.bin/vite build
-  artifacts:
-    paths:
-      - Frontend/CM_Intervention/dist/
-    expire_in: 1 hour
-
-deploy:
-  stage: deploy
-  tags:
-    - ReactRunner
-  dependencies:
-    - build
-  script:
-    - cd Frontend/CM_Intervention
     - pm2 delete cm-app || true
     - pm2 serve dist 8080 --spa --name cm-app --time
     - pm2 save
