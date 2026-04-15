@@ -42,5 +42,5 @@ export const s = {
   taskIcon: "text-3xl",
   taskName: "text-sm font-semibold text-slate-800",
   taskDesc: "text-[11px] text-slate-500 leading-snug",
-  buttonRow: "flex flex-col gap-2 mt-3",
+  buttonRow: "flex flex-row gap-2 mt-3",
 };
