@@ -21,6 +21,7 @@ import HomeOfHomePages from './Componets/homeOfHomePages.jsx'
 import MindfulnessHome from './Componets/mindfulnessHome.jsx'
 import MindfulnessGame from './Componets/mindfulnessGame.jsx'
 
+// test foe ci cd
 
 function App() {
   const [count, setCount] = useState(0);
