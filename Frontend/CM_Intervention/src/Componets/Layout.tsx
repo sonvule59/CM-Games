@@ -1,5 +1,6 @@
 // Layout and prose components: headings, paragraphs.
 
+import { s } from "../Static/officestyles";
 import { rcStyles } from "../Static/rockClimbingStyles";
 
 type InheritProps<
@@ -70,28 +71,16 @@ export function HeaderSubtitle(props: InheritProps<"div">) {
     return <div {...addClassNameToProps(props, rcStyles.headerSubtitle)} />;
 }
 
-export function Button({
-    isPrimary,
-    ...props
-}: InheritProps<"button", { isPrimary?: boolean }>) {
-    return (
-        <button
-            {...addClassNameToProps(
-                props,
-                (isPrimary ?? true)
-                    ? rcStyles.primaryButton
-                    : rcStyles.secondaryButton,
-            )}
-        />
-    );
+export function Button(props: InheritProps<"button">) {
+  return <button {...addClassNameToProps(props, rcStyles.button)} />;
 }
 
 export function PrimaryButton(props: InheritProps<"button">) {
-    return <Button {...props} isPrimary={true} />;
+    return <button {...addClassNameToProps(props, rcStyles.primaryButton)} />;
 }
 
 export function SecondaryButton(props: InheritProps<"button">) {
-    return <Button {...props} isPrimary={false} />;
+    return <button {...addClassNameToProps(props, rcStyles.secondaryButton)} />;
 }
 
 export function ResetButton(props: InheritProps<"button">) {
@@ -108,4 +97,8 @@ export function BackButton(props: InheritProps<"button">) {
             {"children" in props ? props.children : <>Back</>}
         </SecondaryButton>
     );
+}
+
+export function ParagraphItalic(props: InheritProps<"p">) {
+  return <p {...addClassNameToProps(props, s.paragraphItalic)} />;
 }
