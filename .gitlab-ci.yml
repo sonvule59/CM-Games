@@ -30,7 +30,7 @@ build:
     - ReactRunner
   script:
     - cd Frontend/CM_Intervention
-    - npx vite build
+    - ./node_modules/.bin/vite build
   artifacts:
     paths:
       - Frontend/CM_Intervention/dist/
@@ -43,7 +43,7 @@ deploy:
   script:
     - cd Frontend/CM_Intervention
     - pm2 delete cm-app || true
-    - pm2 serve dist 8080 --spa --name cm-app --time --log Frontend/CM_Intervention/log_file
+    - pm2 serve dist 8080 --spa --name cm-app --time
     - pm2 save
   only:
     - master
