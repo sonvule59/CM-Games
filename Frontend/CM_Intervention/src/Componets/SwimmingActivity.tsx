@@ -21,11 +21,16 @@ const STARTING_STATS: Stats = Object.freeze({
     health: 50,
 });
 
+// Undefined means image is unavailable and a placeholder will be shown.
 const IMAGE_ID_TO_SRC = {
-    swimBreak: imgSwimBreak,
-    swimLap: imgSwimLap,
-    swimTread: imgSwimTread,
-} satisfies Record<string, string>;
+    break: imgSwimBreak,
+    lap: imgSwimLap,
+    tread: imgSwimTread,
+    visitingPool: undefined,
+    poolWalking: undefined,
+    poolJogging: undefined,
+    poolCycling: undefined,
+} satisfies Record<string, string | undefined>;
 
 type SwimmingActivityProps = {};
 export default function SwimmingActivity({}: SwimmingActivityProps) {
@@ -45,7 +50,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
 
     let actions: Array<ActionSpec>;
     let actionPrompt: string;
-    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
+    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined;
 
     // Represents the state of the entire component.
     // Goal is to make invalid states unrepresentable using the type system.
@@ -82,7 +87,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             health: +10,
                         }),
                         lastStats: screenState.stats,
-                        lastActionImage: "swimLap",
+                        lastActionImage: "lap",
                     });
                     givePositiveFeedback(
                         "After swimming a lap, you feel better and more confident.",
@@ -101,12 +106,78 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             energy: -5,
                             mood: +10,
                             confidence: +10,
-                            health: +0,
+                            health: +10,
                         }),
                         lastStats: screenState.stats,
-                        lastActionImage: "swimTread",
+                        lastActionImage: "tread",
                     });
                     givePositiveFeedback("You feel more confident.");
+                },
+            },
+            {
+                id: "poolWalking",
+                label: "Pool walk",
+                icon: "🚶",
+                desc: "Walk in the shallow end of the pool.",
+                action() {
+                    setScreenState({
+                        ...screenState,
+                        stats: statsUpdate(screenState.stats, {
+                            energy: -5,
+                            mood: +10,
+                            confidence: +10,
+                            health: +10,
+                        }),
+                        lastStats: screenState.stats,
+                        lastActionImage: "poolWalking",
+                    });
+                    givePositiveFeedback(
+                        "The resistance in the water helps you strengthen your muscles and burn calories.",
+                    );
+                },
+            },
+            {
+                id: "poolJogging",
+                label: "Pool jog",
+                icon: "🏃",
+                desc: "Jog in the shallow end of the pool.",
+                action() {
+                    setScreenState({
+                        ...screenState,
+                        stats: statsUpdate(screenState.stats, {
+                            energy: -10,
+                            mood: +10,
+                            confidence: +15,
+                            health: +20,
+                        }),
+                        lastStats: screenState.stats,
+                        lastActionImage: "poolJogging",
+                    });
+                    givePositiveFeedback(
+                        "The resistance in the water helps you strengthen your muscles and burn calories.",
+                    );
+                },
+            },
+            {
+                id: "poolCycling",
+                label: "Pool cycle",
+                icon: "🚴",
+                desc: "Take part in a pool cycling session, where you use a cycling machine in the shallow end of the pool",
+                action() {
+                    setScreenState({
+                        ...screenState,
+                        stats: statsUpdate(screenState.stats, {
+                            energy: -5,
+                            mood: +10,
+                            confidence: +10,
+                            health: +15,
+                        }),
+                        lastStats: screenState.stats,
+                        lastActionImage: "poolCycling",
+                    });
+                    givePositiveFeedback(
+                        "As you cycle with others, you build confidence. The resistance in the water helps you strengthen your muscles and burn calories.",
+                    );
                 },
             },
             {
@@ -121,10 +192,10 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                             energy: +50,
                             mood: +10,
                             confidence: +0,
-                            health: +50,
+                            health: +0,
                         }),
                         lastStats: screenState.stats,
-                        lastActionImage: "swimBreak",
+                        lastActionImage: "break",
                     });
                     givePositiveFeedback(
                         "After resting for a bit, you feel relaxed, refreshed, and ready for more activity.",
@@ -132,7 +203,10 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                 },
             },
         ];
-        imageId = screenState.lastActionImage;
+        imageId =
+            feedback != undefined
+                ? (screenState.lastActionImage ?? "visitingPool")
+                : "visitingPool";
     } else {
         const _: never = screenState.screen;
         throw new Error();
@@ -143,9 +217,12 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
 
     return (
         <Container>
-            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
-                <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
-            )}
+            {imageId != undefined &&
+                (IMAGE_ID_TO_SRC[imageId] != undefined ? (
+                    <ActivityImage src={IMAGE_ID_TO_SRC[imageId]!} />
+                ) : (
+                    <ActivityImage>Placeholder: {imageId}</ActivityImage>
+                ))}
             {screenState.screen === "game" && (
                 <StatsViewer stats={screenState.stats}></StatsViewer>
             )}
