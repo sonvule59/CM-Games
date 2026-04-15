@@ -167,16 +167,14 @@ export default function TransportGame() {
           <p className={s.paragraph}>
             Every commute is a chance to move your body. Pick what works for you — there's no wrong answer.
           </p>
-          <div className={s.taskGrid}>
+          <div className={s.buttonGroup}>
             {[
               { id: "walk",    icon: "🚶", name: "Walk",    desc: "Fresh air, your pace" },
               { id: "bike",    icon: "🚴", name: "Bike",    desc: "Two wheels, good vibes" },
               { id: "transit", icon: "🚇", name: "Transit", desc: "Bus or subway" },
             ].map((m) => (
-              <button key={m.id} className={s.taskCard} onClick={() => handleModeChoice(m.id)}>
-                <span className={s.taskIcon}>{m.icon}</span>
-                <span className={s.taskName}>{m.name}</span>
-                <span className={s.taskDesc}>{m.desc}</span>
+              <button key={m.id} className={s.button} onClick={() => handleModeChoice(m.id)}>
+                {m.name}: {m.desc}
               </button>
             ))}
           </div>

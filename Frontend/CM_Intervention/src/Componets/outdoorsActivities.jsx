@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { rcStyles } from '../Static/rockClimbingStyles';
+import { ActionPanel } from './ActionPanel.tsx';
+import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 import pullingUpLakeImg from '../images/pullingUpLake.png';
 import walkingLakeImg from '../images/walkingLake.png';
 import guyFishingImg from '../images/guyFishing.png';
@@ -19,7 +21,7 @@ export default function OutdoorsActivities() {
   const initialStats = {
     confidence: 50,
     mood: 50,
-    health: 50,
+    mobility: 50,
     energy: 100,
   };
 
@@ -42,25 +44,25 @@ export default function OutdoorsActivities() {
     setStep('activityIntro');
     setResultText('');
     if (nextActivity === 'walk') {
-      applyDelta({ confidence: +2, mood: +3, health: +4, energy: -2 });
+      applyDelta({ confidence: +2, mood: +3, mobility: +4, energy: -2 });
     } else if (nextActivity === 'fish') {
-      applyDelta({ confidence: +2, mood: +4, health: +1, energy: -1 });
+      applyDelta({ confidence: +2, mood: +4, mobility: +1, energy: -1 });
     } else if (nextActivity === 'golf') {
-      applyDelta({ confidence: +4, mood: +2, health: +2, energy: -3 });
+      applyDelta({ confidence: +4, mood: +2, mobility: +2, energy: -3 });
     } else if (nextActivity === 'bocce') {
-      applyDelta({ confidence: +3, mood: +5, health: +2, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, mobility: +2, energy: -2 });
     }
   };
 
-  const clamp = (value) => Math.max(0, Math.min(100, value));
-
   const applyDelta = (delta) => {
-    setStats((prev) => ({
-      confidence: clamp(prev.confidence + (delta.confidence || 0)),
-      mood: clamp(prev.mood + (delta.mood || 0)),
-      health: clamp(prev.health + (delta.health || 0)),
-      energy: clamp(prev.energy + (delta.energy || 0)),
-    }));
+    setStats((prev) =>
+      statsUpdate(prev, {
+        confidence: delta.confidence ?? 0,
+        mood: delta.mood ?? 0,
+        mobility: delta.mobility ?? 0,
+        energy: delta.energy ?? 0,
+      }),
+    );
   };
 
   const backToLake = () => {
@@ -76,12 +78,12 @@ export default function OutdoorsActivities() {
 
   const handleFishingChoice = (choice) => {
     if (choice === 'catch') {
-      applyDelta({ confidence: +8, mood: +5, health: +2, energy: -5 });
+      applyDelta({ confidence: +8, mood: +5, mobility: +2, energy: -5 });
       setResultText(
         'You cast your line and feel a steady tug. After a quiet moment of waiting, you reel in a fish and take a second to enjoy the view before deciding what comes next.'
       );
     } else if (choice === 'back') {
-      applyDelta({ confidence: +2, mood: +4, health: +1, energy: +2 });
+      applyDelta({ confidence: +2, mood: +4, mobility: +1, energy: +2 });
       setResultText(
         'You enjoy the gentle sounds of the water for a bit, then decide to head back to the shoreline, feeling relaxed and ready for the rest of the day.'
       );
@@ -92,12 +94,12 @@ export default function OutdoorsActivities() {
   // You can adjust these later if you want different situations.
   const handleWalkChoice = (choice) => {
     if (choice === 'short') {
-      applyDelta({ confidence: +3, mood: +5, health: +4, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, mobility: +4, energy: -2 });
       setResultText(
         'You choose a shorter loop along the water, noticing birds, trees, and the way the light hits the lake. It feels like just enough movement to clear your head.'
       );
     } else if (choice === 'long') {
-      applyDelta({ confidence: +5, mood: +6, health: +8, energy: -6 });
+      applyDelta({ confidence: +5, mood: +6, mobility: +8, energy: -6 });
       setResultText(
         'You follow a longer trail that winds through the trees. You take your time, stop for a few photos, and return feeling refreshed and grounded.'
       );
@@ -107,12 +109,12 @@ export default function OutdoorsActivities() {
 
   const handleGolfChoice = (choice) => {
     if (choice === 'drives') {
-      applyDelta({ confidence: +6, mood: +3, health: +2, energy: -5 });
+      applyDelta({ confidence: +6, mood: +3, mobility: +2, energy: -5 });
       setResultText(
         'You focus on easy, smooth swings at the driving range. Instead of chasing perfection, you enjoy the rhythm of each shot and the wide‑open sky.'
       );
     } else if (choice === 'shortGame') {
-      applyDelta({ confidence: +4, mood: +4, health: +1, energy: -3 });
+      applyDelta({ confidence: +4, mood: +4, mobility: +1, energy: -3 });
       setResultText(
         'You practice gentle putts and chips on the green. The slower pace lets you notice small improvements and enjoy being outside.'
       );
@@ -122,12 +124,12 @@ export default function OutdoorsActivities() {
 
   const handleBocceChoice = (choice) => {
     if (choice === 'casual') {
-      applyDelta({ confidence: +4, mood: +7, health: +2, energy: -2 });
+      applyDelta({ confidence: +4, mood: +7, mobility: +2, energy: -2 });
       setResultText(
         'You play a relaxed round of bocce with friends, laughing at wild throws and cheering for close shots. The game becomes more about connection than keeping score.'
       );
     } else if (choice === 'tournament') {
-      applyDelta({ confidence: +6, mood: +6, health: +3, energy: -4 });
+      applyDelta({ confidence: +6, mood: +6, mobility: +3, energy: -4 });
       setResultText(
         'You set up a friendly mini‑tournament, taking turns and celebrating each win with high‑fives. The light competition adds excitement without pressure.'
       );
@@ -147,32 +149,30 @@ export default function OutdoorsActivities() {
         There&apos;s no right or wrong choice here&mdash;just pick what feels interesting for you
         today.
       </p>
-      <div className={rcStyles.buttonGroup}>
-        <button
-          className={rcStyles.button}
-          onClick={() => handleSelectActivity('walk')}
-        >
-          Walk a lakeside trail
-        </button>
-        <button
-          className={rcStyles.button}
-          onClick={() => handleSelectActivity('fish')}
-        >
-          Fish at the lake
-        </button>
-        <button
-          className={rcStyles.button}
-          onClick={() => handleSelectActivity('golf')}
-        >
-          Play a little golf
-        </button>
-        <button
-          className={rcStyles.button}
-          onClick={() => handleSelectActivity('bocce')}
-        >
-          Play bocce ball
-        </button>
-      </div>
+      <ActionPanel
+        actions={[
+          {
+            id: 'act-walk',
+            label: 'Walk a lakeside trail',
+            action: () => handleSelectActivity('walk'),
+          },
+          {
+            id: 'act-fish',
+            label: 'Fish at the lake',
+            action: () => handleSelectActivity('fish'),
+          },
+          {
+            id: 'act-golf',
+            label: 'Play a little golf',
+            action: () => handleSelectActivity('golf'),
+          },
+          {
+            id: 'act-bocce',
+            label: 'Play bocce ball',
+            action: () => handleSelectActivity('bocce'),
+          },
+        ]}
+      />
     </div>
   );
 
@@ -204,18 +204,22 @@ export default function OutdoorsActivities() {
       <div className={rcStyles.section}>
         <h2 className={rcStyles.title}>{title}</h2>
         <p className={rcStyles.paragraph}>{body}</p>
-        <button
-          className={rcStyles.primaryButton}
-          onClick={goToChoices}
-        >
-          Continue
-        </button>
-        <button
-          className={rcStyles.secondaryButton}
-          onClick={backToLake}
-        >
-          Back to the lake options
-        </button>
+        <ActionPanel
+          actions={[
+            {
+              id: 'intro-continue',
+              className: rcStyles.primaryButton,
+              label: 'Continue',
+              action: goToChoices,
+            },
+            {
+              id: 'intro-back',
+              className: rcStyles.secondaryButton,
+              label: 'Back to the lake options',
+              action: backToLake,
+            },
+          ]}
+        />
       </div>
     );
   };
@@ -231,20 +235,20 @@ export default function OutdoorsActivities() {
             You have your line ready and the water is calm. You can lean into the moment or keep it
             brief, depending on what feels best.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleFishingChoice('catch')}
-            >
-              Try to catch a fish
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleFishingChoice('back')}
-            >
-              Sit for a bit, then head back
-            </button>
-          </div>
+          <ActionPanel
+            actions={[
+              {
+                id: 'fish-catch',
+                label: 'Try to catch a fish',
+                action: () => handleFishingChoice('catch'),
+              },
+              {
+                id: 'fish-back',
+                label: 'Sit for a bit, then head back',
+                action: () => handleFishingChoice('back'),
+              },
+            ]}
+          />
         </div>
       );
     }
@@ -257,20 +261,20 @@ export default function OutdoorsActivities() {
             You look down the shoreline and see paths of different lengths. Both options can be a
             good fit&mdash;it just depends on what your body is asking for today.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleWalkChoice('short')}
-            >
-              Take a shorter, slower loop
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleWalkChoice('long')}
-            >
-              Explore a longer trail
-            </button>
-          </div>
+          <ActionPanel
+            actions={[
+              {
+                id: 'walk-short',
+                label: 'Take a shorter, slower loop',
+                action: () => handleWalkChoice('short'),
+              },
+              {
+                id: 'walk-long',
+                label: 'Explore a longer trail',
+                action: () => handleWalkChoice('long'),
+              },
+            ]}
+          />
         </div>
       );
     }
@@ -283,20 +287,20 @@ export default function OutdoorsActivities() {
             You have access to a simple practice area. You can keep things light and playful while
             focusing on one part of your swing.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleGolfChoice('drives')}
-            >
-              Hit some easy drives
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleGolfChoice('shortGame')}
-            >
-              Practice your short game
-            </button>
-          </div>
+          <ActionPanel
+            actions={[
+              {
+                id: 'golf-drives',
+                label: 'Hit some easy drives',
+                action: () => handleGolfChoice('drives'),
+              },
+              {
+                id: 'golf-short',
+                label: 'Practice your short game',
+                action: () => handleGolfChoice('shortGame'),
+              },
+            ]}
+          />
         </div>
       );
     }
@@ -309,20 +313,20 @@ export default function OutdoorsActivities() {
             You&apos;ve got the court, the balls, and some people who are up for a game. You can keep
             it as relaxed or as structured as you want.
           </p>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleBocceChoice('casual')}
-            >
-              Play a casual, low‑key game
-            </button>
-            <button
-              className={rcStyles.button}
-              onClick={() => handleBocceChoice('tournament')}
-            >
-              Make a tiny, friendly tournament
-            </button>
-          </div>
+          <ActionPanel
+            actions={[
+              {
+                id: 'bocce-casual',
+                label: 'Play a casual, low‑key game',
+                action: () => handleBocceChoice('casual'),
+              },
+              {
+                id: 'bocce-tourney',
+                label: 'Make a tiny, friendly tournament',
+                action: () => handleBocceChoice('tournament'),
+              },
+            ]}
+          />
         </div>
       );
     }
@@ -334,31 +338,18 @@ export default function OutdoorsActivities() {
     <div className={rcStyles.section}>
       <h2 className={rcStyles.title}>How it plays out</h2>
       <p className={rcStyles.paragraph}>{resultText}</p>
-      <div className={rcStyles.buttonGroup}>
-        <button
-          className={rcStyles.secondaryButton}
-          onClick={backToLake}
-        >
-          Back to the lake options
-        </button>
-      </div>
+      <ActionPanel
+        actions={[
+          {
+            id: 'result-back',
+            className: rcStyles.secondaryButton,
+            label: 'Back to the lake options',
+            action: backToLake,
+          },
+        ]}
+      />
     </div>
   );
-
-  const renderStatsBar = (label, value, color, isPrimary = false) => {
-    return (
-      <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
-        <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
-        <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
-          <div
-            className={rcStyles.barInner}
-            style={{ width: `${value}%`, backgroundColor: color }}
-          />
-        </div>
-        <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
-      </div>
-    );
-  };
 
   let imageKey = 'lake';
   if (activity === 'walk') {
@@ -398,13 +389,7 @@ export default function OutdoorsActivities() {
       </div>
 
       <div className={rcStyles.topRow}>
-        <div className={rcStyles.statsContainer}>
-          <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444', true)}
-          {renderStatsBar('Mood', stats.mood, '#22c55e')}
-          {renderStatsBar('Health', stats.health, '#3b82f6')}
-          {renderStatsBar('Energy', stats.energy, '#facc15')}
-        </div>
+        <StatsPanel stats={stats} />
       </div>
 
       {step === 'intro' && renderIntro()}

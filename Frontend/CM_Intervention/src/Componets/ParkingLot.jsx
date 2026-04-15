@@ -158,12 +158,12 @@ export default function ParkingLot() {
           <p className={rcStyles.paragraph}>{resultText}</p>
           <div className={rcStyles.deltaContainer}>
             <h3 className={rcStyles.subtitle}>Total Changes</h3>
-            <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button onClick={() => navigate("/office/test")} className={rcStyles.primaryButton}>
-            Go into the office
-          </button>
-        </div>
+                <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
+              </div>
+              <button onClick={() => navigate("/office/test")} className={rcStyles.primaryButton}>
+                Go into the office
+              </button>
+            </div>
       );
     }
   };
