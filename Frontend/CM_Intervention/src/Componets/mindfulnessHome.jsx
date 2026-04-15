@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { rcStyles } from '../Static/rockClimbingStyles';
 import { ActionPanel } from './ActionPanel.tsx';
 import {
     BackButton,

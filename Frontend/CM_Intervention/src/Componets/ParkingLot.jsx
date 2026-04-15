@@ -4,8 +4,25 @@ import walkingImg from "../images/walkingLot.png";
 import fastWalkImg from "../images/walkingFast.png";
 import parkedImg from "../images/parked.png";
 import parkedCloseImg from "../images/parkedClose.png";
-import { rcStyles } from "../Static/rockClimbingStyles";
 import { useNavigate } from "react-router";
+import {
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderRight,
+  HeaderSubtitle,
+  MainTitle,
+  Paragraph,
+  PrimaryButton,
+  ResetButton,
+  ScenePill,
+  Section,
+  Title,
+  TopRow,
+} from "./Layout";
+import { StatDeltaViewer, StatsPanel } from "./StatsPanel";
+import ActivityImage from "./ActivityImage";
+import { ActionPanel } from "./ActionPanel";
 
 
 export default function ParkingLot() {
@@ -85,123 +102,110 @@ export default function ParkingLot() {
     setStep(2); 
   };
 
-  const renderStatsBar = (label, value, color, isPrimary = false) => (
-    <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
-      <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
-      <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
-        <div className={rcStyles.barInner} style={{ width: `${value}%`, backgroundColor: color }} />
-      </div>
-      <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
-    </div>
-  );
-
-  const renderDeltaList = () => {
-    const items = [];
-    const labels = { confidence: 'Confidence', mood: 'Mood', health: 'Health', energy: 'Energy' };
-    Object.keys(lastDelta).forEach((key) => {
-      const value = lastDelta[key];
-      if (!value) return;
-      const sign = value > 0 ? '+' : '';
-      items.push(<li key={key} className={rcStyles.deltaItem}>{sign}{value} {labels[key]}</li>);
-    });
-    return items.length > 0 ? items : <li className={rcStyles.deltaItem}>No recent changes.</li>;
-  };
-
   const renderSceneContent = () => {
     if (scene === "parking" && step === 0) {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Arriving at the Parking Lot</h2>
-          <p className={rcStyles.paragraph}>
-            You arrive at the parking lot. Some spots are close to the entrance, while others are farther away.
-            How will you start your morning?
-          </p>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.button} onClick={() => handleParkingChoice("close")}>
-              Park close to the building
-            </button>
-            <button className={rcStyles.button} onClick={() => handleParkingChoice("far")}>
-              Park farther away and walk
-            </button>
-          </div>
-        </div>
+        <Section>
+          <Title>Arriving at the Parking Lot</Title>
+          <Paragraph>
+            You arrive at the parking lot. Some spots are close to the entrance,
+            while others are farther away. How will you start your morning?
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                key: "park-close",
+                label: <>Park close to the building</>,
+                onClick() {
+                  handleParkingChoice("close");
+                },
+              },
+              {
+                key: "park-far",
+                label: <>Park farther away and walk</>,
+                onClick() {
+                  handleParkingChoice("far");
+                },
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     if (scene === "walking" && step === 1) {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Walking to the Office</h2>
-          <p className={rcStyles.paragraph}>
-            You've parked a bit further away. Now, how would you like to walk to the entrance?
-          </p>
-          <div className={rcStyles.deltaContainer}>
-            <h3 className={rcStyles.subtitle}>Stat Changes from Parking</h3>
-            <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.button} onClick={() => handleWalkingChoice("normal")}>
-              Walk at a relaxed pace
-            </button>
-            <button className={rcStyles.button} onClick={() => handleWalkingChoice("fast")}>
-              Walk faster to wake up
-            </button>
-          </div>
-        </div>
+        <Section>
+          <Title>Walking to the Office</Title>
+          <Paragraph>
+            You've parked a bit further away. Now, how would you like to walk to
+            the entrance?
+          </Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <ActionPanel
+            actions={[
+              {
+                key: "walk-normal",
+                onClick() {
+                  handleWalkingChoice("normal");
+                },
+                label: <>Walk at a relaxed pace</>,
+              },
+              {
+                key: "walk-fast",
+                onClick() {
+                  handleWalkingChoice("fast");
+                },
+                label: <>Walk faster to wake up</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     if (step === 2) {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Morning Arrival Complete</h2>
-          <p className={rcStyles.paragraph}>{resultText}</p>
-          <div className={rcStyles.deltaContainer}>
-            <h3 className={rcStyles.subtitle}>Total Changes</h3>
-            <ul className={rcStyles.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button onClick={() => navigate("/office/test")} className={rcStyles.primaryButton}>
+        <Section>
+          <Title>Morning Arrival Complete</Title>
+          <Paragraph>{resultText}</Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => navigate("/office/test")}>
             Go into the office
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
   };
 
   return (
-    <div className={rcStyles.container}>
-      <div className={rcStyles.header}>
-        <div className={rcStyles.headerLeft}>
-          <h1 className={rcStyles.mainTitle}>Parking Lot Arrival</h1>
-          <p className={rcStyles.headerSubtitle}>Every small movement counts toward your daily health.</p>
-          <div className={rcStyles.scenePill}>
-            {step === 0 ? "Initial Choice" : step === 1 ? "Commute in Progress" : "Arrived"}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className={rcStyles.resetButton} onClick={resetGame}>Reset</button>
-        </div>
-      </div>
+    <Container>
+      <Header>
+        <HeaderLeft>
+          <MainTitle>Parking Lot Arrival</MainTitle>
+          <HeaderSubtitle>
+            Every small movement counts toward your daily health.
+          </HeaderSubtitle>
+          <ScenePill>
+            {step === 0
+              ? "Initial Choice"
+              : step === 1
+                ? "Commute in Progress"
+                : "Arrived"}
+          </ScenePill>
+        </HeaderLeft>
+        <HeaderRight>
+          <ResetButton onClick={resetGame} />
+        </HeaderRight>
+      </Header>
 
-      <div className={rcStyles.topRow}>
-        <div className={rcStyles.statsContainer}>
-          <div className={rcStyles.statsTitle}>How you're feeling</div>
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444', true)}
-          {renderStatsBar('Mood', stats.mood, '#22c55e')}
-          {renderStatsBar('Health', stats.health, '#3b82f6')}
-          {renderStatsBar('Energy', stats.energy, '#facc15')}
-        </div>
-      </div>
+      <TopRow>
+        <StatsPanel stats={stats} />
+      </TopRow>
 
-      <div className={rcStyles.sceneImageWrap}>
-        <img
-          src={currentImage}
-          alt="Current Scene"
-          className={rcStyles.sceneImage}
-        />
-      </div>
+      <ActivityImage>src={currentImage}</ActivityImage>
 
       {renderSceneContent()}
-    </div>
+    </Container>
   );
 }

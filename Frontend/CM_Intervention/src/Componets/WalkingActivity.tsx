@@ -27,7 +27,6 @@ import {
     positiveFeedback,
     randomElement,
 } from "./Feedback";
-import { rcStyles } from "../Static/rockClimbingStyles";
 import {
     Container,
     Paragraph,
