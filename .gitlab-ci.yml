@@ -28,8 +28,11 @@ build:
   stage: build
   tags:
     - ReactRunner
+  dependencies:
+    - install
   script:
     - cd Frontend/CM_Intervention
+    - ls node_modules/.bin/vite  # debug line hopfully I dont need 
     - ./node_modules/.bin/vite build
   artifacts:
     paths:
@@ -40,6 +43,8 @@ deploy:
   stage: deploy
   tags:
     - ReactRunner
+  dependencies:
+    - build
   script:
     - cd Frontend/CM_Intervention
     - pm2 delete cm-app || true
