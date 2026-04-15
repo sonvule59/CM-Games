@@ -102,55 +102,64 @@ function HouseImage({
     didCooking: boolean;
 }) {
     return (
-        <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg">
-            <image
-                x={0}
-                y={0}
-                width={720}
-                height={400}
-                href={imgIndoorDomesticBgs}
-            ></image>
-            <image
-                x={20}
-                y={220}
-                width={150}
-                height={150}
-                href={didLaundry ? imgEmptyBasket : imgFullBasket}
-            ></image>
-            <g>
-                <image x={400} y={200} width={300} href={imgTable}></image>
-                <svg
-                    x={450}
-                    y={100}
-                    width={100}
-                    height={200}
-                    viewBox={didDishes ? "3500 0 3500 5000" : "0 0 3500 5000"}
-                >
-                    <image
-                        x={0}
-                        y={0}
-                        width={7000}
-                        height={5000}
-                        href={imgDishes}
-                    ></image>
-                </svg>
-            </g>
-            <g display={didCleaning ? "none" : "inline"}>
-                <image
-                    x={600}
-                    y={300}
-                    width={50}
-                    height={50}
-                    href={imgSpilledOrangeDrink}
-                ></image>
+        <svg
+            viewBox="0 0 720 400"
+            xmlns="http://www.w3.org/2000/svg"
+            width={"auto"}
+            height={"auto"}
+        >
+            <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg">
                 <image
                     x={0}
-                    y={50}
-                    width={800}
-                    href={imgDustCloud}
-                    opacity={0.8}
+                    y={0}
+                    width={720}
+                    height={400}
+                    href={imgIndoorDomesticBgs}
                 ></image>
-            </g>
+                <image
+                    x={20}
+                    y={220}
+                    width={150}
+                    height={150}
+                    href={didLaundry ? imgEmptyBasket : imgFullBasket}
+                ></image>
+                <g>
+                    <image x={400} y={200} width={300} href={imgTable}></image>
+                    <svg
+                        x={450}
+                        y={100}
+                        width={100}
+                        height={200}
+                        viewBox={
+                            didDishes ? "3500 0 3500 5000" : "0 0 3500 5000"
+                        }
+                    >
+                        <image
+                            x={0}
+                            y={0}
+                            width={7000}
+                            height={5000}
+                            href={imgDishes}
+                        ></image>
+                    </svg>
+                </g>
+                <g display={didCleaning ? "none" : "inline"}>
+                    <image
+                        x={600}
+                        y={300}
+                        width={50}
+                        height={50}
+                        href={imgSpilledOrangeDrink}
+                    ></image>
+                    <image
+                        x={0}
+                        y={50}
+                        width={800}
+                        href={imgDustCloud}
+                        opacity={0.8}
+                    ></image>
+                </g>
+            </svg>
         </svg>
     );
 }
