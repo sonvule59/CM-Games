@@ -5,6 +5,7 @@ stages:
 
 variables:
   NODE_ENV: production
+  GIT_CLEAN_FLAGS: -ffdx --exclude=Frontend/CM_Intervention/node_modules/
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -29,7 +30,7 @@ build:
     - ReactRunner
   script:
     - cd Frontend/CM_Intervention
-    - npm run build
+    - npx vite build
   artifacts:
     paths:
       - Frontend/CM_Intervention/dist/
