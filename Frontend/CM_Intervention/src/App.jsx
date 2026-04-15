@@ -20,6 +20,7 @@ import OutsideDomestic from './Componets/outsideDomestic.jsx'
 import HomeOfHomePages from './Componets/homeOfHomePages.jsx'
 import MindfulnessHome from './Componets/mindfulnessHome.jsx'
 import MindfulnessGame from './Componets/mindfulnessGame.jsx'
+import TransportGameStart from './Componets/TransportGameStart.jsx'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <Route path='/office' element={<OfficeGameStart />} />
         <Route path="/mindfulness-home" element={<MindfulnessHome />} />
         <Route path="/mindfulness" element={<MindfulnessGame />} />
+        <Route path="/transport-home" element={<TransportGameStart />} />
 
         {/* Individual routes for each mini‑game */}
         <Route path="/outdoors" element={<OutdoorsActivities />} />
