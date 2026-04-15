@@ -11,7 +11,7 @@ build:
     - ReactRunner
   script:
     - cd Frontend/CM_Intervention
-    - npm install
+    - npm install --include=dev
     - ./node_modules/.bin/vite build
   artifacts:
     paths:
