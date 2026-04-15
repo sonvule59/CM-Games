@@ -28,15 +28,22 @@ import {
     positiveFeedback,
     randomElement,
 } from "./Feedback";
-import { rcStyles } from "../Static/rockClimbingStyles";
 import {
+    BackButton,
     Container,
+    Header,
+    HeaderLeft,
+    HeaderRight,
+    HeaderSubtitle,
+    MainTitle,
     Paragraph,
     PrimaryButton,
+    ScenePill,
     Section,
     Title,
     TopRow,
 } from "./Layout";
+import { useNavigate } from "react-router";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -67,6 +74,8 @@ const IMAGE_ID_TO_SRC = {
 // TODO: make feedback phrases longer.
 
 function WalkingActivity({}: WalkingActivityProps) {
+    const navigate = useNavigate();
+
     function applyStatDelta(delta: StatDelta) {
         if (newScreenState.screen !== "game") throw new Error();
         const stats = newScreenState.stats;
@@ -108,8 +117,10 @@ function WalkingActivity({}: WalkingActivityProps) {
     let tasks: Array<ActionSpec>;
     let tasksPrompt: string;
     let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined;
+    let scenePillLabel: React.ReactNode;
 
     if (screenState.screen === "chooseActivity") {
+        scenePillLabel = "Mobility";
         tasksPrompt = "Choose an Activity";
         tasks = [
             {
@@ -141,6 +152,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         ];
         imageId = "chooseWalkingCycling";
     } else if (screenState.screen === "chooseLocation") {
+        scenePillLabel = "Mobility";
         tasksPrompt = "Choose a Location";
         tasks = [
             {
@@ -184,10 +196,12 @@ function WalkingActivity({}: WalkingActivityProps) {
         let lightExerciseIcon;
         switch (screenState.activity) {
             case "walk":
+                scenePillLabel = "Walking";
                 lightExerciseLabel = "Walk";
                 lightExerciseIcon = "🚶";
                 break;
             case "bike":
+                scenePillLabel = "Biking";
                 lightExerciseLabel = "Bike";
                 lightExerciseIcon = "🚴";
                 break;
@@ -369,6 +383,25 @@ function WalkingActivity({}: WalkingActivityProps) {
 
     return (
         <Container>
+            <Header>
+                <HeaderLeft>
+                    <MainTitle>Walking and cycling</MainTitle>
+                    <HeaderSubtitle>
+                        Take a leisurely stroll and relax.
+                    </HeaderSubtitle>
+                    {scenePillLabel != undefined && (
+                        <ScenePill>{scenePillLabel}</ScenePill>
+                    )}
+                </HeaderLeft>
+                <HeaderRight>
+                    <BackButton onClick={() => navigate("/leisure")} />
+                </HeaderRight>
+            </Header>
+            {screenState.screen === "game" && (
+                <TopRow>
+                    <StatsViewer stats={screenState.stats}></StatsViewer>
+                </TopRow>
+            )}
             {imageId != undefined &&
                 (IMAGE_ID_TO_SRC[imageId] != undefined ? (
                     <ActivityImage
@@ -380,11 +413,6 @@ function WalkingActivity({}: WalkingActivityProps) {
                         Placeholder: {imageId}
                     </ActivityImage>
                 ))}
-            <TopRow>
-                {screenState.screen === "game" && (
-                    <StatsViewer stats={screenState.stats}></StatsViewer>
-                )}
-            </TopRow>
             {feedback === undefined ? (
                 <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
             ) : (

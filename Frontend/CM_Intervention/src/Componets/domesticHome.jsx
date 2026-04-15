@@ -1,37 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { rcStyles } from '../Static/rockClimbingStyles';
+import {
+  BackButton,
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderSubtitle,
+  MainTitle,
+  ScenePill,
+} from "./Layout";
+import { ActionPanel } from "./ActionPanel";
 
 export default function DomesticHome() {
   const navigate = useNavigate();
 
   return (
-    <div className={rcStyles.container}>
-      <div className={rcStyles.header}>
-        <div className={rcStyles.headerLeft}>
-          <h1 className={rcStyles.mainTitle}>Domestic Activities</h1>
-          <p className={rcStyles.headerSubtitle}>
-            Pick an activity zone. Inside is classic chores; outside is everyday errands and home tasks.
-          </p>
-          <div className={rcStyles.scenePill}>Home base</div>
-        </div>
-        <button type="button" className={rcStyles.secondaryButton} onClick={() => navigate('/')}>
-          Back to hub
-        </button>
-      </div>
+    <Container>
+      <Header>
+        <HeaderLeft>
+          <MainTitle>Domestic Activities</MainTitle>
+          <HeaderSubtitle>
+            Pick an activity zone. Inside is classic chores; outside is everyday
+            errands and home tasks.
+          </HeaderSubtitle>
+          <ScenePill>Home base</ScenePill>
+        </HeaderLeft>
+        <BackButton onClick={() => navigate("/")}>Back to hub</BackButton>
+      </Header>
 
-      <div className={rcStyles.section}>
-        <h2 className={rcStyles.title}>Choose where you want to play</h2>
-        <div className={rcStyles.buttonGroup}>
-          <button className={rcStyles.button} onClick={() => navigate('/indoor-domestic')}>
-            Inside the house (chores)
-          </button>
-          <button className={rcStyles.button} onClick={() => navigate('/outside-domestic')}>
-            Outside / around the house
-          </button>
-        </div>
-      </div>
-    </div>
+      <ActionPanel
+        title={<>Choose where you want to play</>}
+        actions={[
+          {
+            key: "indoor-domestic",
+            label: "Inside the house (chores)",
+            callback() {
+              navigate("/indoor-domestic");
+            },
+          },
+          {
+            key: "outside-domestic",
+            label: "Outside / around the house",
+            callback() {
+              navigate("/outside-domestic");
+            },
+          },
+        ]}
+      />
+    </Container>
   );
 }
 
