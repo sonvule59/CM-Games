@@ -5,8 +5,9 @@ export default function leisureHome() {
 
   const games = [
     { path: "/rock", text: "Rock Climbing 🧗", color: "#ef4444" },
-    { path: "/outdoors", text: "Outdoors Activities (Lake) 🚣‍♂️", color: "#10b981" },
-    { path: "/walk", text: "Walking Activities 🚶‍♂️", color: "#3b82f6" },
+    { path: "/outdoors", text: "Outdoors Activities (Lake) 🚣‍♂️", color: "#3b82f6" },
+    { path: "/walk", text: "Walking Activities 🚶‍♂️", color: "#10b981" },
+    { path: "/swim", text: "Swimming Activities 🏊‍♂️", color: "#06b6d4" },
   ];
   
   return (
