@@ -12,6 +12,7 @@ import imgWalkingStretchNeighborhood from "../images/walkingStretchNeighborhood.
 import imgWalkingStretchPark from "../images/walkingStretchPark.png";
 import imgWalkingWalkNeighborhood from "../images/walkingWalkNeighborhood.png";
 import imgWalkingWalkPark from "../images/walkingWalkPark.png";
+import imgCycleOrWalk from "../images/cycleorwalk.png";
 import {
     StatDelta,
     StatDeltaViewer,
@@ -67,7 +68,7 @@ const IMAGE_ID_TO_SRC = {
     stretchPark: imgWalkingStretchPark,
     walkNeighborhood: imgWalkingWalkNeighborhood,
     walkPark: imgWalkingWalkPark,
-    chooseWalkingCycling: undefined,
+    chooseWalkingCycling: imgCycleOrWalk,
 } satisfies Record<string, string | undefined>;
 
 // TODO: make feedback phrases longer.
