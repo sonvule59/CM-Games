@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { rcStyles } from "../Static/rockClimbingStyles";
 import { useNavigate } from "react-router";
 import transport2homeImg from "../images/transport2home.png";
 import pedometerImg from "../images/pedometer.png";
@@ -10,28 +9,55 @@ import cartcompleteImg from "../images/cartcomplete.png";
 import longorshortImg from "../images/longorshort.png";
 import longcompleteImg from "../images/longcomplete.png";
 import shortcompleteImg from "../images/shortcomplete.png";
-
+import {
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderRight,
+  HeaderSubtitle,
+  MainTitle,
+  Paragraph,
+  PrimaryButton,
+  ResetButton,
+  ScenePill,
+  Section,
+  Title,
+  TopRow,
+} from "./Layout";
+import { StatDeltaViewer, StatsPanel } from "./StatsPanel";
+import { ActionPanel } from "./ActionPanel";
+import ActivityImage from "./ActivityImage";
 
 export default function TransportGame2() {
   const initialStats = {
     energy: 100,
     confidence: 50,
     mood: 50,
-    health: 50
+    health: 50,
   };
 
   const [stats, setStats] = useState(initialStats);
   const [scene, setScene] = useState("home");
-  const [step, setStep] = useState(0); 
+  const [step, setStep] = useState(0);
   const [resultText, setResultText] = useState("");
-  const [lastDelta, setLastDelta] = useState({ energy: 0, confidence: 0, mood: 0, health: 0 });
-  const [totalDelta, setTotalDelta] = useState({ energy: 0, confidence: 0, mood: 0, health: 0 }); //added to track the total stat changes, not the recent changes
-  
+  const [lastDelta, setLastDelta] = useState({
+    energy: 0,
+    confidence: 0,
+    mood: 0,
+    health: 0,
+  });
+  const [totalDelta, setTotalDelta] = useState({
+    energy: 0,
+    confidence: 0,
+    mood: 0,
+    health: 0,
+  }); //added to track the total stat changes, not the recent changes
+
   const [currentImage, setCurrentImage] = useState(transport2homeImg);
 
   const [method, setMethod] = useState("");
   const [useApp, setUseApp] = useState(false);
- 
+
   const navigate = useNavigate();
 
   const clamp = (v) => Math.max(0, Math.min(100, v));
@@ -41,7 +67,7 @@ export default function TransportGame2() {
       energy: clamp(prev.energy + (delta.energy || 0)),
       confidence: clamp(prev.confidence + (delta.confidence || 0)),
       mood: clamp(prev.mood + (delta.mood || 0)),
-      health: clamp(prev.health + (delta.health || 0))
+      health: clamp(prev.health + (delta.health || 0)),
     }));
     setLastDelta({
       energy: delta.energy || 0,
@@ -51,10 +77,10 @@ export default function TransportGame2() {
     });
     //total stat change update
     setTotalDelta((prev) => ({
-        energy: prev.energy + (delta.energy || 0),
-        confidence: prev.confidence + (delta.confidence || 0),
-        mood: prev.mood + (delta.mood || 0),
-        health: prev.health + (delta.health || 0),
+      energy: prev.energy + (delta.energy || 0),
+      confidence: prev.confidence + (delta.confidence || 0),
+      mood: prev.mood + (delta.mood || 0),
+      health: prev.health + (delta.health || 0),
     }));
   };
 
@@ -72,215 +98,257 @@ export default function TransportGame2() {
 
   const handleStartChoice = (choice) => {
     if (choice === "walk") {
-        setMethod("walk");
-        applyDelta({ health: +5, energy: -5, mood: +5, confidence: +5 })
-        setScene("pedometer");
-        setCurrentImage(pedometerImg);
+      setMethod("walk");
+      applyDelta({ health: +5, energy: -5, mood: +5, confidence: +5 });
+      setScene("pedometer");
+      setCurrentImage(pedometerImg);
     } else {
-        setMethod("car");
-        applyDelta({ health: +1, energy: -2, mood: +2, confidence: +1 })
-        setScene("parking");
-        setCurrentImage(parkingImg);
+      setMethod("car");
+      applyDelta({ health: +1, energy: -2, mood: +2, confidence: +1 });
+      setScene("parking");
+      setCurrentImage(parkingImg);
     }
-  }
+  };
 
   const handleAppChoice = (use) => {
     setUseApp(use);
     if (use) {
-        applyDelta({ health: +1, energy: -1, mood: +4, confidence: +5 })
+      applyDelta({ health: +1, energy: -1, mood: +4, confidence: +5 });
     }
-    setScene("grocery")
+    setScene("grocery");
     setCurrentImage(longorshortImg);
-  }
+  };
 
   const handleCarryChoice = (choice) => {
     if (choice === "hand") {
-        applyDelta({ health: +4, energy: -7, mood: +4, confidence: +7 })
-        setResultText("You carried the heavy bags to the car. Your muscles feel worked!");
-        setCurrentImage(handcompleteImg);
+      applyDelta({ health: +4, energy: -7, mood: +4, confidence: +7 });
+      setResultText(
+        "You carried the heavy bags to the car. Your muscles feel worked!",
+      );
+      setCurrentImage(handcompleteImg);
     } else {
-        applyDelta({ health: +2, energy: -2, mood: +3, confidence: +2 })
-        setResultText("You used a cart. It was easy, but you missed a strength workout.");
-        setCurrentImage(cartcompleteImg);
+      applyDelta({ health: +2, energy: -2, mood: +3, confidence: +2 });
+      setResultText(
+        "You used a cart. It was easy, but you missed a strength workout.",
+      );
+      setCurrentImage(cartcompleteImg);
     }
     setStep(2);
-  }
-  
+  };
+
   const handleRouteChoice = (choice) => {
     if (choice === "long") {
-        applyDelta({ health: +5, energy: -6, mood: +5, confidence: +6 })
-        setResultText("You took the scenic long route home.");
-        setCurrentImage(longcompleteImg);
+      applyDelta({ health: +5, energy: -6, mood: +5, confidence: +6 });
+      setResultText("You took the scenic long route home.");
+      setCurrentImage(longcompleteImg);
     } else {
-        applyDelta({ health: +3, energy: -4, mood: +4, confidence: +4 })
-        setResultText("You took the shortcut.");
-        setCurrentImage(shortcompleteImg);
+      applyDelta({ health: +3, energy: -4, mood: +4, confidence: +4 });
+      setResultText("You took the shortcut.");
+      setCurrentImage(shortcompleteImg);
     }
     setStep(2);
-  }
+  };
 
   const handleParkingChoice = (choice) => {
     if (choice === "close") {
       applyDelta({ energy: -3, confidence: +1, mood: +3, health: +1 });
       setResultText(
-        "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs."
-      ); 
+        "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs.",
+      );
     } else if (choice === "far") {
       applyDelta({ energy: -6, confidence: +5, mood: +4, health: +5 });
-      setResultText("You parked far away and enjoyed a nice walk to the entrance.");
+      setResultText(
+        "You parked far away and enjoyed a nice walk to the entrance.",
+      );
     }
     setScene("grocery");
     setCurrentImage(cartorhandsImg);
   };
 
-  const renderStatsBar = (label, value, color, isPrimary = false) => (
-    <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
-      <div className={isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel}>{label}</div>
-      <div className={isPrimary ? rcStyles.barOuterPrimary : rcStyles.barOuter}>
-        <div className={rcStyles.barInner} style={{ width: `${value}%`, backgroundColor: color }} />
-      </div>
-      <div className={isPrimary ? rcStyles.statValuePrimary : rcStyles.statValue}>{value}</div>
-    </div>
-  );
-
-  const renderDeltaList = (deltaData) => {
-    const items = [];
-    const labels = { confidence: 'Confidence', mood: 'Mood', health: 'Health', energy: 'Energy' };
-    Object.keys(deltaData).forEach((key) => {
-      const value = deltaData[key];
-      if (value === 0) return;
-      const sign = value > 0 ? '+' : '';
-      items.push(<li key={key} className={rcStyles.deltaItem}>{sign}{value} {labels[key]}</li>);
-    });
-    return items.length > 0 ? items : <li className={rcStyles.deltaItem}>No recent changes.</li>;
-  };
-
   const renderSceneContent = () => {
     if (step === 2) {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Grocery Shopping Complete</h2>
-          <p className={rcStyles.paragraph}>{resultText}</p>
-          <div className={rcStyles.deltaContainer}>
-            <h3 className={rcStyles.subtitle}>Total Changes</h3>
-            <ul className={rcStyles.deltaList}>{renderDeltaList(totalDelta)}</ul>
-          </div>
+        <Section>
+          <Title>Grocery Shopping Complete</Title>
+          <Paragraph>{resultText}</Paragraph>
+          <StatDeltaViewer delta={totalDelta} />
 
-          <button onClick={() => navigate("/transport")} className={rcStyles.primaryButton}>
+          <PrimaryButton onClick={() => navigate("/transport")}>
             Go to the other transport game
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
     if (scene === "home") {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Time to Buy Groceries</h2>
-          <p className={rcStyles.paragraph}>
+        <Section>
+          <Title>Time to Buy Groceries</Title>
+          <Paragraph>
             The store is about 15 minutes away. How will you get there?
-          </p>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.button} onClick={() => handleStartChoice("walk")}>Walk to the store</button>
-            <button className={rcStyles.button} onClick={() => handleStartChoice("car")}>Drive the car</button>
-          </div>
-        </div>
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                onClick() {
+                  handleStartChoice("walk");
+                },
+                key: "walk",
+                label: <>Walk to the store</>,
+              },
+              {
+                onClick() {
+                  handleStartChoice("car");
+                },
+                key: "car",
+                label: <>Drive the car</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     if (scene === "pedometer") {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Step Tracker</h2>
-          <p className={rcStyles.paragraph}>
+        <Section>
+          <Title>Step Tracker</Title>
+          <Paragraph>
             Will you turn on your pedometer app to track your goal?
-          </p>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.button} onClick={() => handleAppChoice(true)}>Turn on Pedometer App</button>
-            <button className={rcStyles.button} onClick={() => handleAppChoice(false)}>Just walk without tracking</button>
-          </div>
-        </div>
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                onClick() {
+                  handleAppChoice(true);
+                },
+                key: "true",
+                label: <>Turn on Pedometer App</>,
+              },
+              {
+                onClick() {
+                  handleAppChoice(false);
+                },
+                key: "false",
+                label: <>Just walk without tracking</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     if (scene === "parking") {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Grocery Parking</h2>
-          <p className={rcStyles.paragraph}>The entrance is crowded. Where will you park?</p>
-          <div className={rcStyles.buttonGroup}>
-            <button className={rcStyles.button} onClick={() => handleParkingChoice("far")}>Park Far Away</button>
-            <button className={rcStyles.button} onClick={() => handleParkingChoice("close")}>Park Near Entrance</button>
-          </div>
-        </div>
+        <Section>
+          <Title>Grocery Parking</Title>
+          <Paragraph>The entrance is crowded. Where will you park?</Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                onClick() {
+                  handleParkingChoice("far");
+                },
+                key: "far",
+                label: <>Park Far Away</>,
+              },
+              {
+                onClick() {
+                  handleParkingChoice("close");
+                },
+                key: "close",
+                label: <>Park Near Entrance</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     if (scene === "grocery") {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Shopping Finished!</h2>
+        <Section>
+          <Title>Shopping Finished!</Title>
           {method === "car" ? (
             <>
-              <p className={rcStyles.paragraph}>You have 3 heavy bags. How will you get them to your car?</p>
-              <div className={rcStyles.buttonGroup}>
-                <button className={rcStyles.button} onClick={() => handleCarryChoice("hand")}>Carry by hand (Carrying Groceries)</button>
-                <button className={rcStyles.button} onClick={() => handleCarryChoice("cart")}>Use a shopping cart</button>
-              </div>
+              <Paragraph>
+                You have 3 heavy bags. How will you get them to your car?
+              </Paragraph>
+              <ActionPanel
+                actions={[
+                  {
+                    onClick() {
+                      handleCarryChoice("hand");
+                    },
+                    key: "hand",
+                    label: <>Carry by hand (Carrying Groceries)</>,
+                  },
+                  {
+                    onClick() {
+                      handleCarryChoice("cart");
+                    },
+                    key: "cart",
+                    label: <>Use a shopping cart</>,
+                  },
+                ]}
+              />
             </>
           ) : (
             <>
-              <p className={rcStyles.paragraph}>Heading home. Which way will you take?</p>
-              <div className={rcStyles.buttonGroup}>
-                <button className={rcStyles.button} onClick={() => handleRouteChoice("long")}>Take the longer scenic route</button>
-                <button className={rcStyles.button} onClick={() => handleRouteChoice("short")}>Take the usual shortcut</button>
-              </div>
+              <Paragraph>Heading home. Which way will you take?</Paragraph>
+              <ActionPanel
+                actions={[
+                  {
+                    onClick() {
+                      handleRouteChoice("long");
+                    },
+                    key: "long",
+                    label: <>Take the longer scenic route</>,
+                  },
+                  {
+                    onClick() {
+                      handleRouteChoice("short");
+                    },
+                    key: "short",
+                    label: <>Take the usual shortcut</>,
+                  },
+                ]}
+              />
             </>
           )}
-        </div>
+        </Section>
       );
     }
-
   };
 
   return (
-    <div className={rcStyles.container}>
-      <div className={rcStyles.header}>
-        <div className={rcStyles.headerLeft}>
-          <h1 className={rcStyles.mainTitle}>
+    <Container>
+      <Header>
+        <HeaderLeft>
+          <MainTitle>
             {scene === "home" ? "Daily Transport" : "Grocery Shopping"}
-          </h1>
-          <p className={rcStyles.headerSubtitle}>Every small movement counts toward your daily health.</p>
-          <div className={rcStyles.scenePill}>
+          </MainTitle>
+          <HeaderSubtitle>
+            Every small movement counts toward your daily health.
+          </HeaderSubtitle>
+          <ScenePill>
             {step === 0 && "Planning"}
             {step === 1 && "On the Move"}
             {step === 2 && "Mission Complete"}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className={rcStyles.resetButton} onClick={resetGame}>Reset</button>
-        </div>
-      </div>
+          </ScenePill>
+        </HeaderLeft>
+        <HeaderRight>
+          <ResetButton onClick={resetGame} />
+        </HeaderRight>
+      </Header>
 
-      <div className={rcStyles.topRow}>
-        <div className={rcStyles.statsContainer}>
-          <div className={rcStyles.statsTitle}>How you're feeling</div>
-          {renderStatsBar('Confidence', stats.confidence, '#ef4444', true)}
-          {renderStatsBar('Mood', stats.mood, '#22c55e')}
-          {renderStatsBar('Health', stats.health, '#3b82f6')}
-          {renderStatsBar('Energy', stats.energy, '#facc15')}
-        </div>
-      </div>
+      <TopRow>
+        <StatsPanel stats={stats} />
+      </TopRow>
 
-      <div className={rcStyles.sceneImageWrap}>
-        <img
-          src={currentImage}
-          alt="Current Scene"
-          className={rcStyles.sceneImage}
-        />
-      </div>
+      <ActivityImage src={currentImage} />
 
       {renderSceneContent()}
-    </div>
+    </Container>
   );
 }

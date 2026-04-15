@@ -1,10 +1,19 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { rcStyles } from '../Static/rockClimbingStyles';
+import { useNavigate } from "react-router";
 
 import rockBg from '../images/enteringGym.png';
 import outdoorsBg from '../images/pullingUpLake.png';
 import walkBg from '../images/walkingLake.png';
+import {
+  BackButton,
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderSubtitle,
+  MainTitle,
+  Section,
+} from "./Layout";
+import { ActionPanel } from "./ActionPanel";
 
 export default function LeisureHome() {
   const navigate = useNavigate();
@@ -18,81 +27,72 @@ export default function LeisureHome() {
   }, [hovered]);
 
   return (
-    <div
-      className={`${rcStyles.container} relative overflow-hidden max-w-6xl min-h-[78vh] py-10`}
+    <Container
+      className={`relative overflow-hidden max-w-6xl min-h-[78vh] py-10`}
     >
       {/* Faded hover background */}
       <div
         aria-hidden="true"
         className="absolute inset-0 transition-opacity duration-200"
         style={{
-          backgroundImage: bg ? `url(${bg})` : 'none',
+          backgroundImage: bg ? `url(${bg})` : "none",
           // Make the preview feel "bigger" by scaling the background image up.
-          backgroundSize: '170%',
+          backgroundSize: "170%",
           // backgroundPosition: 'center 35%',
-          animation: 'background-scroll 10s infinite ease-in-out alternate',
+          animation: "background-scroll 10s infinite ease-in-out alternate",
           opacity: bg ? 0.14 : 0,
-          filter: 'blur(0.25px)',
+          filter: "blur(0.25px)",
         }}
       />
 
       {/* Foreground content */}
       <div className="relative">
-        <div className={rcStyles.header}>
-          <div className={rcStyles.headerLeft}>
-            <h1 className={rcStyles.mainTitle}>Leisure Game Center</h1>
-            <p className={rcStyles.headerSubtitle}>
+        <Header>
+          <HeaderLeft>
+            <MainTitle>Leisure Game Center</MainTitle>
+            <HeaderSubtitle>
               Pick a mini-game to play. Hover a button to preview the vibe.
-            </p>
-          </div>
-          <button
-            type="button"
-            className={rcStyles.secondaryButton}
-            onClick={() => navigate('/')}
-          >
-            Back to hub
-          </button>
-        </div>
+            </HeaderSubtitle>
+          </HeaderLeft>
+          <BackButton onClick={() => navigate("/")}>Back to hub</BackButton>
+        </Header>
 
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Choose a game</h2>
-          <div className={rcStyles.buttonGroup}>
-            <button
-              className={rcStyles.button}
-              onMouseEnter={() => setHovered('rock')}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered('rock')}
-              onBlur={() => setHovered(null)}
-              onClick={() => navigate('/rock')}
-            >
-              Rock Climbing
-            </button>
-
-            <button
-              className={rcStyles.button}
-              onMouseEnter={() => setHovered('outdoors')}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered('outdoors')}
-              onBlur={() => setHovered(null)}
-              onClick={() => navigate('/outdoors')}
-            >
-              Outdoors Activities (Lake)
-            </button>
-
-            <button
-              className={rcStyles.button}
-              onMouseEnter={() => setHovered('walk')}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered('walk')}
-              onBlur={() => setHovered(null)}
-              onClick={() => navigate('/walk')}
-            >
-              Walking Activities
-            </button>
-          </div>
-        </div>
+        <Section>
+          <ActionPanel
+            title={<>Choose a game</>}
+            actions={[
+              {
+                key: "rock",
+                onMouseEnter: () => setHovered("rock"),
+                onMouseLeave: () => setHovered(null),
+                onFocus: () => setHovered("rock"),
+                onBlur: () => setHovered(null),
+                onClick: () => navigate("/rock"),
+                label: <>Rock Climbing</>,
+              },
+              {
+                key: "outdoors",
+                onMouseEnter: () => setHovered("outdoors"),
+                onMouseLeave: () => setHovered(null),
+                onFocus: () => setHovered("outdoors"),
+                onBlur: () => setHovered(null),
+                onClick: () => navigate("/outdoors"),
+                label: <>Outdoors Activities (Lake)</>,
+              },
+              {
+                key: "walk",
+                onMouseEnter: () => setHovered("walk"),
+                onMouseLeave: () => setHovered(null),
+                onFocus: () => setHovered("walk"),
+                onBlur: () => setHovered(null),
+                onClick: () => navigate("/walk"),
+                label: <>Walking Activities</>,
+              },
+            ]}
+          />
+        </Section>
       </div>
-    </div>
+    </Container>
   );
 }
 

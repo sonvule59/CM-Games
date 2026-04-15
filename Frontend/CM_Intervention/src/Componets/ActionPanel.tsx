@@ -13,7 +13,7 @@ type ButtonEventListeners = {
 export type ActionSpec = ({ id: string } | { key: React.Key }) &
     ({ label: React.ReactNode } | { name: React.ReactNode }) & {
         icon?: React.ReactNode;
-    } & { desc?: React.ReactNode } & (
+    } & { desc?: React.ReactNode } & { isPrimary?: boolean } & (
         | { callback: () => void }
         | { action: () => void }
         | { onClick: () => void }
@@ -53,6 +53,7 @@ function* parseActionSpecs(actions: Iterable<ActionSpec>) {
                       ? actionSpec.action
                       : actionSpec.onClick,
             eventListeners,
+            isPrimary: actionSpec.isPrimary ?? true,
         };
         switch (+("key" in actionSpec) + +("id" in actionSpec)) {
             case 0:
@@ -127,6 +128,7 @@ export function ActionPanel(props: ActionPanelProps) {
                                 desc,
                                 callback,
                                 eventListeners,
+                                isPrimary,
                             }) => (
                                 <button
                                     key={key}
@@ -156,6 +158,7 @@ export function ActionPanel(props: ActionPanelProps) {
                                 desc,
                                 callback,
                                 eventListeners,
+                                isPrimary,
                             }) => (
                                 <button
                                     key={key}
@@ -173,4 +176,39 @@ export function ActionPanel(props: ActionPanelProps) {
                 </>
             );
     }
+}
+
+export function SecondaryActionPanel(props: ActionPanelProps) {
+    const { title, actions, ...otherProps } = props;
+    return (
+        <>
+            {title != undefined && <Title>{title}</Title>}
+            <section {...addClassNameToProps(otherProps, s.buttonRow)}>
+                {Array.from(
+                    parseActionSpecs(actions),
+                    ({
+                        key,
+                        icon,
+                        label,
+                        desc,
+                        callback,
+                        eventListeners,
+                        isPrimary,
+                    }) => (
+                        <button
+                            key={key}
+                            className={`${
+                                isPrimary ? s.primaryButton : s.secondaryButton
+                            } flex-1`}
+                            onClick={callback}
+                            {...eventListeners}
+                        >
+                            {icon != undefined && <>{icon} </>}
+                            {label ?? desc}
+                        </button>
+                    ),
+                )}
+            </section>
+        </>
+    );
 }
