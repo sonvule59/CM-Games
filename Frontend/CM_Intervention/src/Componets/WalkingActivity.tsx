@@ -12,7 +12,13 @@ import imgWalkingStretchNeighborhood from "../images/walkingStretchNeighborhood.
 import imgWalkingStretchPark from "../images/walkingStretchPark.png";
 import imgWalkingWalkNeighborhood from "../images/walkingWalkNeighborhood.png";
 import imgWalkingWalkPark from "../images/walkingWalkPark.png";
-import { StatDelta, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
+import {
+    StatDelta,
+    StatDeltaViewer,
+    Stats,
+    statsUpdate,
+    StatsViewer,
+} from "./StatsPanel";
 import { ActionPanel, ActionSpec } from "./ActionPanel";
 import ActivityImage from "./ActivityImage";
 import {
@@ -22,6 +28,14 @@ import {
     randomElement,
 } from "./Feedback";
 import { rcStyles } from "../Static/rockClimbingStyles";
+import {
+    Container,
+    Paragraph,
+    PrimaryButton,
+    Section,
+    Title,
+    TopRow,
+} from "./Layout";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -30,7 +44,7 @@ const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
     mood: 50,
     confidence: 50,
-    mobility: 50,
+    health: 50,
 });
 
 const IMAGE_ID_TO_SRC = {
@@ -47,6 +61,8 @@ const IMAGE_ID_TO_SRC = {
     walkingWalkPark: imgWalkingWalkPark,
 } satisfies Record<string, string>;
 
+// TODO: make feedback phrases longer.
+
 function WalkingActivity({}: WalkingActivityProps) {
     function applyStatDelta(delta: StatDelta) {
         if (newScreenState.screen !== "game") throw new Error();
@@ -54,6 +70,7 @@ function WalkingActivity({}: WalkingActivityProps) {
         newScreenState = {
             ...newScreenState,
             stats: statsUpdate(stats, delta),
+            lastStats: stats,
         };
     }
 
@@ -79,6 +96,7 @@ function WalkingActivity({}: WalkingActivityProps) {
               activity: "walk" | "bike";
               location: "neighborhood" | "localPark";
               stats: Stats;
+              lastStats: Stats | undefined;
               lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
 
@@ -137,6 +155,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "neighborhood",
                         stats: STARTING_STATS,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -153,6 +172,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         activity: screenState.activity,
                         location: "localPark",
                         stats: STARTING_STATS,
+                        lastStats: undefined,
                         lastAction: undefined,
                     };
                     setScreenState(newScreenState);
@@ -242,7 +262,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         applyStatDelta({
                             energy: +100,
                             mood: -20,
-                            mobility: -10,
+                            health: -10,
                         });
                         giveNegativeFeedback(
                             "You haven't moved in a while, and you're starting to feel bored.",
@@ -251,9 +271,9 @@ function WalkingActivity({}: WalkingActivityProps) {
                         applyStatDelta({
                             energy: +100,
                             mood: +20,
-                            mobility: -10,
+                            health: -10,
                         });
-                        if (screenState.stats.mobility >= 10) {
+                        if (screenState.stats.health >= 10) {
                             givePositiveFeedback(
                                 "You feel refreshed and ready.",
                             );
@@ -279,15 +299,15 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy <= 10) {
                         applyStatDelta({
                             energy: -10,
-                            mobility: +20,
+                            health: +20,
                         });
                         giveNegativeFeedback(
                             "You feel exhausted. Maybe it's time to take a short break.",
                         );
-                    } else if (screenState.stats.mobility >= 90) {
+                    } else if (screenState.stats.health >= 90) {
                         applyStatDelta({
                             energy: -10,
-                            mobility: -100,
+                            health: -100,
                             mood: -50,
                             confidence: -50,
                         });
@@ -297,7 +317,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                     } else {
                         applyStatDelta({
                             energy: -10,
-                            mobility: +50,
+                            health: +50,
                             mood: +10,
                         });
                         givePositiveFeedback("You feel ready to work out.");
@@ -318,17 +338,17 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy <= 20) {
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: -10,
                             mood: -50,
                         });
                         giveNegativeFeedback(
                             "You feel exhausted. Maybe it's time to take a short break.",
                         );
-                    } else if (screenState.stats.mobility <= 10) {
+                    } else if (screenState.stats.health <= 10) {
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: -20,
                             mood: -50,
                         });
@@ -353,7 +373,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         }
                         applyStatDelta({
                             energy: -20,
-                            mobility: -10,
+                            health: -10,
                             confidence: +50,
                             mood: +10,
                         });
@@ -381,18 +401,38 @@ function WalkingActivity({}: WalkingActivityProps) {
     }
 
     return (
-        <div className={rcStyles.container}>
+        <Container>
             {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
                 <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
             )}
-            <div className={rcStyles.topRow}>
+            <TopRow>
                 {screenState.screen === "game" && (
                     <StatsViewer stats={screenState.stats}></StatsViewer>
                 )}
-            </div>
-            <ActionPanel title={tasksPrompt} tasks={tasks}></ActionPanel>
-            <Feedback feedback={feedback}></Feedback>
-        </div>
+            </TopRow>
+            {feedback === undefined ? (
+                <ActionPanel title={tasksPrompt} actions={tasks}></ActionPanel>
+            ) : (
+                <Section>
+                    <Title>How it plays out</Title>
+                    <Paragraph>{feedback}</Paragraph>
+                    {screenState.screen === "game" &&
+                        screenState.lastStats !== undefined && (
+                            <StatDeltaViewer
+                                newStats={screenState.stats}
+                                oldStats={screenState.lastStats}
+                            />
+                        )}
+                    <PrimaryButton
+                        onClick={() => {
+                            setFeedback(undefined);
+                        }}
+                    >
+                        Continue
+                    </PrimaryButton>
+                </Section>
+            )}
+        </Container>
     );
 }
 

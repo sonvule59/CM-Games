@@ -1,7 +1,8 @@
 import { rcStyles } from "../Static/rockClimbingStyles";
+import { addClassNameToProps, Subtitle } from "./Layout";
 
 // Statistics types are defined in this file for now.
-type StatKind = "energy" | "mood" | "confidence" | "mobility";
+type StatKind = "energy" | "mood" | "confidence" | "health";
 
 type Stats = Readonly<Record<StatKind, number>>;
 type StatDelta = Partial<Readonly<Record<StatKind, number>>>;
@@ -17,30 +18,45 @@ function statsUpdate(stats: Stats, delta: StatDelta): Stats {
         energy: clamp(stats.energy + (delta.energy ?? 0), 0, 100),
         mood: clamp(stats.mood + (delta.mood ?? 0), 0, 100),
         confidence: clamp(stats.confidence + (delta.confidence ?? 0), 0, 100),
-        mobility: clamp(stats.mobility + (delta.mobility ?? 0), 0, 100),
+        health: clamp(stats.health + (delta.health ?? 0), 0, 100),
+    };
+}
+
+function statsSubtract(newStats: Stats, oldStats: Stats): StatDelta {
+    return {
+        energy: newStats.energy - oldStats.energy,
+        mood: newStats.mood - oldStats.mood,
+        confidence: newStats.confidence - oldStats.confidence,
+        health: newStats.health - oldStats.health,
     };
 }
 
 // StatsViewer component.
 type StatsViewerProps = {
     stats: Stats;
-};
+} & Omit<React.ComponentPropsWithoutRef<"section">, "children">;
 
 function StatsBar({
     id,
+    key,
     label,
     value,
     color,
     isPrimary,
 }: {
     id: string;
+    key?: React.Key;
     label: string;
     value: number;
     color: string;
     isPrimary: boolean;
 }) {
     return (
-        <div className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}>
+        <div
+            id={id}
+            key={key}
+            className={isPrimary ? rcStyles.statRowPrimary : rcStyles.statRow}
+        >
             <div
                 className={
                     isPrimary ? rcStyles.statLabelPrimary : rcStyles.statLabel
@@ -69,9 +85,10 @@ function StatsBar({
     );
 }
 
-function StatsViewer({ stats }: StatsViewerProps) {
+function StatsViewer(props: StatsViewerProps) {
+    const { stats } = props;
     return (
-        <section className={rcStyles.statsContainer}>
+        <section {...addClassNameToProps(props, rcStyles.statsContainer)}>
             <div className={rcStyles.statsTitle}>How you&apos;re feeling</div>
             <StatsBar
                 id="stat-bar-confidence"
@@ -90,7 +107,7 @@ function StatsViewer({ stats }: StatsViewerProps) {
             <StatsBar
                 id="stat-bar-health"
                 label="Health"
-                value={stats.mobility}
+                value={stats.health}
                 color={"#3b82f6"}
                 isPrimary={false}
             />
@@ -105,4 +122,86 @@ function StatsViewer({ stats }: StatsViewerProps) {
     );
 }
 
-export { statsUpdate, StatsViewer, Stats, StatKind, StatDelta };
+type StatDeltaViewerProps = {
+    subtitle?: React.ReactNode;
+} & ({ delta: StatDelta } | { newStats: Stats; oldStats: Stats }) &
+    Omit<React.ComponentPropsWithoutRef<"div">, "children">;
+function StatDeltaViewer(props: StatDeltaViewerProps) {
+    const { subtitle } = props;
+    const delta =
+        "newStats" in props && "oldStats" in props
+            ? statsSubtract(props.newStats, props.oldStats)
+            : props.delta;
+    return (
+        <div {...addClassNameToProps(props, rcStyles.deltaContainer)}>
+            {subtitle != undefined ? <Subtitle>{subtitle}</Subtitle> : <></>}
+            <ul className={rcStyles.deltaList}>
+                {delta.confidence ||
+                delta.mood ||
+                delta.health ||
+                delta.energy ? (
+                    <>
+                        {delta.confidence ? (
+                            <StatDeltaItem
+                                key={"confidence"}
+                                label={"Confidence"}
+                                value={delta.confidence}
+                            />
+                        ) : (
+                            <></>
+                        )}
+                        {delta.mood ? (
+                            <StatDeltaItem
+                                key={"mood"}
+                                label={"Mood"}
+                                value={delta.mood}
+                            />
+                        ) : (
+                            <></>
+                        )}
+                        {delta.health ? (
+                            <StatDeltaItem
+                                key={"health"}
+                                label={"Health"}
+                                value={delta.health}
+                            />
+                        ) : (
+                            <></>
+                        )}
+                        {delta.energy ? (
+                            <StatDeltaItem
+                                key={"energy"}
+                                label={"Energy"}
+                                value={delta.energy}
+                            />
+                        ) : (
+                            <></>
+                        )}
+                    </>
+                ) : (
+                    <li className={rcStyles.deltaItem}>No recent changes.</li>
+                )}
+            </ul>
+        </div>
+    );
+}
+
+type StatDeltaItemProps = { key: string; label: string; value: number };
+function StatDeltaItem({ key, label, value }: StatDeltaItemProps) {
+    return (
+        <li key={key} className={rcStyles.deltaItem}>
+            {`${value > 0 ? "+" : ""}${value}`} {label}
+        </li>
+    );
+}
+
+export {
+    statsUpdate,
+    statsSubtract,
+    StatsViewer,
+    StatsViewer as StatsPanel,
+    StatDeltaViewer,
+    type Stats,
+    type StatKind,
+    type StatDelta,
+};
