@@ -1,19 +1,19 @@
 import { s } from "../Static/officestyles.js";
 import { useNavigate } from "react-router";
-export default function OfficeGameStart() {
+export default function TransportGameStart() {
   const navigate = useNavigate();
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
 
       <div style={{ position: "relative", width: "100%", height: 340 }}>
         <img
-          src="/assets/Images/going_into_work.webp"
-          alt="Going into work"
+          src="/assets/Images/Transport_homepage.png"
+          alt="Daily Transport Path"
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "contain",
-            objectPosition: "center top",
+            objectFit: "cover",
+            objectPosition: "center",
             display: "block",
           }}
         />
@@ -33,7 +33,7 @@ export default function OfficeGameStart() {
 
         {/* Scene pill */}
         <div style={{ marginBottom: 12 }}>
-          <span className={s.scenePill}>Office Wellness</span>
+          <span className={s.scenePill}>Active Transport</span>
         </div>
 
         {/* Title */}
@@ -46,19 +46,19 @@ export default function OfficeGameStart() {
             letterSpacing: "-0.03em",
           }}
         >
-          Move Better,{" "}
+          Healthy Moves,{" "}
           <span style={{
             background: "linear-gradient(90deg, #6366f1, #10b981)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}>
-            feel better.
+            Happy Journeys.
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className={s.paragraph} style={{ maxWidth: 420, marginBottom: 24, fontSize: "0.95rem" }}>
-          Small moves make a big difference. Choose what fits your energy today every option counts.
+        <p className={s.paragraph} style={{ maxWidth: 840, marginBottom: 24, fontSize: "0.95rem" }}>
+          Make every move count. Choose the active path today. Small changes in how you move lead to big changes in how you feel.
         </p>
 
         {/* Stat preview pills */}
@@ -88,7 +88,7 @@ export default function OfficeGameStart() {
         {/* CTA button */}
         <button
           className={s.primaryButton}
-          onClick={() => {navigate("/parking")}}
+          onClick={() => {navigate("/transport2")}}
           style={{
             width: "100%",
             padding: "14px 24px",
@@ -98,9 +98,12 @@ export default function OfficeGameStart() {
             letterSpacing: "-0.01em",
             marginTop: 0,
             cursor: "pointer",
+            background: "#3b82f6",
+            color: "white",
+            border: "none"
           }}
         >
-          Start your day 🚀
+          Let's Start Moving 🚶‍♂️
         </button>
 
       </div>

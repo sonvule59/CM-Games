@@ -46,19 +46,21 @@ const STARTING_STATS: Stats = Object.freeze({
     health: 50,
 });
 
+// Undefined means image is not available yet and a placeholder will be shown.
 const IMAGE_ID_TO_SRC = {
-    walkingBikeNeighborhood: imgWalkingBikeNeighborhood,
-    walkingBikePark: imgWalkingBikePark,
-    walkingBreakNeighborhood: imgWalkingBreakNeighborhood,
-    walkingBreakPark: imgWalkingBreakPark,
-    walkingChooseLocation: imgWalkingChooseLocation,
-    walkingRunNeighborhood: imgWalkingRunNeighborhood,
-    walkingRunPark: imgWalkingRunPark,
-    walkingStretchNeighborhood: imgWalkingStretchNeighborhood,
-    walkingStretchPark: imgWalkingStretchPark,
-    walkingWalkNeighborhood: imgWalkingWalkNeighborhood,
-    walkingWalkPark: imgWalkingWalkPark,
-} satisfies Record<string, string>;
+    bikeNeighborhood: imgWalkingBikeNeighborhood,
+    bikePark: imgWalkingBikePark,
+    breakNeighborhood: imgWalkingBreakNeighborhood,
+    breakPark: imgWalkingBreakPark,
+    chooseLocation: imgWalkingChooseLocation,
+    runNeighborhood: imgWalkingRunNeighborhood,
+    runPark: imgWalkingRunPark,
+    stretchNeighborhood: imgWalkingStretchNeighborhood,
+    stretchPark: imgWalkingStretchPark,
+    walkNeighborhood: imgWalkingWalkNeighborhood,
+    walkPark: imgWalkingWalkPark,
+    chooseWalkingCycling: undefined,
+} satisfies Record<string, string | undefined>;
 
 // TODO: make feedback phrases longer.
 
@@ -75,10 +77,6 @@ function WalkingActivity({}: WalkingActivityProps) {
 
     function givePositiveFeedback(message: string) {
         setFeedback(positiveFeedback(message));
-    }
-
-    function giveNegativeFeedback(message: string) {
-        setFeedback(negativeFeedback(message));
     }
 
     function giveNeutralFeedback(message: string) {
@@ -107,7 +105,7 @@ function WalkingActivity({}: WalkingActivityProps) {
 
     let tasks: Array<ActionSpec>;
     let tasksPrompt: string;
-    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined = undefined;
+    let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined;
 
     if (screenState.screen === "chooseActivity") {
         tasksPrompt = "Choose an Activity";
@@ -139,7 +137,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                 },
             },
         ];
-        imageId = undefined;
+        imageId = "chooseWalkingCycling";
     } else if (screenState.screen === "chooseLocation") {
         tasksPrompt = "Choose a Location";
         tasks = [
@@ -178,7 +176,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                 },
             },
         ];
-        imageId = "walkingChooseLocation";
+        imageId = "chooseLocation";
     } else if (screenState.screen === "game") {
         let lightExerciseLabel;
         let lightExerciseIcon;
@@ -195,15 +193,15 @@ function WalkingActivity({}: WalkingActivityProps) {
 
         switch (screenState.lastAction) {
             case undefined:
-                imageId = "walkingChooseLocation";
+                imageId = "chooseLocation";
                 break;
             case "break":
                 switch (screenState.location) {
                     case "localPark":
-                        imageId = "walkingBreakPark";
+                        imageId = "breakPark";
                         break;
                     case "neighborhood":
-                        imageId = "walkingBreakNeighborhood";
+                        imageId = "breakNeighborhood";
                         break;
                 }
                 break;
@@ -212,20 +210,20 @@ function WalkingActivity({}: WalkingActivityProps) {
                     case "localPark":
                         switch (screenState.activity) {
                             case "walk":
-                                imageId = "walkingWalkPark";
+                                imageId = "walkPark";
                                 break;
                             case "bike":
-                                imageId = "walkingBikePark";
+                                imageId = "bikePark";
                                 break;
                         }
                         break;
                     case "neighborhood":
                         switch (screenState.activity) {
                             case "walk":
-                                imageId = "walkingWalkNeighborhood";
+                                imageId = "walkNeighborhood";
                                 break;
                             case "bike":
-                                imageId = "walkingBikeNeighborhood";
+                                imageId = "bikeNeighborhood";
                                 break;
                         }
                         break;
@@ -234,10 +232,10 @@ function WalkingActivity({}: WalkingActivityProps) {
             case "stretch":
                 switch (screenState.location) {
                     case "localPark":
-                        imageId = "walkingStretchPark";
+                        imageId = "stretchPark";
                         break;
                     case "neighborhood":
-                        imageId = "walkingStretchNeighborhood";
+                        imageId = "stretchNeighborhood";
                         break;
                 }
                 break;
@@ -260,27 +258,16 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy == 100) {
                         applyStatDelta({
                             energy: +100,
-                            mood: -20,
-                            health: -10,
                         });
-                        giveNegativeFeedback(
-                            "You haven't moved in a while, and you're starting to feel bored.",
+                        giveNeutralFeedback(
+                            "You feel refreshed, but maybe it's time to start walking.",
                         );
                     } else {
                         applyStatDelta({
                             energy: +100,
                             mood: +20,
-                            health: -10,
                         });
-                        if (screenState.stats.health >= 10) {
-                            givePositiveFeedback(
-                                "You feel refreshed and ready.",
-                            );
-                        } else {
-                            giveNeutralFeedback(
-                                "You feel refreshed, but not quite prepared. Maybe it's time to stretch.",
-                            );
-                        }
+                        givePositiveFeedback("You feel refreshed and ready.");
                     }
                     newScreenState = {
                         ...newScreenState,
@@ -300,18 +287,8 @@ function WalkingActivity({}: WalkingActivityProps) {
                             energy: -10,
                             health: +20,
                         });
-                        giveNegativeFeedback(
-                            "You feel exhausted. Maybe it's time to take a short break.",
-                        );
-                    } else if (screenState.stats.health >= 90) {
-                        applyStatDelta({
-                            energy: -10,
-                            health: -100,
-                            mood: -50,
-                            confidence: -50,
-                        });
-                        giveNegativeFeedback(
-                            "You're starting to feel strained. Maybe it's time to work out.",
+                        giveNeutralFeedback(
+                            "You've been doing activity for a while. Maybe it's time to take a short break.",
                         );
                     } else {
                         applyStatDelta({
@@ -337,22 +314,11 @@ function WalkingActivity({}: WalkingActivityProps) {
                     if (screenState.stats.energy <= 20) {
                         applyStatDelta({
                             energy: -20,
-                            health: -10,
-                            confidence: -10,
-                            mood: -50,
+                            health: +10,
+                            confidence: +10,
                         });
-                        giveNegativeFeedback(
-                            "You feel exhausted. Maybe it's time to take a short break.",
-                        );
-                    } else if (screenState.stats.health <= 10) {
-                        applyStatDelta({
-                            energy: -20,
-                            health: -10,
-                            confidence: -20,
-                            mood: -50,
-                        });
-                        giveNegativeFeedback(
-                            "You feel strained. Maybe it's time to stretch.",
+                        giveNeutralFeedback(
+                            "You've been doing activity for a while. Maybe it's time to take a short break.",
                         );
                     } else {
                         let locationSpecificWorkoutFeedback;
@@ -372,7 +338,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         }
                         applyStatDelta({
                             energy: -20,
-                            health: -10,
+                            health: +10,
                             confidence: +50,
                             mood: +10,
                         });
@@ -401,9 +367,17 @@ function WalkingActivity({}: WalkingActivityProps) {
 
     return (
         <Container>
-            {imageId != undefined && IMAGE_ID_TO_SRC[imageId] != undefined && (
-                <ActivityImage id={imageId} src={IMAGE_ID_TO_SRC[imageId]} />
-            )}
+            {imageId != undefined &&
+                (IMAGE_ID_TO_SRC[imageId] != undefined ? (
+                    <ActivityImage
+                        key={imageId}
+                        src={IMAGE_ID_TO_SRC[imageId]!}
+                    />
+                ) : (
+                    <ActivityImage key={imageId}>
+                        Placeholder: {imageId}
+                    </ActivityImage>
+                ))}
             <TopRow>
                 {screenState.screen === "game" && (
                     <StatsViewer stats={screenState.stats}></StatsViewer>

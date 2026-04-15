@@ -32,10 +32,41 @@ import imgDishes from "../images/dishes.png";
 // @ts-ignore
 import imgTable from "../images/table.png";
 import { Container, Paragraph, PrimaryButton, Section, Title } from "./Layout";
+import { useNavigate } from "react-router-dom";
 
 type IndoorDomesticActivityProps = {};
 
-const IMAGE_ID_TO_SRC = {} satisfies Record<string, string | undefined>;
+// Undefined means image isn't available yet,
+// a placeholder will be shown for now.
+const IMAGE_ID_TO_SRC = {
+    cleaningThinking: undefined,
+    vacuuming: undefined,
+    sweeping: undefined,
+    dusting: undefined,
+    mopping: undefined,
+    lookAtDirtyDishes: undefined,
+    putDishesInDishwasher: undefined,
+    lookAtDirtyDishesInDishwasher: undefined,
+    startDishwasher: undefined,
+    lookAtFinishedDishwasher: undefined,
+    getDishesOutOfDishwasher: undefined,
+    lookAtCleanDishes: undefined,
+    lookAtDirtyClothes: undefined,
+    pickUpDirtyLaundry: undefined,
+    lookAtDirtyClothesInWasher: undefined,
+    washClothes: undefined,
+    lookAtCleanWetClothesInWasher: undefined,
+    dryClothes: undefined,
+    lookAtCleanDryClothesInDryer: undefined,
+    foldCleanClothes: undefined,
+    lookAtUnmadeBed: undefined,
+    makeBed: undefined,
+    cookingThinking: undefined,
+    lookAtPantry: undefined,
+    cookDinner: undefined,
+    finishedDinner: undefined,
+    eatDinner: undefined,
+} satisfies Record<string, string | undefined>;
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -49,13 +80,11 @@ function HouseImage({
     didDishes,
     didLaundry,
     didCooking,
-    didDinner,
 }: {
     didCleaning: boolean;
     didDishes: boolean;
     didLaundry: boolean;
     didCooking: boolean;
-    didDinner: boolean;
 }) {
     return (
         <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg">
@@ -112,11 +141,13 @@ function HouseImage({
 }
 
 function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
+    const navigate = useNavigate();
+
     type ImageID = "house" | keyof typeof IMAGE_ID_TO_SRC | undefined;
 
     let actions: Array<ActionSpec>;
-    let actionPrompt: string;
-    let imageId: ImageID = undefined;
+    let actionPrompt: string | undefined = undefined;
+    let imageId: ImageID;
     let message: React.ReactNode = undefined;
 
     const [stats, _setStats] = useState<Stats>(STARTING_STATS);
@@ -125,11 +156,14 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     const [didDishes, setDidDishes] = useState<boolean>(false);
     const [didLaundry, setDidLaundry] = useState<boolean>(false);
     const [didCooking, setDidCooking] = useState<boolean>(false);
-    const [didDinner, setDidDinner] = useState<boolean>(false);
 
     function setStats(newStats: Stats) {
         _setOldStats(stats);
         _setStats(newStats);
+    }
+
+    function goBack() {
+        navigate("/");
     }
 
     type ActivityState = Readonly<
@@ -141,10 +175,9 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
               didMopping: boolean;
               didDusting: boolean;
           }
-        | { activity: "dishes" }
-        | { activity: "laundry" }
-        | { activity: "cooking" }
-        | { activity: "dinner" }
+        | { activity: "dishes"; sequence: 0 | 1 | 2 }
+        | { activity: "laundry"; sequence: 0 | 1 | 2 | 3 | 4 }
+        | { activity: "cooking"; sequence: 0 | 1 }
     >;
     const [activityState, setActivityState] = useState<ActivityState>({
         activity: "overview",
@@ -153,17 +186,44 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     type FeedbackState = Readonly<{
         message: React.ReactNode;
         imageId?: ImageID;
+        isFinalForActivity?: boolean;
+        closeAction?: () => void;
     }>;
     const [feedback, setFeedback] = useState<FeedbackState | undefined>(
         undefined,
     );
+    function setFeedbackSequence(...feedbacks: readonly FeedbackState[]) {
+        const newFeedbacks: FeedbackState[] = Array(feedbacks.length);
+        for (let _i = 0; _i < feedbacks.length; _i++) {
+            const i = _i;
+            newFeedbacks[i] = {
+                message: feedbacks[i].message,
+                imageId: feedbacks[i].imageId,
+                isFinalForActivity: feedbacks[i].isFinalForActivity,
+                closeAction() {
+                    if (i + 1 == feedbacks.length) {
+                        if (feedbacks[i].closeAction == undefined) {
+                            setFeedback(undefined);
+                        } else {
+                            feedbacks[i].closeAction();
+                        }
+                    } else {
+                        setFeedback(feedbacks[i + 1]);
+                        feedbacks[i].closeAction?.();
+                    }
+                },
+            };
+        }
+        if (feedbacks.length > 0) setFeedback(newFeedbacks[0]);
+    }
 
     switch (activityState.activity) {
         case "overview":
             imageId = "house";
             actionPrompt = "Choose an activity";
-            actions = [
-                {
+            actions = [];
+            if (!didCleaning)
+                actions.push({
                     id: "startCleaning",
                     label: "Cleaning",
                     icon: "🧹",
@@ -176,55 +236,110 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             didMopping: false,
                             didDusting: false,
                         });
+                        setFeedback({
+                            imageId: "cleaningThinking",
+                            message: (
+                                <>
+                                    <Title>Cleaning the house</Title>
+                                    <Paragraph>
+                                        You've decided to start cleaning your
+                                        home. It looks pretty messy right now,
+                                        but you're determined to make it clean.
+                                        What should you do first?
+                                    </Paragraph>
+                                </>
+                            ),
+                        });
                     },
-                },
-                {
+                });
+            if (!didDishes)
+                actions.push({
                     id: "startDishes",
                     label: "Dishes",
                     icon: "🧽",
                     desc: "Clean the dishes",
                     action() {
-                        setDidDishes(true);
-                        // setActivityState({ activity: "dishes" });
+                        setFeedback({
+                            imageId: "lookAtDirtyDishes",
+                            message: (
+                                <>
+                                    <Title>Cleaning the dishes</Title>
+                                    <Paragraph>
+                                        It's time to start cleaning the dishes.
+                                        It will take some amount of work, but
+                                        should be quick enough.
+                                    </Paragraph>
+                                </>
+                            ),
+                        });
+                        setActivityState({ activity: "dishes", sequence: 0 });
                     },
-                },
-                {
+                });
+            if (!didLaundry)
+                actions.push({
                     id: "startLaundry",
                     label: "Laundry",
                     icon: "🧺",
                     desc: "Do the laundry",
                     action() {
-                        setDidLaundry(true);
-                        // setActivityState({ activity: "laundry" });
+                        setFeedback({
+                            imageId: "lookAtDirtyClothes",
+                            message: (
+                                <>
+                                    <Title>Doing the laundry</Title>
+                                    <Paragraph>
+                                        It's time to start doing the laundry.
+                                        While you're at it, you also plan to
+                                        wash your bedsheets and make your bed.
+                                    </Paragraph>
+                                </>
+                            ),
+                        });
+                        setActivityState({ activity: "laundry", sequence: 0 });
                     },
-                },
-                {
+                });
+            if (!didCooking)
+                actions.push({
                     id: "startCooking",
                     label: "Cook",
                     icon: "🍲",
                     desc: "Cook some food",
                     action() {
-                        setDidCooking(true);
-                        // setActivityState({ activity: "cooking" });
+                        setFeedback({
+                            imageId: "cookingThinking",
+                            message: (
+                                <>
+                                    <Title>Cooking</Title>
+                                    <Paragraph>
+                                        You feel a bit tired and hungry, and
+                                        decide it's time to cook some dinner.
+                                    </Paragraph>
+                                </>
+                            ),
+                        });
+                        setActivityState({ activity: "cooking", sequence: 0 });
                     },
-                },
-                {
-                    id: "startDinner",
-                    label: "Eat",
-                    icon: "🍽️",
-                    desc: "Have dinner",
-                    action() {
-                        setDidDinner(true);
-                        setStats(statsUpdate(stats, { energy: +100 }));
-                        // setActivityState({ activity: "dinner" });
-                    },
-                },
-            ];
+                });
+            if (actions.length == 0) {
+                imageId = "house";
+                actionPrompt = undefined;
+                message = (
+                    <>
+                        <Paragraph>
+                            Looks like there's nothing left to do.{" "}
+                            {positiveFeedback()}
+                        </Paragraph>
+                        <PrimaryButton onClick={goBack}>Go Back</PrimaryButton>
+                    </>
+                );
+            }
             break;
         case "cleaning":
+            imageId = "cleaningThinking";
             {
                 function setActivityStateForCleaning(
                     newActivityState: ActivityState & { activity: "cleaning" },
+                    imageId: ImageID,
                     feedbackMessage: React.ReactNode,
                 ) {
                     const numActivitiesCompleted: 0 | 1 | 2 | 3 | 4 =
@@ -237,6 +352,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         setActivityState({
                             activity: "overview",
                         });
+                        setDidCleaning(true);
                     } else {
                         setActivityState(newActivityState);
                     }
@@ -288,11 +404,20 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                                 <Title>What happens next</Title>
                                 <Paragraph>
                                     {positiveFeedback()} {feedbackMessage}{" "}
-                                    {genericFeedbackMessage}
                                 </Paragraph>
+                                <Paragraph>{genericFeedbackMessage}</Paragraph>
                             </>
                         ),
+                        imageId,
+                        isFinalForActivity: allActivitiesCompleted,
                     });
+                    setStats(
+                        statsUpdate(stats, {
+                            energy: -10,
+                            mood: +5,
+                            confidence: +5,
+                        }),
+                    );
                 }
 
                 actionPrompt = "Choose an activity";
@@ -304,12 +429,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🌫️",
                         desc: "Vacuum the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didVacuuming: true,
                                 },
+                                "vacuuming",
                                 <>You vaccumed away the dust.</>,
                             );
                         },
@@ -321,12 +446,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🧹",
                         desc: "Sweep the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didSweeping: true,
                                 },
+                                "sweeping",
                                 <>You sweeped the floor.</>,
                             );
                         },
@@ -338,12 +463,12 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🪣",
                         desc: "Mop the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didMopping: true,
                                 },
+                                "mopping",
                                 <>You mopped the floor.</>,
                             );
                         },
@@ -355,21 +480,436 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         icon: "🧽",
                         desc: "Dust the house",
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
                             setActivityStateForCleaning(
                                 {
                                     ...activityState,
                                     didDusting: true,
                                 },
+                                "dusting",
                                 <>You dusted the furniture and other items.</>,
                             );
                         },
                     });
             }
             break;
+        case "dishes":
+            switch (activityState.sequence) {
+                case 0:
+                    imageId = "lookAtDirtyDishes";
+                    message = (
+                        <Paragraph>
+                            First, it's time to put the dirty dishes in the
+                            dishwasher.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next0",
+                            label: "Place dishes in dishwasher",
+                            desc: "Put the dirty dishes in the dishwasher.",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -5,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 1,
+                                });
+                                setFeedback({
+                                    imageId: "putDishesInDishwasher",
+                                    message: (
+                                        <Paragraph>
+                                            You put the dirty dishes in the
+                                            dishwasher.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 1:
+                    imageId = "lookAtDirtyDishesInDishwasher";
+                    message = (
+                        <Paragraph>
+                            The dishes are in the dishwasher. Now it's time to
+                            start it up!
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next1",
+                            label: "Start the dishwasher",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -5,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 2,
+                                });
+                                setFeedback({
+                                    imageId: "startDishwasher",
+                                    message: (
+                                        <Paragraph>
+                                            You start up the dishwasher. It's
+                                            time to wait for it to finish.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 2:
+                    imageId = "lookAtFinishedDishwasher";
+                    message = (
+                        <Paragraph>
+                            {positiveFeedback()} The dishwasher has finished.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next2",
+                            label: "Pick up dishes",
+                            desc: "Pick up the clean dishes from the dishwasher.",
+                            action() {
+                                setActivityState({
+                                    activity: "overview",
+                                });
+                                setDidDishes(true);
+                                setStats(statsUpdate(stats, { energy: -5 }));
+                                setFeedbackSequence(
+                                    {
+                                        imageId: "getDishesOutOfDishwasher",
+                                        message: (
+                                            <Paragraph>
+                                                You get the dishes out of the
+                                                dishwasher, and put them back on
+                                                the table.
+                                            </Paragraph>
+                                        ),
+                                        closeAction() {
+                                            setStats(
+                                                statsUpdate(stats, {
+                                                    mood: +20,
+                                                    confidence: +20,
+                                                    health: +10,
+                                                }),
+                                            );
+                                        },
+                                    },
+                                    {
+                                        imageId: "lookAtCleanDishes",
+                                        message: (
+                                            <Paragraph>
+                                                {positiveFeedback()} The dishes
+                                                are complete! You feel proud.
+                                            </Paragraph>
+                                        ),
+                                        isFinalForActivity: true,
+                                    },
+                                );
+                            },
+                        },
+                    ];
+                    break;
+                default:
+                    activityState satisfies never;
+                    throw new Error();
+            }
+            break;
+        case "laundry":
+            switch (activityState.sequence) {
+                case 0:
+                    imageId = "lookAtDirtyClothes";
+                    message = (
+                        <Paragraph>
+                            First, it's time to put the dirty clothes in the
+                            washer.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next0",
+                            label: "Pick up dirty clothes",
+                            desc: "Pick up the dirty clothes, and put them in the washer.",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -5,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 1,
+                                });
+                                setFeedback({
+                                    imageId: "pickUpDirtyLaundry",
+                                    message: (
+                                        <Paragraph>
+                                            You picked up the dirty clothes, and
+                                            put them in the washer.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 1:
+                    imageId = "lookAtDirtyClothesInWasher";
+                    message = (
+                        <Paragraph>
+                            The clothes are in the washing machine. Now it's
+                            time to start it up!
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next1",
+                            label: "Start the washing machine",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -5,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 2,
+                                });
+                                setFeedback({
+                                    imageId: "washClothes",
+                                    message: (
+                                        <Paragraph>
+                                            You start up the washer. It's time
+                                            to wait for it to finish.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 2:
+                    imageId = "lookAtCleanWetClothesInWasher";
+                    message = (
+                        <Paragraph>
+                            {positiveFeedback()} The clothes have finished
+                            washing.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next2",
+                            label: "Dry the clothes",
+                            desc: "Pick up the clean clothes and place them in the dryer.",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -5,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 3,
+                                });
+                                setFeedback({
+                                    imageId: "dryClothes",
+                                    message: (
+                                        <Paragraph>
+                                            You start up the dryer. It's time to
+                                            wait for it to finish.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 3:
+                    imageId = "lookAtCleanDryClothesInDryer";
+                    message = (
+                        <Paragraph>
+                            {positiveFeedback()} The clothes have finished
+                            drying.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next3",
+                            label: "Fold clothes",
+                            desc: "Fold the clothes and put them back.",
+                            action() {
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -10,
+                                    }),
+                                );
+                                setActivityState({
+                                    ...activityState,
+                                    sequence: 4,
+                                });
+                                setFeedback({
+                                    imageId: "foldCleanClothes",
+                                    message: (
+                                        <Paragraph>
+                                            {positiveFeedback()} You fold the
+                                            clean clothes and put them back. You
+                                            feel accomplished.
+                                        </Paragraph>
+                                    ),
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                case 4:
+                    imageId = "lookAtUnmadeBed";
+                    message = (
+                        <Paragraph>
+                            However, you still have your bedsheets. Now it's
+                            time to put them back on your bed.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            id: "next4",
+                            label: "Make bed",
+                            desc: "Make your bed.",
+                            action() {
+                                setActivityState({
+                                    activity: "overview",
+                                });
+                                setDidLaundry(true);
+                                setStats(
+                                    statsUpdate(stats, {
+                                        energy: -10,
+                                        mood: +50,
+                                        health: +10,
+                                        confidence: +20,
+                                    }),
+                                );
+                                setFeedback({
+                                    imageId: "makeBed",
+                                    message: (
+                                        <Paragraph>
+                                            {positiveFeedback()} You feel
+                                            accomplished, and now you have a
+                                            freshly-made bed and freshly-folded
+                                            clothes!
+                                        </Paragraph>
+                                    ),
+                                    closeAction() {
+                                        setStats(
+                                            statsUpdate(stats, {
+                                                mood: +20,
+                                                confidence: +20,
+                                                health: +10,
+                                            }),
+                                        );
+                                        setFeedback(undefined);
+                                    },
+                                    isFinalForActivity: true,
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                default:
+                    activityState satisfies never;
+                    throw new Error();
+            }
+            break;
+        case "cooking":
+            switch (activityState.sequence) {
+                case 0: {
+                    message = (
+                        <>
+                            <Title>Planning your meal</Title>
+                            <Paragraph>
+                                You look at your pantry to decide what to make
+                                for dinner.
+                            </Paragraph>
+                        </>
+                    );
+                    imageId = "lookAtPantry";
+                    const meals = [
+                        { name: "Pizza", icon: "🍕" },
+                        { name: "Spaghetti", icon: "🍝" },
+                        { name: "Salad", icon: "🥗" },
+                        { name: "Sandwich", icon: "🥪" },
+                        { name: "Curry and rice", icon: "🍛" },
+                        { name: "Dumplings", icon: "🥟" },
+                    ];
+                    actions = meals.map(({ name, icon }) => ({
+                        key: name,
+                        label: name,
+                        icon: icon,
+                        action() {
+                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setActivityState({ ...activityState, sequence: 1 });
+                            setFeedback({
+                                imageId: "cookDinner",
+                                message: (
+                                    <Paragraph>
+                                        Good choice! You cook your dinner.
+                                    </Paragraph>
+                                ),
+                            });
+                        },
+                    }));
+                    break;
+                }
+                case 1:
+                    imageId = "finishedDinner";
+                    message = (
+                        <Paragraph>
+                            After cooking, your dinner is ready to eat.
+                        </Paragraph>
+                    );
+                    actions = [
+                        {
+                            key: "eatDinner",
+                            label: "Eat dinner",
+                            icon: "🍽️",
+                            desc: "Enjoy your dinner.",
+                            action() {
+                                setStats(statsUpdate(stats, { energy: +100 }));
+                                setActivityState({
+                                    activity: "overview",
+                                });
+                                setDidCooking(true);
+                                setFeedback({
+                                    imageId: "eatDinner",
+                                    message: (
+                                        <>
+                                            <Paragraph>
+                                                {positiveFeedback()} After
+                                                enjoying your meal, you feel
+                                                replenished.
+                                            </Paragraph>
+                                        </>
+                                    ),
+                                    isFinalForActivity: true,
+                                });
+                            },
+                        },
+                    ];
+                    break;
+                default:
+                    activityState satisfies never;
+                    throw new Error();
+            }
+            break;
         default:
-            throw new Error("unimplemented");
             activityState satisfies never;
+            throw new Error();
     }
 
     {
@@ -383,17 +923,19 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             didDishes={didDishes}
                             didLaundry={didLaundry}
                             didCooking={didCooking}
-                            didDinner={didDinner}
                         />
                     </ActivityImage>
+                ) : !(_imageId != undefined && _imageId in IMAGE_ID_TO_SRC) ? (
+                    <></>
+                ) : IMAGE_ID_TO_SRC[_imageId] != undefined ? (
+                    <ActivityImage
+                        key={_imageId}
+                        src={IMAGE_ID_TO_SRC[_imageId]}
+                    />
                 ) : (
-                    _imageId != undefined &&
-                    IMAGE_ID_TO_SRC[_imageId] != undefined && (
-                        <ActivityImage
-                            key={_imageId}
-                            src={IMAGE_ID_TO_SRC[_imageId]}
-                        />
-                    )
+                    <ActivityImage key={_imageId}>
+                        Placeholder: {_imageId}
+                    </ActivityImage>
                 )}
                 <StatsViewer stats={stats} />
                 <Section>
@@ -408,9 +950,16 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     {feedback !== undefined && (
                         <>
                             <PrimaryButton
-                                onClick={() => setFeedback(undefined)}
+                                onClick={
+                                    feedback.closeAction ??
+                                    (() => setFeedback(undefined))
+                                }
                             >
-                                Continue
+                                {feedback.isFinalForActivity ? (
+                                    <>Finish</>
+                                ) : (
+                                    <>Continue</>
+                                )}
                             </PrimaryButton>
                         </>
                     )}
