@@ -45,4 +45,4 @@ deploy:
     - pm2 serve dist 8080 --spa --name cm-app --time
     - pm2 save
   only:
-    - main
+    - master
