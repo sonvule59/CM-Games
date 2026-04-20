@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { rcStyles } from "../Static/rockClimbingStyles";
+import { rcStyles } from "../Static/rockClimbingStyles.js";
 import { ActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from "./StatsPanel.tsx";
 import {
