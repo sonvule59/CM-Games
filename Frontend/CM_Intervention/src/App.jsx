@@ -28,31 +28,28 @@ function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Top-level hub */}
-        <Route path="/" element={<HomeOfHomePages />} />
-        <Route path="/leisure" element={<LeisureHome />} />
-        <Route path='/office' element={<OfficeGameStart />} />
-        <Route path="/mindfulness-home" element={<MindfulnessHome />} />
-        <Route path="/mindfulness" element={<MindfulnessGame />} />
-        <Route path="/transport-home" element={<TransportGameStart />} />
+    <Routes>
+      {/* Top-level hub */}
+      <Route path="/" element={<HomeOfHomePages />} />
+      <Route path="/leisure" element={<LeisureHome />} />
+      <Route path="/office" element={<OfficeGameStart />} />
+      <Route path="/mindfulness-home" element={<MindfulnessHome />} />
+      <Route path="/mindfulness" element={<MindfulnessGame />} />
+      <Route path="/transport-home" element={<TransportGameStart />} />
 
-        {/* Individual routes for each mini‑game */}
-        <Route path="/outdoors" element={<OutdoorsActivities />} />
-        <Route path="/rock" element={<RockClimbing />} />
-        <Route path="/walk" element={<WalkingActivity />} />
-        <Route path='/office/test' element = {<OfficeGame/>} /> 
-        <Route path="/swim" element = {<SwimmingActivity /> } />
-        <Route path="/indoor-domestic" element = {<IndoorDomesticActivity /> } />
-        <Route path="/domestic-home" element={<DomesticHome />} />
-        <Route path="/outside-domestic" element={<OutsideDomestic />} />
-        <Route path='/transport' element={<TransportGame />} />
-        <Route path="/parking" element={<ParkingLot />} />
-        <Route path='/transport2' element={<TransportGame2 />} />
-
+      {/* Individual routes for each mini‑game */}
+      <Route path="/outdoors" element={<OutdoorsActivities />} />
+      <Route path="/rock" element={<RockClimbing />} />
+      <Route path="/walk" element={<WalkingActivity />} />
+      <Route path="/office/test" element={<OfficeGame />} />
+      <Route path="/swim" element={<SwimmingActivity />} />
+      <Route path="/indoor-domestic" element={<IndoorDomesticActivity />} />
+      <Route path="/domestic-home" element={<DomesticHome />} />
+      <Route path="/outside-domestic" element={<OutsideDomestic />} />
+      <Route path="/transport" element={<TransportGame />} />
+      <Route path="/parking" element={<ParkingLot />} />
+      <Route path="/transport2" element={<TransportGame2 />} />
     </Routes>
-    </BrowserRouter>
   );
 }
 
