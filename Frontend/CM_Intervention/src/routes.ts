@@ -6,7 +6,7 @@ export default [
     route("/leisure", "./Componets/leisureHome.jsx"),
     route("/office", "./Componets/OfficeGameStart.jsx"),
     route("/mindfulness-home", "./Componets/mindfulnessHome.jsx"),
-    route("/mindfulness", "./Componets/mindfulnessGame.jsx"),
+    route("/mindfulness", "./Componets/mindfulnessGame.tsx"),
     route("/transport-home", "./Componets/TransportGameStart.jsx"),
 
     // Individual routes for each mini-game
