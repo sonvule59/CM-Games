@@ -203,7 +203,7 @@ export default function ParkingLot() {
         <StatsPanel stats={stats} />
       </TopRow>
 
-      <ActivityImage>src={currentImage}</ActivityImage>
+      <ActivityImage src={currentImage} />
 
       {renderSceneContent()}
     </Container>
