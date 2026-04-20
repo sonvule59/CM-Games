@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { href, useNavigate } from 'react-router';
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 import pullingUpLakeImg from '../images/pullingUpLake.png';
@@ -386,7 +386,7 @@ export default function OutdoorsActivities() {
             gives you a slightly different way to enjoy the day.
           </HeaderSubtitle>
         </HeaderLeft>
-        <BackButton onClick={() => navigate("/")}>Back to Home</BackButton>
+        <BackButton onClick={() => navigate(href("/"))}>Back to Home</BackButton>
       </Header>
 
       <ActivityImage src={OUTDOOR_IMAGES[imageKey]} />

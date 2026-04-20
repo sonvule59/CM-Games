@@ -1,12 +1,12 @@
 import { s } from "../Static/officestyles.js";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 
 export default function TransportGameStart() {
   const navigate = useNavigate();
-  const games = [
+  const games = /** @type {const} */([
     { path: "/transport",  text: "Go to work",             color: "#10b981" },
     { path: "/transport2", text: "Going to get groceries", color: "#3b82f6" },
-  ];
+  ]);
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
@@ -83,7 +83,7 @@ export default function TransportGameStart() {
             <button
               key={game.path}
               className={s.primaryButton}
-              onClick={() => navigate(game.path)}
+              onClick={() => navigate(href(game.path))}
               style={{
                 width: "100%",
                 padding: "14px 24px",

@@ -1,5 +1,5 @@
 import { s } from "../Static/officestyles.js";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 export default function OfficeGameStart() {
   const navigate = useNavigate();
   return (
@@ -88,7 +88,7 @@ export default function OfficeGameStart() {
         {/* CTA button */}
         <button
           className={s.primaryButton}
-          onClick={() => {navigate("/parking")}}
+          onClick={() => { navigate(href("/parking")) }}
           style={{
             width: "100%",
             padding: "14px 24px",

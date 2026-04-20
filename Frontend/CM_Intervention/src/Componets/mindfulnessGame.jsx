@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 import { ActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from "./StatsPanel.tsx";
 import {
@@ -171,7 +171,7 @@ export default function MindfulnessGame() {
                     <ScenePill>Gentle practice</ScenePill>
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton onClick={() => navigate("/mindfulness-home")} />
+                    <BackButton onClick={() => navigate(href("/mindfulness-home"))} />
                     <ResetButton onClick={reset} />
                 </HeaderRight>
             </Header>

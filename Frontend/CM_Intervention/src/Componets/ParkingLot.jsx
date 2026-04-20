@@ -4,7 +4,7 @@ import walkingImg from "../images/walkingLot.png";
 import fastWalkImg from "../images/walkingFast.png";
 import parkedImg from "../images/parked.png";
 import parkedCloseImg from "../images/parkedClose.png";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 import {
   Container,
   Header,
@@ -170,7 +170,7 @@ export default function ParkingLot() {
           <Title>Morning Arrival Complete</Title>
           <Paragraph>{resultText}</Paragraph>
           <StatDeltaViewer delta={lastDelta} />
-          <PrimaryButton onClick={() => navigate("/office/test")}>
+          <PrimaryButton onClick={() => navigate(href("/office/test"))}>
             Go into the office
           </PrimaryButton>
         </Section>
