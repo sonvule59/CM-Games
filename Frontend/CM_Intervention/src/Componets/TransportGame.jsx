@@ -358,7 +358,7 @@ export default function TransportGame() {
               {
                 key: "navigateToOffice",
                 isPrimary: true,
-                onClick: () => navigate(href("/office/game")),
+                onClick: () => navigate(href("/office/test")),
                 label: <>Head to the office 💼</>,
               },
               {
