@@ -15,7 +15,8 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "types": ["vite/client"],
+        "rootDirs": [".", "./.react-router/types"],
         "allowImportingTsExtensions": true
     },
-    "include": ["src"]
+    "include": ["./**/*", "./.react-router/**/*"]
 }
