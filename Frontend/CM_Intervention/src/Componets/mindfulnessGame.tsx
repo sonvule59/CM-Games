@@ -19,13 +19,43 @@ import {
     PrimaryButton,
     ResetButton,
     ScenePill,
-    SecondaryButton,
     Section,
-    Subtitle,
     Title,
     TopRow,
 } from "./Layout.tsx";
 import ActivityImage from "./ActivityImage.tsx";
+
+// Mindfulness phrase images (src/images — filenames match each prompt theme)
+// @ts-ignore
+import imgBodyKindness from "../images/bodyKindness.png";
+// @ts-ignore
+import imgBreathingCalm from "../images/breathingCalm.png";
+// @ts-ignore
+import imgCalmerMoving from "../images/calmerMoving.png";
+// @ts-ignore
+import imgCuriousToTryNew from "../images/curiousToTryNew.png";
+// @ts-ignore
+import imgEnergyFlowsThrough from "../images/energyFlowsThrough.png";
+// @ts-ignore
+import imgFocusOnFeel from "../images/focusOnFeel.png";
+// @ts-ignore
+import imgGratefulWhatCanDo from "../images/gratefulWhatCanDo.png";
+// @ts-ignore
+import imgHeartShowsStrength from "../images/heartShowsStrength.png";
+// @ts-ignore
+import imgLightAndFree from "../images/lightandFree.png";
+// @ts-ignore
+import imgOkayToGoSlow from "../images/okayToGoSlow.png";
+// @ts-ignore
+import imgProudShowingUp from "../images/proudShowingUp.png";
+// @ts-ignore
+import imgRelaxedAfterStretch from "../images/relaxedAfterStretch.png";
+// @ts-ignore
+import imgSelfCareGood from "../images/selfCareGood.png";
+// @ts-ignore
+import imgSmallSteps from "../images/smallSteps.png";
+// @ts-ignore
+import imgWarmthThroughBody from "../images/warmthThroughBody.png";
 
 const INITIAL_STATS = {
     confidence: 50,
@@ -39,11 +69,10 @@ type PhraseSpec = {
     label: React.ReactNode;
     explanation: React.ReactNode;
     delta: StatDelta;
-    imageSrc?: string;
+    imageSrc: string;
 };
 
 /** Short phrase (button) and fuller meaning (shown after you tap). */
-// TODO: include images
 const PHRASES: PhraseSpec[] = [
     {
         id: "focus-feel",
@@ -51,6 +80,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Shifts attention from external appearance to internal sensations, encouraging mindfulness and self-acceptance.",
         delta: { mood: 6, health: 4, confidence: 4, energy: 2 },
+        imageSrc: imgFocusOnFeel,
     },
     {
         id: "small-steps",
@@ -58,6 +88,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Reinforces the idea that even small actions are valuable and contribute to progress.",
         delta: { confidence: 6, mood: 4, energy: 3 },
+        imageSrc: imgSmallSteps,
     },
     {
         id: "go-slow",
@@ -65,6 +96,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Promotes self-compassion and reduces the pressure to perform at a certain level.",
         delta: { mood: 7, health: 3, energy: 4 },
+        imageSrc: imgOkayToGoSlow,
     },
     {
         id: "body-kindness",
@@ -72,6 +104,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Encourages a nurturing mindset that supports engaging in physical activity.",
         delta: { health: 6, mood: 5, confidence: 5 },
+        imageSrc: imgBodyKindness,
     },
     {
         id: "calmer-moving",
@@ -79,6 +112,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Highlights the emotional benefits of movement, reinforcing a positive association.",
         delta: { mood: 8, energy: 4, health: 3 },
+        imageSrc: imgCalmerMoving,
     },
     {
         id: "grateful",
@@ -86,6 +120,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Cultivates appreciation for current abilities rather than focusing on limitations.",
         delta: { confidence: 7, mood: 5, health: 2 },
+        imageSrc: imgGratefulWhatCanDo,
     },
     {
         id: "showing-up",
@@ -93,6 +128,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Builds self-esteem and strengthens commitment to physical activity.",
         delta: { confidence: 8, mood: 6, energy: 2 },
+        imageSrc: imgProudShowingUp,
     },
     {
         id: "curious",
@@ -100,6 +136,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Inspires openness and playfulness, making physical activity more enjoyable.",
         delta: { energy: 6, mood: 5, health: 4 },
+        imageSrc: imgCuriousToTryNew,
     },
     {
         id: "relaxed-stretch",
@@ -107,6 +144,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Connects mindful movement to feelings of ease and comfort.",
         delta: { health: 7, mood: 6, energy: 3 },
+        imageSrc: imgRelaxedAfterStretch,
     },
     {
         id: "self-care",
@@ -114,6 +152,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Frames physical activity as an act of self-love rather than a chore.",
         delta: { mood: 7, confidence: 4, health: 3 },
+        imageSrc: imgSelfCareGood,
     },
     {
         id: "warmth",
@@ -121,6 +160,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Encourages noticing pleasant bodily sensations without judgment.",
         delta: { health: 5, mood: 5, confidence: 3 },
+        imageSrc: imgWarmthThroughBody,
     },
     {
         id: "breathing",
@@ -128,6 +168,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Uses breath awareness as a calming anchor during physical activity.",
         delta: { mood: 8, energy: 2, health: 3 },
+        imageSrc: imgBreathingCalm,
     },
     {
         id: "light-free",
@@ -135,6 +176,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Links physical sensations to emotional well-being and a sense of freedom.",
         delta: { health: 6, mood: 6, confidence: 4 },
+        imageSrc: imgLightAndFree,
     },
     {
         id: "energy-flows",
@@ -142,6 +184,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Recognizes the energizing effects of movement on both body and mind.",
         delta: { energy: 8, mood: 4, health: 3 },
+        imageSrc: imgEnergyFlowsThrough,
     },
     {
         id: "heart-strength",
@@ -149,6 +192,7 @@ const PHRASES: PhraseSpec[] = [
         explanation:
             "Reframes physical responses as signs of strength and vitality.",
         delta: { confidence: 7, energy: 5, mood: 4 },
+        imageSrc: imgHeartShowsStrength,
     },
 ];
 
@@ -209,12 +253,10 @@ export default function MindfulnessGame() {
                 </Section>
             ) : (
                 <>
-                    {currentPhrase.imageSrc != undefined && (
-                        <ActivityImage
-                            src={currentPhrase.imageSrc}
-                            subtitle={currentPhrase.label}
-                        />
-                    )}
+                    <ActivityImage
+                        src={currentPhrase.imageSrc}
+                        subtitle={currentPhrase.label}
+                    />
                     <Section>
                         <Title>Why this helps</Title>
                         <Paragraph>{currentPhrase.explanation}</Paragraph>
