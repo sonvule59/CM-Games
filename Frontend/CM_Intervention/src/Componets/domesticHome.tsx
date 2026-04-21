@@ -3,10 +3,10 @@ import { href, useNavigate } from "react-router";
 
 export default function DomesticGameStart() {
   const navigate = useNavigate();
-  const games = /** @type {const} */([
-    { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
-    { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },
-  ]);
+  const games = [
+    { path: "/indoor-domestic", text: "Indoor activities", color: "#10b981" },
+    { path: "/outside-domestic", text: "Around the house", color: "#6366f1" },
+  ] as const;
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>

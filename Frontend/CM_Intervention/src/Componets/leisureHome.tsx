@@ -3,12 +3,16 @@ import { href, useNavigate } from "react-router";
 export default function leisureHome() {
   const navigate = useNavigate();
 
-  const games = /** @type {const} */([
+  const games = [
     { path: "/rock", text: "Rock Climbing 🧗", color: "#ef4444" },
-    { path: "/outdoors", text: "Outdoors Activities (Lake) 🚣‍♂️", color: "#3b82f6" },
+    {
+      path: "/outdoors",
+      text: "Outdoors Activities (Lake) 🚣‍♂️",
+      color: "#3b82f6",
+    },
     { path: "/walk", text: "Walking Activities 🚶‍♂️", color: "#10b981" },
     { path: "/swim", text: "Swimming Activities 🏊‍♂️", color: "#06b6d4" },
-  ]);
+  ] as const;
   
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
