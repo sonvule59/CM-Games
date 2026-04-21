@@ -16,7 +16,12 @@ import {
   Title,
   TopRow,
 } from "./Layout.js";
-import { StatDeltaViewer, StatsPanel } from "./StatsPanel.js";
+import {
+  StatDelta,
+  StatDeltaViewer,
+  StatsPanel,
+  statsUpdate,
+} from "./StatsPanel.js";
 import ActivityImage from "./ActivityImage.js";
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.js";
 const atDeskImg        = "/assets/Images/working.webp";
@@ -82,7 +87,7 @@ const WALK_OPTIONS = [
       "Technically productive, secretly a wellness break. Nobody needs to know. 🖨️",
     delta: { energy: -2, mood: +8, confidence: +4, health: +6 },
   },
-];
+] as const;
 
 const DESK_EXERCISE_OPTIONS = [
   {
@@ -112,7 +117,7 @@ const DESK_EXERCISE_OPTIONS = [
       "Sneaky and effective. Core engaged, legs working — all from your chair. Keep it up! ✨",
     delta: { energy: -5, mood: +8, health: +10, confidence: +6 },
   },
-];
+] as const;
 
 const TASKS = [
   {
@@ -149,31 +154,33 @@ const TASKS = [
       "You don't need a gym. You've got a chair, two arms, and two legs — let's use them.",
     result: "",
   },
-];
+] as const;
 
 export default function OfficeGame() {
   const [stats, setStats]           = useState(INITIAL_STATS);
-  const [scene, setScene]           = useState("office");
+  const [scene, setScene] = useState<keyof typeof SCENE_LABELS>("office");
   const [step, setStep]             = useState(0);
-  const [lastDelta, setLastDelta] = useState({
+  const [lastDelta, setLastDelta] = useState<StatDelta>({
     energy: 0,
     mood: 0,
     confidence: 0,
     health: 0,
   });
   const [resultText, setResultText] = useState("");
-  const [activeTask, setActiveTask] = useState(null);
-  const [deskOption, setDeskOption] = useState(null);
-  const [walkOption, setWalkOption] = useState(null);
+  const [activeTask, setActiveTask] = useState<(typeof TASKS)[number] | null>(
+    null,
+  );
+  const [deskOption, setDeskOption] = useState<
+    (typeof DESK_EXERCISE_OPTIONS)[number] | null
+  >(null);
+  const [walkOption, setWalkOption] = useState<
+    (typeof WALK_OPTIONS)[number] | null
+  >(null);
 
-  const clamp = (v) => Math.max(0, Math.min(100, Math.round(v)));
+  const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
 
-  const applyDelta = (delta) => {
-    setStats((prev) => {
-      const next = {};
-      STAT_KEYS.forEach((k) => (next[k] = clamp(prev[k] + (delta[k] || 0))));
-      return next;
-    });
+  const applyDelta = (delta: StatDelta) => {
+    setStats((prev) => statsUpdate(prev, delta));
     setLastDelta({
       energy: delta.energy || 0,
       mood: delta.mood || 0,
@@ -182,7 +189,7 @@ export default function OfficeGame() {
     });
   };
 
-  const handleTaskChoice = (task) => {
+  const handleTaskChoice = (task: (typeof TASKS)[number]) => {
     applyDelta(task.delta());
     setActiveTask(task);
     setScene(task.scene);
@@ -193,18 +200,18 @@ export default function OfficeGame() {
   };
 
   const handleConfirm = () => {
-    setResultText(activeTask.result);
+    setResultText(activeTask!.result);
     setStep(3);
   };
 
-  const handleWalkOption = (option) => {
+  const handleWalkOption = (option: (typeof WALK_OPTIONS)[number]) => {
     applyDelta(option.delta);
     setWalkOption(option);
     setResultText(option.result);
     setStep(3);
   };
 
-  const handleDeskOption = (option) => {
+  const handleDeskOption = (option: (typeof DESK_EXERCISE_OPTIONS)[number]) => {
     applyDelta(option.delta);
     setDeskOption(option);
     setResultText(option.result);

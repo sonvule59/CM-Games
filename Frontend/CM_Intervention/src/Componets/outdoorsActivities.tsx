@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { href, useNavigate } from 'react-router';
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
-import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
+import { statsUpdate, StatsPanel, StatDelta } from "./StatsPanel.tsx";
 import pullingUpLakeImg from '../images/pullingUpLake.png';
 import walkingLakeImg from '../images/walkingLake.png';
 import guyFishingImg from '../images/guyFishing.png';
@@ -37,8 +37,12 @@ export default function OutdoorsActivities() {
     energy: 100,
   };
 
-  const [activity, setActivity] = useState(null); // 'walk' | 'fish' | 'golf' | 'bocce' | null
-  const [step, setStep] = useState('intro'); // 'intro' | 'activityIntro' | 'activityChoice' | 'result'
+  const [activity, setActivity] = useState<
+    "walk" | "fish" | "golf" | "bocce" | null
+  >(null);
+  const [step, setStep] = useState<
+    "intro" | "activityIntro" | "activityChoice" | "result"
+  >("intro");
   const [resultText, setResultText] = useState('');
   const [stats, setStats] = useState(initialStats);
 
@@ -51,22 +55,24 @@ export default function OutdoorsActivities() {
     bocce: bocceBallImg,
   };
 
-  const handleSelectActivity = (nextActivity) => {
+  const handleSelectActivity = (
+    nextActivity: "walk" | "fish" | "golf" | "bocce",
+  ) => {
     setActivity(nextActivity);
-    setStep('activityIntro');
-    setResultText('');
-    if (nextActivity === 'walk') {
+    setStep("activityIntro");
+    setResultText("");
+    if (nextActivity === "walk") {
       applyDelta({ confidence: +2, mood: +3, health: +4, energy: -2 });
-    } else if (nextActivity === 'fish') {
+    } else if (nextActivity === "fish") {
       applyDelta({ confidence: +2, mood: +4, health: +1, energy: -1 });
-    } else if (nextActivity === 'golf') {
+    } else if (nextActivity === "golf") {
       applyDelta({ confidence: +4, mood: +2, health: +2, energy: -3 });
-    } else if (nextActivity === 'bocce') {
+    } else if (nextActivity === "bocce") {
       applyDelta({ confidence: +3, mood: +5, health: +2, energy: -2 });
     }
   };
 
-  const applyDelta = (delta) => {
+  const applyDelta = (delta: StatDelta) => {
     setStats((prev) =>
       statsUpdate(prev, {
         confidence: delta.confidence ?? 0,
@@ -88,65 +94,65 @@ export default function OutdoorsActivities() {
     setStep('activityChoice');
   };
 
-  const handleFishingChoice = (choice) => {
-    if (choice === 'catch') {
+  const handleFishingChoice = (choice: "catch" | "back") => {
+    if (choice === "catch") {
       applyDelta({ confidence: +8, mood: +5, health: +2, energy: -5 });
       setResultText(
-        'You cast your line and feel a steady tug. After a quiet moment of waiting, you reel in a fish and take a second to enjoy the view before deciding what comes next.'
+        "You cast your line and feel a steady tug. After a quiet moment of waiting, you reel in a fish and take a second to enjoy the view before deciding what comes next.",
       );
-    } else if (choice === 'back') {
+    } else if (choice === "back") {
       applyDelta({ confidence: +2, mood: +4, health: +1, energy: +2 });
       setResultText(
-        'You enjoy the gentle sounds of the water for a bit, then decide to head back to the shoreline, feeling relaxed and ready for the rest of the day.'
+        "You enjoy the gentle sounds of the water for a bit, then decide to head back to the shoreline, feeling relaxed and ready for the rest of the day.",
       );
     }
-    setStep('result');
+    setStep("result");
   };
 
   // You can adjust these later if you want different situations.
-  const handleWalkChoice = (choice) => {
-    if (choice === 'short') {
+  const handleWalkChoice = (choice: "short" | "long") => {
+    if (choice === "short") {
       applyDelta({ confidence: +3, mood: +5, health: +4, energy: -2 });
       setResultText(
-        'You choose a shorter loop along the water, noticing birds, trees, and the way the light hits the lake. It feels like just enough movement to clear your head.'
+        "You choose a shorter loop along the water, noticing birds, trees, and the way the light hits the lake. It feels like just enough movement to clear your head.",
       );
-    } else if (choice === 'long') {
+    } else if (choice === "long") {
       applyDelta({ confidence: +5, mood: +6, health: +8, energy: -6 });
       setResultText(
-        'You follow a longer trail that winds through the trees. You take your time, stop for a few photos, and return feeling refreshed and grounded.'
+        "You follow a longer trail that winds through the trees. You take your time, stop for a few photos, and return feeling refreshed and grounded.",
       );
     }
-    setStep('result');
+    setStep("result");
   };
 
-  const handleGolfChoice = (choice) => {
-    if (choice === 'drives') {
+  const handleGolfChoice = (choice: "drives" | "shortGame") => {
+    if (choice === "drives") {
       applyDelta({ confidence: +6, mood: +3, health: +2, energy: -5 });
       setResultText(
-        'You focus on easy, smooth swings at the driving range. Instead of chasing perfection, you enjoy the rhythm of each shot and the wide‑open sky.'
+        "You focus on easy, smooth swings at the driving range. Instead of chasing perfection, you enjoy the rhythm of each shot and the wide‑open sky.",
       );
-    } else if (choice === 'shortGame') {
+    } else if (choice === "shortGame") {
       applyDelta({ confidence: +4, mood: +4, health: +1, energy: -3 });
       setResultText(
-        'You practice gentle putts and chips on the green. The slower pace lets you notice small improvements and enjoy being outside.'
+        "You practice gentle putts and chips on the green. The slower pace lets you notice small improvements and enjoy being outside.",
       );
     }
-    setStep('result');
+    setStep("result");
   };
 
-  const handleBocceChoice = (choice) => {
-    if (choice === 'casual') {
+  const handleBocceChoice = (choice: "casual" | "tournament") => {
+    if (choice === "casual") {
       applyDelta({ confidence: +4, mood: +7, health: +2, energy: -2 });
       setResultText(
-        'You play a relaxed round of bocce with friends, laughing at wild throws and cheering for close shots. The game becomes more about connection than keeping score.'
+        "You play a relaxed round of bocce with friends, laughing at wild throws and cheering for close shots. The game becomes more about connection than keeping score.",
       );
-    } else if (choice === 'tournament') {
+    } else if (choice === "tournament") {
       applyDelta({ confidence: +6, mood: +6, health: +3, energy: -4 });
       setResultText(
-        'You set up a friendly mini‑tournament, taking turns and celebrating each win with high‑fives. The light competition adds excitement without pressure.'
+        "You set up a friendly mini‑tournament, taking turns and celebrating each win with high‑fives. The light competition adds excitement without pressure.",
       );
     }
-    setStep('result');
+    setStep("result");
   };
 
   const renderIntro = () => (
@@ -365,7 +371,7 @@ export default function OutdoorsActivities() {
     </Section>
   );
 
-  let imageKey = 'lake';
+  let imageKey: keyof typeof OUTDOOR_IMAGES = "lake";
   if (activity === 'walk') {
     imageKey = 'walk';
   } else if (activity === 'fish') {
