@@ -78,7 +78,7 @@ export default function ParkingLot() {
       setCurrentImage(parkedCloseImg);
       setStep(2);
     } else if (choice === "far") {
-      applyDelta({ energy: -7, confidnece: +6, mood: +5, health: +6 });
+      applyDelta({ energy: -7, confidence: +6, mood: +5, health: +6 });
       setCurrentImage(parkedImg);
       setScene("walking");
       setStep(1);
