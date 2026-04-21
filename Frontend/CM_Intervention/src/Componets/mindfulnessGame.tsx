@@ -34,7 +34,6 @@ const INITIAL_STATS = {
     energy: 50,
 };
 
-/** Short phrase (button) and fuller meaning (shown after you tap). */
 type PhraseSpec = {
     id: string;
     label: React.ReactNode;
@@ -42,6 +41,9 @@ type PhraseSpec = {
     delta: StatDelta;
     imageSrc?: string;
 };
+
+/** Short phrase (button) and fuller meaning (shown after you tap). */
+// TODO: include images
 const PHRASES: PhraseSpec[] = [
     {
         id: "focus-feel",
@@ -208,7 +210,10 @@ export default function MindfulnessGame() {
             ) : (
                 <>
                     {currentPhrase.imageSrc != undefined && (
-                        <ActivityImage src={currentPhrase.imageSrc} />
+                        <ActivityImage
+                            src={currentPhrase.imageSrc}
+                            subtitle={currentPhrase.label}
+                        />
                     )}
                     <Section>
                         <Title>Why this helps</Title>
