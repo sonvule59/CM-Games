@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { rcStyles } from '../Static/rockClimbingStyles';
-import { ActionPanel } from './ActionPanel.tsx';
+import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 import pullingUpLakeImg from '../images/pullingUpLake.png';
 import walkingLakeImg from '../images/walkingLake.png';
@@ -9,6 +8,19 @@ import guyFishingImg from '../images/guyFishing.png';
 import catchFishImg from '../images/catchFish.png';
 import golfingImg from '../images/golfing.png';
 import bocceBallImg from '../images/bocceBall.png';
+import {
+  BackButton,
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderSubtitle,
+  MainTitle,
+  Paragraph,
+  Section,
+  Title,
+  TopRow,
+} from "./Layout.tsx";
+import ActivityImage from "./ActivityImage.tsx";
 
 /**
  * OutdoorsActivities: a simple, choice-based mini‑game set at a lakeside park.
@@ -21,7 +33,7 @@ export default function OutdoorsActivities() {
   const initialStats = {
     confidence: 50,
     mood: 50,
-    mobility: 50,
+    health: 50,
     energy: 100,
   };
 
@@ -44,13 +56,13 @@ export default function OutdoorsActivities() {
     setStep('activityIntro');
     setResultText('');
     if (nextActivity === 'walk') {
-      applyDelta({ confidence: +2, mood: +3, mobility: +4, energy: -2 });
+      applyDelta({ confidence: +2, mood: +3, health: +4, energy: -2 });
     } else if (nextActivity === 'fish') {
-      applyDelta({ confidence: +2, mood: +4, mobility: +1, energy: -1 });
+      applyDelta({ confidence: +2, mood: +4, health: +1, energy: -1 });
     } else if (nextActivity === 'golf') {
-      applyDelta({ confidence: +4, mood: +2, mobility: +2, energy: -3 });
+      applyDelta({ confidence: +4, mood: +2, health: +2, energy: -3 });
     } else if (nextActivity === 'bocce') {
-      applyDelta({ confidence: +3, mood: +5, mobility: +2, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, health: +2, energy: -2 });
     }
   };
 
@@ -59,7 +71,7 @@ export default function OutdoorsActivities() {
       statsUpdate(prev, {
         confidence: delta.confidence ?? 0,
         mood: delta.mood ?? 0,
-        mobility: delta.mobility ?? 0,
+        health: delta.health ?? 0,
         energy: delta.energy ?? 0,
       }),
     );
@@ -78,12 +90,12 @@ export default function OutdoorsActivities() {
 
   const handleFishingChoice = (choice) => {
     if (choice === 'catch') {
-      applyDelta({ confidence: +8, mood: +5, mobility: +2, energy: -5 });
+      applyDelta({ confidence: +8, mood: +5, health: +2, energy: -5 });
       setResultText(
         'You cast your line and feel a steady tug. After a quiet moment of waiting, you reel in a fish and take a second to enjoy the view before deciding what comes next.'
       );
     } else if (choice === 'back') {
-      applyDelta({ confidence: +2, mood: +4, mobility: +1, energy: +2 });
+      applyDelta({ confidence: +2, mood: +4, health: +1, energy: +2 });
       setResultText(
         'You enjoy the gentle sounds of the water for a bit, then decide to head back to the shoreline, feeling relaxed and ready for the rest of the day.'
       );
@@ -94,12 +106,12 @@ export default function OutdoorsActivities() {
   // You can adjust these later if you want different situations.
   const handleWalkChoice = (choice) => {
     if (choice === 'short') {
-      applyDelta({ confidence: +3, mood: +5, mobility: +4, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, health: +4, energy: -2 });
       setResultText(
         'You choose a shorter loop along the water, noticing birds, trees, and the way the light hits the lake. It feels like just enough movement to clear your head.'
       );
     } else if (choice === 'long') {
-      applyDelta({ confidence: +5, mood: +6, mobility: +8, energy: -6 });
+      applyDelta({ confidence: +5, mood: +6, health: +8, energy: -6 });
       setResultText(
         'You follow a longer trail that winds through the trees. You take your time, stop for a few photos, and return feeling refreshed and grounded.'
       );
@@ -109,12 +121,12 @@ export default function OutdoorsActivities() {
 
   const handleGolfChoice = (choice) => {
     if (choice === 'drives') {
-      applyDelta({ confidence: +6, mood: +3, mobility: +2, energy: -5 });
+      applyDelta({ confidence: +6, mood: +3, health: +2, energy: -5 });
       setResultText(
         'You focus on easy, smooth swings at the driving range. Instead of chasing perfection, you enjoy the rhythm of each shot and the wide‑open sky.'
       );
     } else if (choice === 'shortGame') {
-      applyDelta({ confidence: +4, mood: +4, mobility: +1, energy: -3 });
+      applyDelta({ confidence: +4, mood: +4, health: +1, energy: -3 });
       setResultText(
         'You practice gentle putts and chips on the green. The slower pace lets you notice small improvements and enjoy being outside.'
       );
@@ -124,12 +136,12 @@ export default function OutdoorsActivities() {
 
   const handleBocceChoice = (choice) => {
     if (choice === 'casual') {
-      applyDelta({ confidence: +4, mood: +7, mobility: +2, energy: -2 });
+      applyDelta({ confidence: +4, mood: +7, health: +2, energy: -2 });
       setResultText(
         'You play a relaxed round of bocce with friends, laughing at wild throws and cheering for close shots. The game becomes more about connection than keeping score.'
       );
     } else if (choice === 'tournament') {
-      applyDelta({ confidence: +6, mood: +6, mobility: +3, energy: -4 });
+      applyDelta({ confidence: +6, mood: +6, health: +3, energy: -4 });
       setResultText(
         'You set up a friendly mini‑tournament, taking turns and celebrating each win with high‑fives. The light competition adds excitement without pressure.'
       );
@@ -138,42 +150,43 @@ export default function OutdoorsActivities() {
   };
 
   const renderIntro = () => (
-    <div className={rcStyles.section}>
-      <h2 className={rcStyles.title}>Pulling Up to the Lake</h2>
-      <p className={rcStyles.paragraph}>
-        Looking around, you notice a few options that all sound appealing. There&apos;s a trail that
-        winds around the shoreline, people fishing quietly from a dock, a small golf area, and a spot
-        set up for bocce ball.
-      </p>
-      <p className={rcStyles.paragraph}>
-        There&apos;s no right or wrong choice here&mdash;just pick what feels interesting for you
-        today.
-      </p>
+    <Section>
+      <Title>Pulling Up to the Lake</Title>
+      <Paragraph>
+        Looking around, you notice a few options that all sound appealing.
+        There&apos;s a trail that winds around the shoreline, people fishing
+        quietly from a dock, a small golf area, and a spot set up for bocce
+        ball.
+      </Paragraph>
+      <Paragraph>
+        There&apos;s no right or wrong choice here&mdash;just pick what feels
+        interesting for you today.
+      </Paragraph>
       <ActionPanel
         actions={[
           {
-            id: 'act-walk',
-            label: 'Walk a lakeside trail',
-            action: () => handleSelectActivity('walk'),
+            id: "act-walk",
+            label: "Walk a lakeside trail",
+            action: () => handleSelectActivity("walk"),
           },
           {
-            id: 'act-fish',
-            label: 'Fish at the lake',
-            action: () => handleSelectActivity('fish'),
+            id: "act-fish",
+            label: "Fish at the lake",
+            action: () => handleSelectActivity("fish"),
           },
           {
-            id: 'act-golf',
-            label: 'Play a little golf',
-            action: () => handleSelectActivity('golf'),
+            id: "act-golf",
+            label: "Play a little golf",
+            action: () => handleSelectActivity("golf"),
           },
           {
-            id: 'act-bocce',
-            label: 'Play bocce ball',
-            action: () => handleSelectActivity('bocce'),
+            id: "act-bocce",
+            label: "Play bocce ball",
+            action: () => handleSelectActivity("bocce"),
           },
         ]}
       />
-    </div>
+    </Section>
   );
 
   const renderActivityIntro = () => {
@@ -201,26 +214,26 @@ export default function OutdoorsActivities() {
     }
 
     return (
-      <div className={rcStyles.section}>
-        <h2 className={rcStyles.title}>{title}</h2>
-        <p className={rcStyles.paragraph}>{body}</p>
-        <ActionPanel
+      <Section>
+        <Title>{title}</Title>
+        <Paragraph>{body}</Paragraph>
+        <SecondaryActionPanel
           actions={[
             {
-              id: 'intro-continue',
-              className: rcStyles.primaryButton,
-              label: 'Continue',
+              id: "intro-continue",
+              isPrimary: true,
+              label: "Continue",
               action: goToChoices,
             },
             {
-              id: 'intro-back',
-              className: rcStyles.secondaryButton,
-              label: 'Back to the lake options',
+              id: "intro-back",
+              isPrimary: false,
+              label: "Back to the lake options",
               action: backToLake,
             },
           ]}
         />
-      </div>
+      </Section>
     );
   };
 
@@ -229,105 +242,106 @@ export default function OutdoorsActivities() {
 
     if (activity === 'fish') {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>How do you want to fish?</h2>
-          <p className={rcStyles.paragraph}>
-            You have your line ready and the water is calm. You can lean into the moment or keep it
-            brief, depending on what feels best.
-          </p>
+        <Section>
+          <Title>How do you want to fish?</Title>
+          <Paragraph>
+            You have your line ready and the water is calm. You can lean into
+            the moment or keep it brief, depending on what feels best.
+          </Paragraph>
           <ActionPanel
             actions={[
               {
-                id: 'fish-catch',
-                label: 'Try to catch a fish',
-                action: () => handleFishingChoice('catch'),
+                id: "fish-catch",
+                label: "Try to catch a fish",
+                action: () => handleFishingChoice("catch"),
               },
               {
-                id: 'fish-back',
-                label: 'Sit for a bit, then head back',
-                action: () => handleFishingChoice('back'),
+                id: "fish-back",
+                label: "Sit for a bit, then head back",
+                action: () => handleFishingChoice("back"),
               },
             ]}
           />
-        </div>
+        </Section>
       );
     }
 
     if (activity === 'walk') {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Choosing your walk</h2>
-          <p className={rcStyles.paragraph}>
-            You look down the shoreline and see paths of different lengths. Both options can be a
-            good fit&mdash;it just depends on what your body is asking for today.
-          </p>
+        <Section>
+          <Title>Choosing your walk</Title>
+          <Paragraph>
+            You look down the shoreline and see paths of different lengths. Both
+            options can be a good fit&mdash;it just depends on what your body is
+            asking for today.
+          </Paragraph>
           <ActionPanel
             actions={[
               {
-                id: 'walk-short',
-                label: 'Take a shorter, slower loop',
-                action: () => handleWalkChoice('short'),
+                id: "walk-short",
+                label: "Take a shorter, slower loop",
+                action: () => handleWalkChoice("short"),
               },
               {
-                id: 'walk-long',
-                label: 'Explore a longer trail',
-                action: () => handleWalkChoice('long'),
+                id: "walk-long",
+                label: "Explore a longer trail",
+                action: () => handleWalkChoice("long"),
               },
             ]}
           />
-        </div>
+        </Section>
       );
     }
 
     if (activity === 'golf') {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>How do you want to play?</h2>
-          <p className={rcStyles.paragraph}>
-            You have access to a simple practice area. You can keep things light and playful while
-            focusing on one part of your swing.
-          </p>
+        <Section>
+          <Title>How do you want to play?</Title>
+          <Paragraph>
+            You have access to a simple practice area. You can keep things light
+            and playful while focusing on one part of your swing.
+          </Paragraph>
           <ActionPanel
             actions={[
               {
-                id: 'golf-drives',
-                label: 'Hit some easy drives',
-                action: () => handleGolfChoice('drives'),
+                id: "golf-drives",
+                label: "Hit some easy drives",
+                action: () => handleGolfChoice("drives"),
               },
               {
-                id: 'golf-short',
-                label: 'Practice your short game',
-                action: () => handleGolfChoice('shortGame'),
+                id: "golf-short",
+                label: "Practice your short game",
+                action: () => handleGolfChoice("shortGame"),
               },
             ]}
           />
-        </div>
+        </Section>
       );
     }
 
     if (activity === 'bocce') {
       return (
-        <div className={rcStyles.section}>
-          <h2 className={rcStyles.title}>Setting the vibe for bocce</h2>
-          <p className={rcStyles.paragraph}>
-            You&apos;ve got the court, the balls, and some people who are up for a game. You can keep
-            it as relaxed or as structured as you want.
-          </p>
+        <Section>
+          <Title>Setting the vibe for bocce</Title>
+          <Paragraph>
+            You&apos;ve got the court, the balls, and some people who are up for
+            a game. You can keep it as relaxed or as structured as you want.
+          </Paragraph>
           <ActionPanel
             actions={[
               {
-                id: 'bocce-casual',
-                label: 'Play a casual, low‑key game',
-                action: () => handleBocceChoice('casual'),
+                id: "bocce-casual",
+                label: "Play a casual, low‑key game",
+                action: () => handleBocceChoice("casual"),
               },
               {
-                id: 'bocce-tourney',
-                label: 'Make a tiny, friendly tournament',
-                action: () => handleBocceChoice('tournament'),
+                id: "bocce-tourney",
+                label: "Make a tiny, friendly tournament",
+                action: () => handleBocceChoice("tournament"),
               },
             ]}
           />
-        </div>
+        </Section>
       );
     }
 
@@ -335,20 +349,20 @@ export default function OutdoorsActivities() {
   };
 
   const renderResult = () => (
-    <div className={rcStyles.section}>
-      <h2 className={rcStyles.title}>How it plays out</h2>
-      <p className={rcStyles.paragraph}>{resultText}</p>
-      <ActionPanel
+    <Section>
+      <Title>How it plays out</Title>
+      <Paragraph>{resultText}</Paragraph>
+      <SecondaryActionPanel
         actions={[
           {
-            id: 'result-back',
-            className: rcStyles.secondaryButton,
-            label: 'Back to the lake options',
+            id: "result-back",
+            isPrimary: false,
+            label: "Back to the lake options",
             action: backToLake,
           },
         ]}
       />
-    </div>
+    </Section>
   );
 
   let imageKey = 'lake';
@@ -363,40 +377,29 @@ export default function OutdoorsActivities() {
   }
 
   return (
-    <div className={rcStyles.container}>
-      <div className={rcStyles.header}>
-        <div className={rcStyles.headerLeft}>
-          <h1 className={rcStyles.mainTitle}>Day at the Lake</h1>
-          <p className={rcStyles.headerSubtitle}>
-            Choose how you&apos;d like to spend time outdoors&mdash;each path gives you a slightly
-            different way to enjoy the day.
-          </p>
-        </div>
-        <button
-          className={rcStyles.secondaryButton}
-          onClick={() => navigate('/')}
-        >
-          Back to Home
-        </button>
-      </div>
+    <Container>
+      <Header>
+        <HeaderLeft>
+          <MainTitle>Day at the Lake</MainTitle>
+          <HeaderSubtitle>
+            Choose how you&apos;d like to spend time outdoors&mdash;each path
+            gives you a slightly different way to enjoy the day.
+          </HeaderSubtitle>
+        </HeaderLeft>
+        <BackButton onClick={() => navigate("/")}>Back to Home</BackButton>
+      </Header>
 
-      <div className={rcStyles.sceneImageWrap}>
-        <img
-          src={OUTDOOR_IMAGES[imageKey]}
-          alt=""
-          className={rcStyles.sceneImage}
-        />
-      </div>
+      <ActivityImage src={OUTDOOR_IMAGES[imageKey]} />
 
-      <div className={rcStyles.topRow}>
+      <TopRow>
         <StatsPanel stats={stats} />
-      </div>
+      </TopRow>
 
-      {step === 'intro' && renderIntro()}
-      {step === 'activityIntro' && renderActivityIntro()}
-      {step === 'activityChoice' && renderActivityChoices()}
-      {step === 'result' && renderResult()}
-    </div>
+      {step === "intro" && renderIntro()}
+      {step === "activityIntro" && renderActivityIntro()}
+      {step === "activityChoice" && renderActivityChoices()}
+      {step === "result" && renderResult()}
+    </Container>
   );
 }
 

@@ -1,6 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { s } from "../Static/officestyles.js";
+import {
+  Container,
+  Header,
+  HeaderLeft,
+  HeaderSubtitle,
+  MainTitle,
+  Paragraph,
+  PrimaryButton,
+  ResetButton,
+  ScenePill,
+  Section,
+  Title,
+  TopRow,
+} from "./Layout.js";
+import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.js";
+import { StatDeltaViewer, StatsPanel } from "./StatsPanel.js";
+import ActivityImage from "./ActivityImage.js";
 
 // ── Images ────────────────────────────────────────────────────────────────────
 const busStopImg     = "/assets/Images/Woman_heading_to_bus_stop.png";
@@ -23,14 +39,8 @@ const SCENE_IMAGES = {
 };
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const INITIAL_STATS = { Confidence: 50, Mood: 50, Health: 50, Energy: 100 };
-const STAT_COLORS = {
-  Confidence: "#facc15",
-  Mood:       "#22c55e",
-  Health:     "#3b82f6",
-  Energy:     "#ef4444",
-};
-const STAT_KEYS = ["Confidence", "Mood", "Health", "Energy"];
+const INITIAL_STATS = { confidence: 50, mood: 50, health: 50, energy: 100 };
+const STAT_KEYS = ["confidence", "mood", "health", "energy"];
 
 const SCENE_LABELS = {
   start:       "Leaving the house",
@@ -48,7 +58,12 @@ export default function TransportGame() {
   const [stats, setStats]           = useState(INITIAL_STATS);
   const [scene, setScene]           = useState("start");
   const [step, setStep]             = useState(0);
-  const [lastDelta, setLastDelta]   = useState({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 });
+  const [lastDelta, setLastDelta] = useState({
+    energy: 0,
+    mood: 0,
+    confidence: 0,
+    health: 0,
+  });
   const [resultText, setResultText] = useState("");
   const [transitChoice, setTransitChoice] = useState(null); // 'stairs' | 'escalator'
   const [waitChoice, setWaitChoice]       = useState(null); // 'walk' | 'stand'
@@ -63,10 +78,10 @@ export default function TransportGame() {
       return next;
     });
     setLastDelta({
-      Energy:     delta.Energy     || 0,
-      Mood:       delta.Mood       || 0,
-      Confidence: delta.Confidence || 0,
-      Health:     delta.Health     || 0,
+      energy: delta.energy || 0,
+      mood: delta.mood || 0,
+      confidence: delta.confidence || 0,
+      health: delta.health || 0,
     });
   };
 
@@ -74,7 +89,7 @@ export default function TransportGame() {
     setStats(INITIAL_STATS);
     setScene("start");
     setStep(0);
-    setLastDelta({ Energy: 0, Mood: 0, Confidence: 0, Health: 0 });
+    setLastDelta({ energy: 0, mood: 0, confidence: 0, health: 0 });
     setResultText("");
     setTransitChoice(null);
     setWaitChoice(null);
@@ -85,15 +100,15 @@ export default function TransportGame() {
   const handleModeChoice = (mode) => {
     setCommuteMode(mode);
     if (mode === "walk") {
-      applyDelta({ Energy: -8, Mood: +12, Confidence: +10, Health: +15 });
+      applyDelta({ energy: -8, mood: +12, confidence: +10, health: +15 });
       setScene("walk");
       setStep(1);
     } else if (mode === "bike") {
-      applyDelta({ Energy: -10, Mood: +15, Confidence: +12, Health: +18 });
+      applyDelta({ energy: -10, mood: +15, confidence: +12, health: +18 });
       setScene("bike");
       setStep(1);
     } else if (mode === "transit") {
-      applyDelta({ Energy: -3, Mood: +6, Confidence: +5, Health: +5 });
+      applyDelta({ energy: -3, mood: +6, confidence: +5, health: +5 });
       setScene("transit");
       setStep(1);
     }
@@ -103,12 +118,12 @@ export default function TransportGame() {
   const handleStairsChoice = (choice) => {
     setTransitChoice(choice);
     if (choice === "stairs") {
-      applyDelta({ Energy: -5, Mood: +8, Confidence: +8, Health: +12 });
+      applyDelta({ energy: -5, mood: +8, confidence: +8, health: +12 });
       setScene("stairs");
       setStep(3); // → stairs result → then wait choice
       setResultText("You take the stairs at your own pace, one step at a time. Your legs wake up and your heart rate lifts just enough to feel good.");
     } else {
-      applyDelta({ Energy: -1, Mood: +4, Confidence: +3, Health: +2 });
+      applyDelta({ energy: -1, mood: +4, confidence: +3, health: +2 });
       setScene("transit");
       setStep(3);
       setResultText("You take the escalator, standing to the right. No rush — you're saving energy for the day ahead. That's a valid choice too.");
@@ -119,42 +134,17 @@ export default function TransportGame() {
   const handleWaitChoice = (choice) => {
     setWaitChoice(choice);
     if (choice === "walk") {
-      applyDelta({ Energy: -3, Mood: +10, Confidence: +6, Health: +8 });
+      applyDelta({ energy: -3, mood: +10, confidence: +6, health: +8 });
       setScene("subwaywait");
       setStep(5);
       setResultText("You pace the platform gently, earphones in, watching the tunnel. Movement while you wait — every bit counts. 🚇");
     } else {
-      applyDelta({ Energy: +2, Mood: +6, Confidence: +4, Health: +2 });
+      applyDelta({ energy: +2, mood: +6, confidence: +4, health: +2 });
       setScene("subwaywait");
       setStep(5);
       setResultText("You find a bench and sit, breathing slowly. Rest is productive too. You arrive calm and ready. 🧘");
     }
   };
-
-  // ── Helpers ─────────────────────────────────────────────────────────────────
-  const renderDeltaList = () => {
-    const items = STAT_KEYS.filter((k) => lastDelta[k] !== 0).map((k) => {
-      const v = lastDelta[k];
-      return (
-        <li key={k} className={s.deltaItem}>
-          {v > 0 ? "+" : ""}{v} {k}
-        </li>
-      );
-    });
-    return items.length
-      ? items
-      : <li className={s.deltaItem}>No recent changes.</li>;
-  };
-
-  const renderStatsBar = (label, value, color) => (
-    <div className={s.statRow} key={label}>
-      <div className={s.statLabel}>{label}</div>
-      <div className={s.barOuter}>
-        <div className={s.barInner} style={{ width: `${value}%`, backgroundColor: color }} />
-      </div>
-      <div className={s.statValue}>{value}</div>
-    </div>
-  );
 
   // ── Scene renderer ──────────────────────────────────────────────────────────
   const renderScene = () => {
@@ -162,169 +152,193 @@ export default function TransportGame() {
     // ── Step 0: Choose your commute ──
     if (step === 0) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>How are you getting in today?</h2>
-          <p className={s.paragraph}>
-            Every commute is a chance to move your body. Pick what works for you — there's no wrong answer.
-          </p>
-          <div className={s.taskGrid}>
-            {[
-              { id: "walk",    icon: "🚶", name: "Walk",    desc: "Fresh air, your pace" },
-              { id: "bike",    icon: "🚴", name: "Bike",    desc: "Two wheels, good vibes" },
-              { id: "transit", icon: "🚇", name: "Transit", desc: "Bus or subway" },
-            ].map((m) => (
-              <button key={m.id} className={s.taskCard} onClick={() => handleModeChoice(m.id)}>
-                <span className={s.taskIcon}>{m.icon}</span>
-                <span className={s.taskName}>{m.name}</span>
-                <span className={s.taskDesc}>{m.desc}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <Section>
+          <Title>How are you getting in today?</Title>
+          <Paragraph>
+            Every commute is a chance to move your body. Pick what works for you
+            — there's no wrong answer.
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                id: "walk",
+                icon: "🚶",
+                name: "Walk",
+                desc: "Fresh air, your pace",
+              },
+              {
+                id: "bike",
+                icon: "🚴",
+                name: "Bike",
+                desc: "Two wheels, good vibes",
+              },
+              {
+                id: "transit",
+                icon: "🚇",
+                name: "Transit",
+                desc: "Bus or subway",
+              },
+            ].map((m) => ({
+              id: m.id,
+              onClick: () => handleModeChoice(m.id),
+              icon: m.icon,
+              name: m.name,
+              desc: m.desc,
+            }))}
+          />
+        </Section>
       );
     }
 
     // ── Walk: step 1 (intro + result) ──
     if (scene === "walk" && step === 1) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>Walking to Work 🚶</h2>
-          <p className={s.paragraph}>
-            You step outside and the morning air hits your face. No screen, no seat — just you and the pavement.
-            Your body is already thanking you.
-          </p>
-          <p className={s.paragraph}>
-            You take your time, noticing things you'd miss from a window. A good start to the day.
-          </p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>Recent changes</h3>
-            <ul className={s.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button className={s.primaryButton} onClick={() => setStep(99)}>
+        <Section>
+          <Title>Walking to Work 🚶</Title>
+          <Paragraph>
+            You step outside and the morning air hits your face. No screen, no
+            seat — just you and the pavement. Your body is already thanking you.
+          </Paragraph>
+          <Paragraph>
+            You take your time, noticing things you'd miss from a window. A good
+            start to the day.
+          </Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => setStep(99)}>
             You've arrived! 🏢
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
     // ── Bike: step 1 (intro + result) ──
     if (scene === "bike" && step === 1) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>Cycling In 🚴</h2>
-          <p className={s.paragraph}>
-            You clip in and push off. The bike lane opens up and you find your rhythm — legs turning,
-            wind at your back, brain fully awake before you've even had coffee.
-          </p>
-          <p className={s.paragraph}>
-            This is the good stuff. Body moving, mind clear, arriving with energy to spare.
-          </p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>Recent changes</h3>
-            <ul className={s.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button className={s.primaryButton} onClick={() => setStep(99)}>
+        <Section>
+          <Title>Cycling In 🚴</Title>
+          <Paragraph>
+            You clip in and push off. The bike lane opens up and you find your
+            rhythm — legs turning, wind at your back, brain fully awake before
+            you've even had coffee.
+          </Paragraph>
+          <Paragraph>
+            This is the good stuff. Body moving, mind clear, arriving with
+            energy to spare.
+          </Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => setStep(99)}>
             You've arrived! 🏢
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
     // ── Transit: step 1 — walking to bus stop ──
     if (scene === "transit" && step === 1) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>Heading to the Bus Stop 🚌</h2>
-          <p className={s.paragraph}>
-            You grab your bag and head out. The walk to the stop is short but it counts —
-            legs moving, fresh air, easing into the day.
-          </p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>Recent changes</h3>
-            <ul className={s.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button className={s.primaryButton} onClick={() => setStep(2)}>
+        <Section>
+          <Title>Heading to the Bus Stop 🚌</Title>
+          <Paragraph>
+            You grab your bag and head out. The walk to the stop is short but it
+            counts — legs moving, fresh air, easing into the day.
+          </Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => setStep(2)}>
             You're at the subway 🚇
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
     // ── Transit: step 2 — stairs or escalator ──
     if (scene === "transit" && step === 2) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>Stairs or escalator? 🚇</h2>
-          <p className={s.paragraph}>
-            You're at the entrance. Both get you down — one just works a little harder for you.
-            What feels right today?
-          </p>
-          <div className={s.buttonGroup}>
-            <button className={s.button} onClick={() => handleStairsChoice("stairs")}>
-              Take the stairs
-            </button>
-            <button className={s.button} onClick={() => handleStairsChoice("escalator")}>
-              Take the escalator
-            </button>
-          </div>
-        </div>
+        <Section>
+          <Title>Stairs or escalator? 🚇</Title>
+          <Paragraph>
+            You're at the entrance. Both get you down — one just works a little
+            harder for you. What feels right today?
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                id: "stairs",
+                onClick() {
+                  handleStairsChoice("stairs");
+                },
+                label: <>Take the stairs</>,
+              },
+              {
+                id: "escalator",
+                onClick() {
+                  handleStairsChoice("escalator");
+                },
+                label: <>Take the escalator</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     // ── Transit: step 3 — stairs/escalator result → ask about waiting ──
     if ((scene === "stairs" || scene === "transit") && step === 3) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>
+        <Section>
+          <Title>
             {transitChoice === "stairs" ? "Nice work! 💪" : "On your way down"}
-          </h2>
-          <p className={s.paragraph}>{resultText}</p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>Recent changes</h3>
-            <ul className={s.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button className={s.primaryButton} onClick={() => setStep(4)}>
+          </Title>
+          <Paragraph>{resultText}</Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => setStep(4)}>
             Now wait for the train 🚇
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
     // ── Transit: step 4 — walk the platform or stand? ──
     if (step === 4) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>While you wait… 🚇</h2>
-          <p className={s.paragraph}>
-            The train's a few minutes away. The platform stretches out in both directions.
-            What do you feel like doing?
-          </p>
-          <div className={s.buttonGroup}>
-            <button className={s.button} onClick={() => handleWaitChoice("walk")}>
-              Walk up and down the platform
-            </button>
-            <button className={s.button} onClick={() => handleWaitChoice("stand")}>
-              Find a spot and rest
-            </button>
-          </div>
-        </div>
+        <Section>
+          <Title>While you wait… 🚇</Title>
+          <Paragraph>
+            The train's a few minutes away. The platform stretches out in both
+            directions. What do you feel like doing?
+          </Paragraph>
+          <ActionPanel
+            actions={[
+              {
+                id: "walk",
+                onClick() {
+                  handleWaitChoice("walk");
+                },
+                label: <>Walk up and down the platform</>,
+              },
+              {
+                id: "stand",
+                onClick() {
+                  handleWaitChoice("stand");
+                },
+                label: <>Find a spot and rest</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
     // ── Transit: step 5 — platform result → arrived ──
     if (scene === "subwaywait" && step === 5) {
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>On the train! 🚇</h2>
-          <p className={s.paragraph}>{resultText}</p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>Recent changes</h3>
-            <ul className={s.deltaList}>{renderDeltaList()}</ul>
-          </div>
-          <button className={s.primaryButton} onClick={() => setStep(99)}>
+        <Section>
+          <Title>On the train! 🚇</Title>
+          <Paragraph>{resultText}</Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <PrimaryButton onClick={() => setStep(99)}>
             You've arrived! 🏢
-          </button>
-        </div>
+          </PrimaryButton>
+        </Section>
       );
     }
 
@@ -332,31 +346,30 @@ export default function TransportGame() {
     if (step === 99) {
       const modeEmoji = { walk: "🚶", bike: "🚴", transit: "🚇" };
       return (
-        <div className={s.section}>
-          <h2 className={s.title}>You made it! {modeEmoji[commuteMode]} 🏢</h2>
-          <p className={s.paragraph}>
-            You're here, you moved your body to get here, and that already puts you ahead.
-            Time to take on the day.
-          </p>
-          <div className={s.deltaContainer}>
-            <h3 className={s.subtitle}>How you arrived</h3>
-            <ul className={s.deltaList}>
-              {STAT_KEYS.map((k) => (
-                <li key={k} className={s.deltaItem}>
-                  {k}: {stats[k]}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className={s.buttonRow}>
-            <button className={s.primaryButton} onClick={() => navigate("/office/game")}>
-              Head to the office 💼
-            </button>
-            <button className={s.secondaryButton} onClick={resetGame}>
-              Try a different commute
-            </button>
-          </div>
-        </div>
+        <Section>
+          <Title>You made it! {modeEmoji[commuteMode]} 🏢</Title>
+          <Paragraph>
+            You're here, you moved your body to get here, and that already puts
+            you ahead. Time to take on the day.
+          </Paragraph>
+          <StatDeltaViewer delta={lastDelta} />
+          <SecondaryActionPanel
+            actions={[
+              {
+                key: "navigateToOffice",
+                isPrimary: true,
+                onClick: () => navigate("/office/game"),
+                label: <>Head to the office 💼</>,
+              },
+              {
+                key: "resetGame",
+                isPrimary: false,
+                onClick: resetGame,
+                label: <>Try a different commute</>,
+              },
+            ]}
+          />
+        </Section>
       );
     }
 
@@ -371,38 +384,30 @@ export default function TransportGame() {
     : scene;
 
   return (
-    <div className={s.container}>
-
+    <Container>
       {/* Header */}
-      <div className={s.header}>
-        <div className={s.headerLeft}>
-          <h1 className={s.mainTitle}>The Commute</h1>
-          <p className={s.headerSubtitle}>
+      <Header>
+        <HeaderLeft>
+          <MainTitle>The Commute</MainTitle>
+          <HeaderSubtitle>
             Your journey to work starts here — every step counts.
-          </p>
-          <div className={s.scenePill}>{SCENE_LABELS[sceneImageKey] ?? SCENE_LABELS[scene]}</div>
-        </div>
-        <button className={s.resetButton} onClick={resetGame}>Reset</button>
-      </div>
+          </HeaderSubtitle>
+          <ScenePill>
+            {SCENE_LABELS[sceneImageKey] ?? SCENE_LABELS[scene]}
+          </ScenePill>
+        </HeaderLeft>
+        <ResetButton onClick={resetGame} />
+      </Header>
 
       {/* Stats */}
-      <div className={s.topRow}>
-        <div className={s.statsContainer}>
-          <div className={s.statsTitle}>How you're feeling</div>
-          {STAT_KEYS.map((k) => renderStatsBar(k, stats[k], STAT_COLORS[k]))}
-        </div>
-      </div>
+      <TopRow>
+        <StatsPanel stats={stats} />
+      </TopRow>
 
       {/* Scene image */}
-      <div className={s.sceneImageWrap}>
-        <img
-          src={SCENE_IMAGES[sceneImageKey]}
-          alt=""
-          className={s.sceneImage}
-        />
-      </div>
+      <ActivityImage src={SCENE_IMAGES[sceneImageKey]} />
 
       {renderScene()}
-    </div>
+    </Container>
   );
 }

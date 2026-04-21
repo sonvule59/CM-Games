@@ -1,21 +1,20 @@
 import { s } from "../Static/officestyles.js";
 import { useNavigate } from "react-router";
 
-export default function DomesticGameStart() {
+export default function TransportGameStart() {
   const navigate = useNavigate();
   const games = [
-    { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
-    { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },
+    { path: "/transport",  text: "Go to work",             color: "#10b981" },
+    { path: "/transport2", text: "Going to get groceries", color: "#3b82f6" },
   ];
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
 
-      {/* Hero image */}
       <div style={{ position: "relative", width: "100%", height: 340 }}>
         <img
-          src="/assets/Images/cleaningWindows.png"
-          alt="Home activities"
+          src="/assets/Images/Transport_homepage.png"
+          alt="Daily Transport Path"
           style={{
             width: "100%",
             height: "100%",
@@ -32,32 +31,30 @@ export default function DomesticGameStart() {
         }} />
       </div>
 
-      {/* Card content */}
       <div style={{ padding: "0 28px 32px", marginTop: -16, position: "relative" }}>
 
         <div style={{ marginBottom: 12 }}>
-          <span className={s.scenePill}>Home Activities</span>
+          <span className={s.scenePill}>Active Transport</span>
         </div>
 
         <h1
           className={s.mainTitle}
           style={{ fontSize: "2.4rem", lineHeight: 1.1, marginBottom: 10, letterSpacing: "-0.03em" }}
         >
-          Move at home,{" "}
+          Healthy Moves,{" "}
           <span style={{
             background: "linear-gradient(90deg, #6366f1, #10b981)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}>
-            feel the difference.
+            Happy Journeys.
           </span>
         </h1>
 
         <p className={s.paragraph} style={{ maxWidth: 840, marginBottom: 24, fontSize: "0.95rem" }}>
-          You don't need a gym. Everyday tasks and simple movements at home count more than you think — pick what fits your day.
+          Make every move count. Choose the active path today. Small changes in how you move lead to big changes in how you feel.
         </p>
 
-        {/* Stat preview pills */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 28 }}>
           {[
             { label: "Confidence", color: "#fef9c3", text: "#9d174d" },
@@ -80,7 +77,7 @@ export default function DomesticGameStart() {
           ))}
         </div>
 
-        {/* CTA buttons */}
+        {/* CTA buttons — one per game */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {games.map((game) => (
             <button

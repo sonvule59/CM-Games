@@ -9,7 +9,7 @@ export const rcStyles = {
   mainTitle: 'm-0 text-3xl font-extrabold tracking-tight text-slate-900',
   headerSubtitle: 'text-sm text-slate-600',
   resetButton:
-    'px-3 py-1 rounded-full border border-indigo-200 bg-white/80 text-xs font-medium text-indigo-700 shadow-sm cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-colors',
+    'mt-3 px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 cursor-pointer text-sm hover:bg-slate-50 transition-colors',
   scenePill:
     'inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200',
 
