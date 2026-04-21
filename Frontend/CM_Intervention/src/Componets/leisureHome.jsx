@@ -1,14 +1,14 @@
 import { s } from "../Static/officestyles.js";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 export default function leisureHome() {
   const navigate = useNavigate();
 
-  const games = [
+  const games = /** @type {const} */([
     { path: "/rock", text: "Rock Climbing 🧗", color: "#ef4444" },
     { path: "/outdoors", text: "Outdoors Activities (Lake) 🚣‍♂️", color: "#3b82f6" },
     { path: "/walk", text: "Walking Activities 🚶‍♂️", color: "#10b981" },
     { path: "/swim", text: "Swimming Activities 🏊‍♂️", color: "#06b6d4" },
-  ];
+  ]);
   
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
@@ -99,7 +99,7 @@ export default function leisureHome() {
             <button
               key={index}
               className={s.primaryButton}
-              onClick={() => {navigate(game.path)}}
+              onClick={() => { navigate(href(game.path)) }}
               style={{
                 width: "100%",
                 padding: "14px 24px", 

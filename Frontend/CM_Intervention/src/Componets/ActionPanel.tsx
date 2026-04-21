@@ -20,14 +20,6 @@ export type ActionSpec = ({ id: string } | { key: React.Key }) &
     ) &
     Partial<ButtonEventListeners>;
 
-type ActionPanelProps = {
-    title?: React.ReactNode;
-    actions: Array<ActionSpec>;
-} & Omit<
-    React.ComponentPropsWithoutRef<"section">,
-    "children" | "title" | "actions"
->;
-
 function* parseActionSpecs(actions: Iterable<ActionSpec>) {
     const seenActionKeys: Set<React.Key> = new Set();
     for (const actionSpec of actions) {
@@ -100,15 +92,23 @@ function* parseActionSpecs(actions: Iterable<ActionSpec>) {
     }
 }
 
-export function ActionPanel(props: ActionPanelProps) {
-    const { title, actions, ...otherProps } = props;
-    switch (ACTION_BUTTON_STYLE) {
+export function ActionPanel({
+    title,
+    actions,
+    buttonStyle = ACTION_BUTTON_STYLE,
+    ...otherProps
+}: {
+    title?: React.ReactNode;
+    actions: Array<ActionSpec>;
+    buttonStyle?: typeof ACTION_BUTTON_STYLE;
+} & Omit<
+    React.ComponentPropsWithoutRef<"section">,
+    "children" | "title" | "actions" | "buttonStyle"
+>) {
+    switch (buttonStyle) {
         default:
-            ACTION_BUTTON_STYLE satisfies never;
-            console.warn(
-                "unrecognized ACTION_BUTTON_STYLE in ActionPanel.tsx:",
-                ACTION_BUTTON_STYLE,
-            );
+            buttonStyle satisfies never;
+            console.warn("unrecognized action button style", buttonStyle);
         case "dylan":
             return (
                 <>
@@ -136,7 +136,6 @@ export function ActionPanel(props: ActionPanelProps) {
                                     onClick={callback}
                                     {...eventListeners}
                                 >
-                                    {icon != undefined && <>{icon} </>}
                                     {label ?? desc}
                                 </button>
                             ),
@@ -166,9 +165,21 @@ export function ActionPanel(props: ActionPanelProps) {
                                     onClick={callback}
                                     {...eventListeners}
                                 >
-                                    <span className={s.taskIcon}>{icon}</span>
-                                    <span className={s.taskName}>{label}</span>
-                                    <span className={s.taskDesc}>{desc}</span>
+                                    {icon != undefined && (
+                                        <span className={s.taskIcon}>
+                                            {icon}
+                                        </span>
+                                    )}
+                                    {label != undefined && (
+                                        <span className={s.taskName}>
+                                            {label}
+                                        </span>
+                                    )}
+                                    {desc != undefined && (
+                                        <span className={s.taskDesc}>
+                                            {desc}
+                                        </span>
+                                    )}
                                 </button>
                             ),
                         )}
@@ -178,8 +189,17 @@ export function ActionPanel(props: ActionPanelProps) {
     }
 }
 
-export function SecondaryActionPanel(props: ActionPanelProps) {
-    const { title, actions, ...otherProps } = props;
+export function SecondaryActionPanel({
+    title,
+    actions,
+    ...otherProps
+}: {
+    title?: React.ReactNode;
+    actions: Array<ActionSpec>;
+} & Omit<
+    React.ComponentPropsWithoutRef<"section">,
+    "children" | "title" | "actions"
+>) {
     return (
         <>
             {title != undefined && <Title>{title}</Title>}
@@ -203,7 +223,6 @@ export function SecondaryActionPanel(props: ActionPanelProps) {
                             onClick={callback}
                             {...eventListeners}
                         >
-                            {icon != undefined && <>{icon} </>}
                             {label ?? desc}
                         </button>
                     ),

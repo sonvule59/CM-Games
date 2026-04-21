@@ -1,7 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 import { ActionPanel } from "./ActionPanel.tsx";
-import { statsUpdate, StatsPanel } from "./StatsPanel.tsx";
+import {
+    statsUpdate,
+    StatsPanel,
+    StatDelta,
+    StatDeltaViewer,
+} from "./StatsPanel.tsx";
 import {
     BackButton,
     Container,
@@ -11,6 +16,7 @@ import {
     HeaderSubtitle,
     MainTitle,
     Paragraph,
+    PrimaryButton,
     ResetButton,
     ScenePill,
     SecondaryButton,
@@ -19,6 +25,7 @@ import {
     Title,
     TopRow,
 } from "./Layout.tsx";
+import ActivityImage from "./ActivityImage.tsx";
 
 const INITIAL_STATS = {
     confidence: 50,
@@ -27,8 +34,17 @@ const INITIAL_STATS = {
     energy: 50,
 };
 
+type PhraseSpec = {
+    id: string;
+    label: React.ReactNode;
+    explanation: React.ReactNode;
+    delta: StatDelta;
+    imageSrc?: string;
+};
+
 /** Short phrase (button) and fuller meaning (shown after you tap). */
-const PHRASES = [
+// TODO: include images
+const PHRASES: PhraseSpec[] = [
     {
         id: "focus-feel",
         label: "I can focus on how I feel",
@@ -139,7 +155,9 @@ const PHRASES = [
 export default function MindfulnessGame() {
     const navigate = useNavigate();
     const [stats, setStats] = useState(INITIAL_STATS);
-    const [reflection, setReflection] = useState("");
+    const [currentPhrase, setCurrentPhrase] = useState<PhraseSpec | undefined>(
+        undefined,
+    );
 
     const tasks = useMemo(
         () =>
@@ -148,7 +166,7 @@ export default function MindfulnessGame() {
                 label: phrase.label,
                 action: () => {
                     setStats((prev) => statsUpdate(prev, phrase.delta));
-                    setReflection(phrase.explanation);
+                    setCurrentPhrase(phrase);
                 },
             })),
         [],
@@ -156,7 +174,7 @@ export default function MindfulnessGame() {
 
     const reset = () => {
         setStats(INITIAL_STATS);
-        setReflection("");
+        setCurrentPhrase(undefined);
     };
 
     return (
@@ -171,7 +189,7 @@ export default function MindfulnessGame() {
                     <ScenePill>Gentle practice</ScenePill>
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton onClick={() => navigate("/mindfulness-home")} />
+                    <BackButton onClick={() => navigate(href("/mindfulness-home"))} />
                     <ResetButton onClick={reset} />
                 </HeaderRight>
             </Header>
@@ -180,20 +198,34 @@ export default function MindfulnessGame() {
                 <StatsPanel stats={stats} />
             </TopRow>
 
-            <Section>
-                <Title>Choose a phrase</Title>
-                <Paragraph>
-                    There is no wrong pick—only what feels honest in this
-                    moment.
-                </Paragraph>
-                <ActionPanel id="mindfulness-phrases" actions={tasks} />
-            </Section>
-
-            {reflection !== "" && (
+            {currentPhrase == undefined ? (
                 <Section>
-                    <Subtitle>Why this helps</Subtitle>
-                    <Paragraph>{reflection}</Paragraph>
+                    <Title>Choose a phrase</Title>
+                    <Paragraph>
+                        There is no wrong pick—only what feels honest in this
+                        moment.
+                    </Paragraph>
+                    <ActionPanel id="mindfulness-phrases" actions={tasks} />
                 </Section>
+            ) : (
+                <>
+                    {currentPhrase.imageSrc != undefined && (
+                        <ActivityImage
+                            src={currentPhrase.imageSrc}
+                            subtitle={currentPhrase.label}
+                        />
+                    )}
+                    <Section>
+                        <Title>Why this helps</Title>
+                        <Paragraph>{currentPhrase.explanation}</Paragraph>
+                        <StatDeltaViewer delta={currentPhrase.delta} />
+                        <PrimaryButton
+                            onClick={() => setCurrentPhrase(undefined)}
+                        >
+                            Continue
+                        </PrimaryButton>
+                    </Section>
+                </>
             )}
         </Container>
     );
