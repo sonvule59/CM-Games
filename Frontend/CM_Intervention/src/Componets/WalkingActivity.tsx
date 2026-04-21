@@ -43,7 +43,7 @@ import {
     Title,
     TopRow,
 } from "./Layout";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 
 // WalkingActivity component.
 type WalkingActivityProps = {};
@@ -394,7 +394,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                     )}
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton onClick={() => navigate("/leisure")} />
+                    <BackButton onClick={() => navigate(href("/leisure"))} />
                 </HeaderRight>
             </Header>
             {screenState.screen === "game" && (

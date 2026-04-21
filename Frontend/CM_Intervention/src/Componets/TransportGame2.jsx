@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 import transport2homeImg from "../images/transport2home.png";
 import pedometerImg from "../images/pedometer.png";
 import parkingImg from "../images/transport2parking.png";
@@ -173,7 +173,7 @@ export default function TransportGame2() {
           <Paragraph>{resultText}</Paragraph>
           <StatDeltaViewer delta={totalDelta} />
 
-          <PrimaryButton onClick={() => navigate("/transport")}>
+          <PrimaryButton onClick={() => navigate(href("/transport"))}>
             Go to the other transport game
           </PrimaryButton>
         </Section>

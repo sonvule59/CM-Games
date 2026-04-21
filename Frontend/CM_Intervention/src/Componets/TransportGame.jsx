@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { href, useNavigate } from "react-router-dom";
 import {
   Container,
   Header,
@@ -358,7 +358,7 @@ export default function TransportGame() {
               {
                 key: "navigateToOffice",
                 isPrimary: true,
-                onClick: () => navigate("/office/game"),
+                onClick: () => navigate(href("/office/test")),
                 label: <>Head to the office 💼</>,
               },
               {

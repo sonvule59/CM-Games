@@ -2,7 +2,7 @@
 // This component owns the narrative flow and stat logic; layout / visuals
 // are handled via Tailwind utility sets in `rockClimbingStyles`.
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { href, useNavigate } from 'react-router';
 import enteringGymImg from '../images/enteringGym.png';
 import climbingWallImg from '../images/climbingWall.png';
 import whichRouteImg from '../images/whichRoute.png';
@@ -494,7 +494,7 @@ export default function RockClimbing() {
           <ScenePill>{SCENE_LABELS[scene]}</ScenePill>
         </HeaderLeft>
         <HeaderRight>
-          <BackButton onClick={() => navigate("/")}>Back to Home</BackButton>
+          <BackButton onClick={() => navigate(href("/"))}>Back to Home</BackButton>
           <ResetButton onClick={resetGame}>Reset Game</ResetButton>
         </HeaderRight>
       </Header>
