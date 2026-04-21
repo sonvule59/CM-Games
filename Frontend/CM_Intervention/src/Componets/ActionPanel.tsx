@@ -1,4 +1,4 @@
-const ACTION_BUTTON_STYLE: "dylan" | "kelly" = "kelly";
+const ACTION_BUTTON_STYLE: "dylan" | "kelly" = "dylan";
 
 import { s } from "../Static/officestyles";
 import { rcStyles } from "../Static/rockClimbingStyles";
