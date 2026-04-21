@@ -15,7 +15,12 @@ import {
   TopRow,
 } from "./Layout.js";
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.js";
-import { StatDeltaViewer, StatsPanel } from "./StatsPanel.js";
+import {
+  StatDelta,
+  StatDeltaViewer,
+  StatsPanel,
+  statsUpdate,
+} from "./StatsPanel.js";
 import ActivityImage from "./ActivityImage.js";
 
 // ── Images ────────────────────────────────────────────────────────────────────
@@ -56,7 +61,7 @@ export default function TransportGame() {
   const navigate = useNavigate();
 
   const [stats, setStats]           = useState(INITIAL_STATS);
-  const [scene, setScene]           = useState("start");
+  const [scene, setScene] = useState<keyof typeof SCENE_LABELS>("start");
   const [step, setStep]             = useState(0);
   const [lastDelta, setLastDelta] = useState({
     energy: 0,
@@ -65,18 +70,18 @@ export default function TransportGame() {
     health: 0,
   });
   const [resultText, setResultText] = useState("");
-  const [transitChoice, setTransitChoice] = useState(null); // 'stairs' | 'escalator'
-  const [waitChoice, setWaitChoice]       = useState(null); // 'walk' | 'stand'
-  const [commuteMode, setCommuteMode]     = useState(null); // 'walk' | 'bike' | 'transit'
+  const [transitChoice, setTransitChoice] = useState<
+    "stairs" | "escalator" | null
+  >(null);
+  const [waitChoice, setWaitChoice] = useState<"walk" | "stand" | null>(null);
+  const [commuteMode, setCommuteMode] = useState<
+    "walk" | "bike" | "transit" | null
+  >(null);
 
-  const clamp = (v) => Math.max(0, Math.min(100, Math.round(v)));
+  const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
 
-  const applyDelta = (delta) => {
-    setStats((prev) => {
-      const next = {};
-      STAT_KEYS.forEach((k) => (next[k] = clamp(prev[k] + (delta[k] || 0))));
-      return next;
-    });
+  const applyDelta = (delta: StatDelta) => {
+    setStats((prev) => statsUpdate(prev, delta));
     setLastDelta({
       energy: delta.energy || 0,
       mood: delta.mood || 0,
@@ -97,7 +102,7 @@ export default function TransportGame() {
   };
 
   // ── Mode selection ──────────────────────────────────────────────────────────
-  const handleModeChoice = (mode) => {
+  const handleModeChoice = (mode: "walk" | "bike" | "transit") => {
     setCommuteMode(mode);
     if (mode === "walk") {
       applyDelta({ energy: -8, mood: +12, confidence: +10, health: +15 });
@@ -115,34 +120,42 @@ export default function TransportGame() {
   };
 
   // ── Transit: stairs vs escalator ───────────────────────────────────────────
-  const handleStairsChoice = (choice) => {
+  const handleStairsChoice = (choice: "stairs" | "escalator") => {
     setTransitChoice(choice);
     if (choice === "stairs") {
       applyDelta({ energy: -5, mood: +8, confidence: +8, health: +12 });
       setScene("stairs");
       setStep(3); // → stairs result → then wait choice
-      setResultText("You take the stairs at your own pace, one step at a time. Your legs wake up and your heart rate lifts just enough to feel good.");
+      setResultText(
+        "You take the stairs at your own pace, one step at a time. Your legs wake up and your heart rate lifts just enough to feel good.",
+      );
     } else {
       applyDelta({ energy: -1, mood: +4, confidence: +3, health: +2 });
       setScene("transit");
       setStep(3);
-      setResultText("You take the escalator, standing to the right. No rush — you're saving energy for the day ahead. That's a valid choice too.");
+      setResultText(
+        "You take the escalator, standing to the right. No rush — you're saving energy for the day ahead. That's a valid choice too.",
+      );
     }
   };
 
   // ── Transit: walk the platform vs stand ────────────────────────────────────
-  const handleWaitChoice = (choice) => {
+  const handleWaitChoice = (choice: "walk" | "stand") => {
     setWaitChoice(choice);
     if (choice === "walk") {
       applyDelta({ energy: -3, mood: +10, confidence: +6, health: +8 });
       setScene("subwaywait");
       setStep(5);
-      setResultText("You pace the platform gently, earphones in, watching the tunnel. Movement while you wait — every bit counts. 🚇");
+      setResultText(
+        "You pace the platform gently, earphones in, watching the tunnel. Movement while you wait — every bit counts. 🚇",
+      );
     } else {
       applyDelta({ energy: +2, mood: +6, confidence: +4, health: +2 });
       setScene("subwaywait");
       setStep(5);
-      setResultText("You find a bench and sit, breathing slowly. Rest is productive too. You arrive calm and ready. 🧘");
+      setResultText(
+        "You find a bench and sit, breathing slowly. Rest is productive too. You arrive calm and ready. 🧘",
+      );
     }
   };
 
@@ -159,26 +172,28 @@ export default function TransportGame() {
             — there's no wrong answer.
           </Paragraph>
           <ActionPanel
-            actions={[
-              {
-                id: "walk",
-                icon: "🚶",
-                name: "Walk",
-                desc: "Fresh air, your pace",
-              },
-              {
-                id: "bike",
-                icon: "🚴",
-                name: "Bike",
-                desc: "Two wheels, good vibes",
-              },
-              {
-                id: "transit",
-                icon: "🚇",
-                name: "Transit",
-                desc: "Bus or subway",
-              },
-            ].map((m) => ({
+            actions={(
+              [
+                {
+                  id: "walk",
+                  icon: "🚶",
+                  name: "Walk",
+                  desc: "Fresh air, your pace",
+                },
+                {
+                  id: "bike",
+                  icon: "🚴",
+                  name: "Bike",
+                  desc: "Two wheels, good vibes",
+                },
+                {
+                  id: "transit",
+                  icon: "🚇",
+                  name: "Transit",
+                  desc: "Bus or subway",
+                },
+              ] as const
+            ).map((m) => ({
               id: m.id,
               onClick: () => handleModeChoice(m.id),
               icon: m.icon,
@@ -347,7 +362,7 @@ export default function TransportGame() {
       const modeEmoji = { walk: "🚶", bike: "🚴", transit: "🚇" };
       return (
         <Section>
-          <Title>You made it! {modeEmoji[commuteMode]} 🏢</Title>
+          <Title>You made it! {modeEmoji[commuteMode!]} 🏢</Title>
           <Paragraph>
             You're here, you moved your body to get here, and that already puts
             you ahead. Time to take on the day.

@@ -24,7 +24,7 @@ import {
   Title,
   TopRow,
 } from "./Layout";
-import { StatDeltaViewer, StatsPanel } from "./StatsPanel";
+import { StatDelta, StatDeltaViewer, StatsPanel } from "./StatsPanel";
 import { ActionPanel } from "./ActionPanel";
 import ActivityImage from "./ActivityImage";
 
@@ -60,9 +60,9 @@ export default function TransportGame2() {
 
   const navigate = useNavigate();
 
-  const clamp = (v) => Math.max(0, Math.min(100, v));
+  const clamp = (v: number) => Math.max(0, Math.min(100, v));
 
-  const applyDelta = (delta) => {
+  const applyDelta = (delta: StatDelta) => {
     setStats((prev) => ({
       energy: clamp(prev.energy + (delta.energy || 0)),
       confidence: clamp(prev.confidence + (delta.confidence || 0)),
@@ -96,7 +96,7 @@ export default function TransportGame2() {
     setTotalDelta({ energy: 0, confidence: 0, mood: 0, health: 0 });
   };
 
-  const handleStartChoice = (choice) => {
+  const handleStartChoice = (choice: "walk" | "car") => {
     if (choice === "walk") {
       setMethod("walk");
       applyDelta({ health: +5, energy: -5, mood: +5, confidence: +5 });
@@ -110,7 +110,7 @@ export default function TransportGame2() {
     }
   };
 
-  const handleAppChoice = (use) => {
+  const handleAppChoice = (use: boolean) => {
     setUseApp(use);
     if (use) {
       applyDelta({ health: +1, energy: -1, mood: +4, confidence: +5 });
@@ -119,7 +119,7 @@ export default function TransportGame2() {
     setCurrentImage(longorshortImg);
   };
 
-  const handleCarryChoice = (choice) => {
+  const handleCarryChoice = (choice: "hand" | "cart") => {
     if (choice === "hand") {
       applyDelta({ health: +4, energy: -7, mood: +4, confidence: +7 });
       setResultText(
@@ -136,7 +136,7 @@ export default function TransportGame2() {
     setStep(2);
   };
 
-  const handleRouteChoice = (choice) => {
+  const handleRouteChoice = (choice: "long" | "short") => {
     if (choice === "long") {
       applyDelta({ health: +5, energy: -6, mood: +5, confidence: +6 });
       setResultText("You took the scenic long route home.");
@@ -149,7 +149,7 @@ export default function TransportGame2() {
     setStep(2);
   };
 
-  const handleParkingChoice = (choice) => {
+  const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
       applyDelta({ energy: -3, confidence: +1, mood: +3, health: +1 });
       setResultText(

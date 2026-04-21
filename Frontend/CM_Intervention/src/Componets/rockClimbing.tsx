@@ -14,7 +14,12 @@ import askRoutesImg from '../images/askRoutes.png';
 import gentleMobilityImg from '../images/gentleMobility.png';
 import hardRouteImg from '../images/hardRoute.png';
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
-import { statsUpdate, StatsPanel, StatDeltaViewer } from "./StatsPanel.tsx";
+import {
+  statsUpdate,
+  StatsPanel,
+  StatDeltaViewer,
+  StatDelta,
+} from "./StatsPanel.tsx";
 import {
   BackButton,
   Container,
@@ -68,22 +73,26 @@ export default function RockClimbing() {
 
   const [stats, setStats] = useState(initialStats);
   // scene drives which branch of the story is active.
-  const [scene, setScene] = useState('entrance'); // 'entrance' | 'wall' | 'watch' | 'stretch'
+  const [scene, setScene] = useState<"entrance" | "wall" | "watch" | "stretch">(
+    "entrance",
+  );
   // step is a small state machine inside each scene (intro → choices → result).
-  const [step, setStep] = useState(0); // 0 = entrance, 1 = path intro, 2 = path follow-up choices, 3 = path follow-up result
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0); // 0 = entrance, 1 = path intro, 2 = path follow-up choices, 3 = path follow-up result
   const [lastDelta, setLastDelta] = useState({
     confidence: 0,
     mood: 0,
     health: 0,
     energy: 0,
   });
-  const [resultText, setResultText] = useState('');
-  const [stretchChoice, setStretchChoice] = useState(null); // 'health' | 'easyHolds' | null
-  const [watchChoice, setWatchChoice] = useState(null); // 'cheer' | 'ask' | null
-  const [wallChoice, setWallChoice] = useState(null); // 'easy' | 'hard' | null
+  const [resultText, setResultText] = useState("");
+  const [stretchChoice, setStretchChoice] = useState<
+    "health" | "easyHolds" | null
+  >(null);
+  const [watchChoice, setWatchChoice] = useState<"cheer" | "ask" | null>(null);
+  const [wallChoice, setWallChoice] = useState<"easy" | "hard" | null>(null);
 
   // Apply stat changes in one place; any missing fields default to 0.
-  const applyDelta = (delta) => {
+  const applyDelta = (delta: StatDelta) => {
     setStats((prev) =>
       statsUpdate(prev, {
         confidence: delta.confidence ?? 0,
@@ -124,7 +133,7 @@ export default function RockClimbing() {
   };
 
   // Handle the very first choice from the entrance and move into a branch.
-  const handleEntranceChoice = (choice) => {
+  const handleEntranceChoice = (choice: "wall" | "watch" | "stretch") => {
     if (choice === "wall") {
       applyDelta({ confidence: +8, mood: +5, health: +5, energy: -10 });
       setScene("wall");
@@ -140,7 +149,7 @@ export default function RockClimbing() {
   };
 
   // Wall follow‑ups: easier vs harder route trades energy vs confidence.
-  const handleWallFollowup = (choice) => {
+  const handleWallFollowup = (choice: "easy" | "hard") => {
     setWallChoice(choice);
     if (choice === "easy") {
       applyDelta({ confidence: +6, mood: +4, health: +3, energy: -5 });
@@ -157,7 +166,7 @@ export default function RockClimbing() {
   };
 
   // Watching follow‑ups: social choices that mostly affect mood / confidence.
-  const handleWatchFollowup = (choice) => {
+  const handleWatchFollowup = (choice: "cheer" | "ask") => {
     setWatchChoice(choice);
     if (choice === "cheer") {
       applyDelta({ confidence: +5, mood: +8, health: 0, energy: -1 });
@@ -174,7 +183,7 @@ export default function RockClimbing() {
   };
 
   // Stretch follow‑ups: health vs easy climbing warm‑up, both supportive.
-  const handleStretchFollowup = (choice) => {
+  const handleStretchFollowup = (choice: "health" | "easyHolds") => {
     setStretchChoice(choice);
     if (choice === "health") {
       applyDelta({ confidence: +4, mood: +6, health: +12, energy: -3 });
