@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { href, useNavigate } from 'react-router';
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
 import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
 
@@ -326,8 +326,8 @@ export default function OutsideDomestic() {
         </HeaderLeft>
 
         <HeaderRight>
-          <BackButton onClick={() => navigate("/")}>Main Menu</BackButton>
-          <BackButton onClick={() => navigate("/domestic-home")}>
+          <BackButton onClick={() => navigate(href("/"))}>Main Menu</BackButton>
+          <BackButton onClick={() => navigate(href("/domestic-home"))}>
             Back
           </BackButton>
           <ResetButton onClick={reset}>Reset</ResetButton>

@@ -32,7 +32,7 @@ import {
     TopRow,
 } from "./Layout";
 import { negativeFeedback, positiveFeedback } from "./Feedback";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 
 const STARTING_STATS: Stats = Object.freeze({
     energy: 50,
@@ -248,7 +248,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     <ScenePill>Water activities</ScenePill>
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton onClick={() => navigate("/leisure")} />
+                    <BackButton onClick={() => navigate(href("/leisure"))} />
                 </HeaderRight>
             </Header>
             <TopRow>

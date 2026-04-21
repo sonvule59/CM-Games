@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { href, useNavigate } from "react-router";
 import {
   Container,
   Header,
@@ -33,35 +33,35 @@ export default function HomeOfHomePages() {
               key: "/leisure",
               label: "Leisure",
               callback() {
-                navigate("/leisure");
+                navigate(href("/leisure"));
               },
             },
             {
               key: "/domestic-home",
               label: "Domestic (home)",
               callback() {
-                navigate("/domestic-home");
+                navigate(href("/domestic-home"));
               },
             },
             {
               key: "/office",
               label: "Office game",
               callback() {
-                navigate("/office");
+                navigate(href("/office"));
               },
             },
             {
               key: "/mindfulness-home",
               label: "Mindfulness",
               callback() {
-                navigate("/mindfulness-home");
+                navigate(href("/mindfulness-home"));
               },
             },
             {
               key: "/transport-home",
               label: "Transport game",
               callback() {
-                navigate("/transport-home");
+                navigate(href("/transport-home"));
               },
             },
           ]}

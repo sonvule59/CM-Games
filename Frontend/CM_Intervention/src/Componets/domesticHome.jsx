@@ -1,12 +1,12 @@
 import { s } from "../Static/officestyles.js";
-import { useNavigate } from "react-router";
+import { href, useNavigate } from "react-router";
 
 export default function DomesticGameStart() {
   const navigate = useNavigate();
-  const games = [
+  const games = /** @type {const} */([
     { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
     { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },
-  ];
+  ]);
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
@@ -86,7 +86,7 @@ export default function DomesticGameStart() {
             <button
               key={game.path}
               className={s.primaryButton}
-              onClick={() => navigate(game.path)}
+              onClick={() => navigate(href(game.path))}
               style={{
                 width: "100%",
                 padding: "14px 24px",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { href, useNavigate } from 'react-router';
 import { ActionPanel } from './ActionPanel.tsx';
 import {
     BackButton,
@@ -28,7 +28,7 @@ export default function MindfulnessHome() {
                         feedback—no scores to beat.
                     </HeaderSubtitle>
                 </HeaderLeft>
-                <BackButton onClick={() => navigate("/")}>
+                <BackButton onClick={() => navigate(href("/"))}>
                     Back to hub
                 </BackButton>
             </Header>
@@ -41,7 +41,7 @@ export default function MindfulnessHome() {
                 </Paragraph>
                 <PrimaryButton
                     id={"start-mindfulness"}
-                    onClick={() => navigate("/mindfulness")}
+                    onClick={() => navigate(href("/mindfulness"))}
                 >
                     Start mindfulness game
                 </PrimaryButton>

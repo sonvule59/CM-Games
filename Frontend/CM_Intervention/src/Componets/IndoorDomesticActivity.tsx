@@ -47,7 +47,7 @@ import {
     Title,
     TopRow,
 } from "./Layout";
-import { useNavigate } from "react-router-dom";
+import { href, useNavigate } from "react-router-dom";
 
 type IndoorDomesticActivityProps = {};
 
@@ -199,7 +199,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
     }
 
     function goBack() {
-        navigate("/");
+        navigate(href("/"));
     }
 
     type ActivityState = Readonly<
@@ -980,7 +980,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     </HeaderLeft>
                     <HeaderRight>
                         <BackButton
-                            onClick={() => navigate("/domestic-home")}
+                            onClick={() => navigate(href("/domestic-home"))}
                         />
                     </HeaderRight>
                 </Header>
