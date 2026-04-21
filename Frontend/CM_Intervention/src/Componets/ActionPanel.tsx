@@ -1,8 +1,9 @@
 const ACTION_BUTTON_STYLE: "dylan" | "kelly" = "dylan";
 
+import { useSyncExternalStore } from "react";
 import { s } from "../Static/officestyles";
 import { rcStyles } from "../Static/rockClimbingStyles";
-import { addClassNameToProps, Title } from "./Layout";
+import { addClassNameToProps, SecondaryButton, Title } from "./Layout";
 
 type ButtonProps = React.ComponentPropsWithoutRef<"button">;
 type ButtonEventListeners = {
@@ -92,10 +93,75 @@ function* parseActionSpecs(actions: Iterable<ActionSpec>) {
     }
 }
 
+const _buttonStyleSettingListeners = new Set<() => void>();
+function useButtonStyleSetting() {
+    const COOKIE_NAME = "cm_intervention_buttonStyle";
+
+    type ButtonStyle = typeof ACTION_BUTTON_STYLE | undefined;
+
+    function setButtonStyleSetting(name: ButtonStyle) {
+        if (name == undefined) {
+            localStorage.removeItem(COOKIE_NAME);
+        } else {
+            localStorage.setItem(COOKIE_NAME, name);
+        }
+        for (const listener of _buttonStyleSettingListeners) {
+            listener();
+        }
+    }
+    const buttonStyleSetting = useSyncExternalStore<ButtonStyle>(
+        (onStoreChange) => {
+            function storageEventListener(event: StorageEvent) {
+                if (
+                    event.storageArea === localStorage &&
+                    event.key == COOKIE_NAME
+                ) {
+                    onStoreChange();
+                }
+            }
+            window.addEventListener("storage", storageEventListener);
+            _buttonStyleSettingListeners.add(onStoreChange);
+
+            function unsubscribe() {
+                window.removeEventListener("storage", storageEventListener);
+                _buttonStyleSettingListeners.delete(onStoreChange);
+            }
+            return unsubscribe;
+        },
+        () => localStorage.getItem(COOKIE_NAME) as ButtonStyle,
+        () => undefined,
+    );
+    return [buttonStyleSetting, setButtonStyleSetting] as const;
+}
+
+export function ActionPanelButtonStyleToggle() {
+    const [buttonStyleSetting, setButtonStyleSetting] = useButtonStyleSetting();
+    function onClick() {
+        const buttonStyle = buttonStyleSetting ?? ACTION_BUTTON_STYLE;
+        switch (buttonStyle) {
+            default:
+                buttonStyle satisfies never;
+                console.warn(
+                    "unrecognized action button style setting",
+                    buttonStyleSetting,
+                );
+            case "dylan":
+                setButtonStyleSetting("kelly");
+                break;
+            case "kelly":
+                setButtonStyleSetting("dylan");
+                break;
+        }
+    }
+    return (
+        <SecondaryButton onClick={onClick}>Toggle Button Style</SecondaryButton>
+    );
+}
+
 export function ActionPanel({
     title,
     actions,
-    buttonStyle = ACTION_BUTTON_STYLE,
+    buttonStyle,
     ...otherProps
 }: {
     title?: React.ReactNode;
@@ -105,6 +171,12 @@ export function ActionPanel({
     React.ComponentPropsWithoutRef<"section">,
     "children" | "title" | "actions" | "buttonStyle"
 >) {
+    const [buttonStyleSetting, _setButtonStyleSetting] =
+        useButtonStyleSetting();
+
+    buttonStyle ??= buttonStyleSetting;
+    buttonStyle ??= ACTION_BUTTON_STYLE;
+
     switch (buttonStyle) {
         default:
             buttonStyle satisfies never;

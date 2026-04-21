@@ -4,11 +4,12 @@ import {
   Container,
   Header,
   HeaderLeft,
+  HeaderRight,
   HeaderSubtitle,
   MainTitle,
   Section,
 } from "./Layout";
-import { ActionPanel } from "./ActionPanel";
+import { ActionPanel, ActionPanelButtonStyleToggle } from "./ActionPanel";
 
 export default function HomeOfHomePages() {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ export default function HomeOfHomePages() {
             mindfulness phrase game.
           </HeaderSubtitle>
         </HeaderLeft>
+        <HeaderRight>
+          <ActionPanelButtonStyleToggle />
+        </HeaderRight>
       </Header>
 
       <Section>
