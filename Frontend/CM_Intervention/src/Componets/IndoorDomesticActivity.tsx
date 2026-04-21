@@ -4,33 +4,44 @@ import { Feedback, negativeFeedback, positiveFeedback } from "./Feedback";
 import ActivityImage from "./ActivityImage";
 import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 
-// Source: https://www.freepik.com/free-vector/empty-room-with-light-yellow-wall-parquet-floor_21196882.htm
+// House overview background (local asset)
 // @ts-ignore
-import imgIndoorDomesticBgs from "../images/indoorDomesticBg.jpg";
+import imgIndoorDomesticBgs from "../images/walkingHome.png";
 
-// Source: https://freesvg.org/basket-with-dirty-laundry-vector-clip-art
+// Indoor domestic activity images (local assets in src/images/)
 // @ts-ignore
-import imgFullBasket from "../images/foldedBasket.svg";
+import imgWhatToClean from "../images/whatToClean.png";
+// @ts-ignore
+import imgVacuuming from "../images/vacFloor.png";
+// @ts-ignore
+import imgSweeping from "../images/sweepingFloor.png";
+// @ts-ignore
+import imgDusting from "../images/dusting.png";
+// @ts-ignore
+import imgMopping from "../images/moppingFloor.png";
+// @ts-ignore
+import imgDirtyDishes from "../images/dirtyDishes.png";
+// @ts-ignore
+import imgPuttingInDishes from "../images/puttingInDishes.png";
+// @ts-ignore
+import imgPuttingAwayDishes from "../images/puttingAwayDishes.png";
+// @ts-ignore
+import imgDirtyClothesPile from "../images/dirtyClothesPile.png";
+// @ts-ignore
+import imgDirtyClothesWasher from "../images/dirtyClothesWasher.png";
+// @ts-ignore
+import imgWasherToDryer from "../images/washerToDryer.png";
+// @ts-ignore
+import imgFoldingClothes from "../images/foldingClothes.png";
+// @ts-ignore
+import imgMakingTheBed from "../images/makingTheBed.png";
+// @ts-ignore
+import imgWhatToMake from "../images/whatToMake.png";
+// @ts-ignore
+import imgMakingDinner from "../images/makingDinner.png";
+// @ts-ignore
+import imgEatingDinner from "../images/eatingDinner.png";
 
-// Source: https://freesvg.org/plastic-laundry-basket-vector-drawing
-// @ts-ignore
-import imgEmptyBasket from "../images/emptyBasket.svg";
-
-// Source: https://freesvg.org/spilled-orange-drink
-// @ts-ignore
-import imgSpilledOrangeDrink from "../images/spilledOrangeDrink.svg";
-
-// Source: https://toppng.com/show_download/111868/dust-cloud-png
-// @ts-ignore
-import imgDustCloud from "../images/dustCloud.png";
-
-// Source: https://www.vecteezy.com/vector-art/1314090-cartoon-style-dirty-and-clean-dishes-set
-// @ts-ignore
-import imgDishes from "../images/dishes.png";
-
-// Source: https://commons.wikimedia.org/wiki/File:Dinner_table_side_pine_wood_large_table_front.png
-// @ts-ignore
-import imgTable from "../images/table.png";
 import {
     BackButton,
     Container,
@@ -54,53 +65,43 @@ type IndoorDomesticActivityProps = {};
 // Undefined means image isn't available yet,
 // a placeholder will be shown for now.
 const IMAGE_ID_TO_SRC = {
-    cleaningThinking: undefined,
-    vacuuming: undefined,
-    sweeping: undefined,
-    dusting: undefined,
-    mopping: undefined,
-    lookAtDirtyDishes: undefined,
-    putDishesInDishwasher: undefined,
-    lookAtDirtyDishesInDishwasher: undefined,
-    startDishwasher: undefined,
-    lookAtFinishedDishwasher: undefined,
-    getDishesOutOfDishwasher: undefined,
-    lookAtCleanDishes: undefined,
-    lookAtDirtyClothes: undefined,
-    pickUpDirtyLaundry: undefined,
-    lookAtDirtyClothesInWasher: undefined,
-    washClothes: undefined,
-    lookAtCleanWetClothesInWasher: undefined,
-    dryClothes: undefined,
-    lookAtCleanDryClothesInDryer: undefined,
-    foldCleanClothes: undefined,
-    lookAtUnmadeBed: undefined,
-    makeBed: undefined,
-    cookingThinking: undefined,
-    lookAtPantry: undefined,
-    cookDinner: undefined,
-    finishedDinner: undefined,
-    eatDinner: undefined,
+    cleaningThinking: imgWhatToClean,
+    vacuuming: imgVacuuming,
+    sweeping: imgSweeping,
+    dusting: imgDusting,
+    mopping: imgMopping,
+    lookAtDirtyDishes: imgDirtyDishes,
+    putDishesInDishwasher: imgPuttingInDishes,
+    lookAtDirtyDishesInDishwasher: imgPuttingInDishes,
+    startDishwasher: imgPuttingInDishes,
+    lookAtFinishedDishwasher: imgPuttingAwayDishes,
+    getDishesOutOfDishwasher: imgPuttingAwayDishes,
+    lookAtCleanDishes: imgPuttingAwayDishes,
+    lookAtDirtyClothes: imgDirtyClothesPile,
+    pickUpDirtyLaundry: imgDirtyClothesPile,
+    lookAtDirtyClothesInWasher: imgDirtyClothesWasher,
+    washClothes: imgDirtyClothesWasher,
+    lookAtCleanWetClothesInWasher: imgDirtyClothesWasher,
+    dryClothes: imgWasherToDryer,
+    lookAtCleanDryClothesInDryer: imgFoldingClothes,
+    foldCleanClothes: imgFoldingClothes,
+    lookAtUnmadeBed: imgMakingTheBed,
+    makeBed: imgMakingTheBed,
+    cookingThinking: imgWhatToMake,
+    lookAtPantry: imgWhatToMake,
+    cookDinner: imgMakingDinner,
+    finishedDinner: imgEatingDinner,
+    eatDinner: imgEatingDinner,
 } satisfies Record<string, string | undefined>;
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 50,
+    energy: 100,
     mood: 50,
     confidence: 50,
     health: 50,
 });
 
-function HouseImage({
-    didCleaning,
-    didDishes,
-    didLaundry,
-    didCooking,
-}: {
-    didCleaning: boolean;
-    didDishes: boolean;
-    didLaundry: boolean;
-    didCooking: boolean;
-}) {
+function HouseImage() {
     return (
         <svg
             viewBox="0 0 720 400"
@@ -108,58 +109,13 @@ function HouseImage({
             width={"auto"}
             height={"auto"}
         >
-            <svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg">
-                <image
-                    x={0}
-                    y={0}
-                    width={720}
-                    height={400}
-                    href={imgIndoorDomesticBgs}
-                ></image>
-                <image
-                    x={20}
-                    y={220}
-                    width={150}
-                    height={150}
-                    href={didLaundry ? imgEmptyBasket : imgFullBasket}
-                ></image>
-                <g>
-                    <image x={400} y={200} width={300} href={imgTable}></image>
-                    <svg
-                        x={450}
-                        y={100}
-                        width={100}
-                        height={200}
-                        viewBox={
-                            didDishes ? "3500 0 3500 5000" : "0 0 3500 5000"
-                        }
-                    >
-                        <image
-                            x={0}
-                            y={0}
-                            width={7000}
-                            height={5000}
-                            href={imgDishes}
-                        ></image>
-                    </svg>
-                </g>
-                <g display={didCleaning ? "none" : "inline"}>
-                    <image
-                        x={600}
-                        y={300}
-                        width={50}
-                        height={50}
-                        href={imgSpilledOrangeDrink}
-                    ></image>
-                    <image
-                        x={0}
-                        y={50}
-                        width={800}
-                        href={imgDustCloud}
-                        opacity={0.8}
-                    ></image>
-                </g>
-            </svg>
+            <image
+                x={0}
+                y={0}
+                width={720}
+                height={400}
+                href={imgIndoorDomesticBgs}
+            ></image>
         </svg>
     );
 }
@@ -989,12 +945,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                 </TopRow>
                 {_imageId == "house" ? (
                     <ActivityImage key={_imageId}>
-                        <HouseImage
-                            didCleaning={didCleaning}
-                            didDishes={didDishes}
-                            didLaundry={didLaundry}
-                            didCooking={didCooking}
-                        />
+                        <HouseImage />
                     </ActivityImage>
                 ) : !(_imageId != undefined && _imageId in IMAGE_ID_TO_SRC) ? (
                     <></>
