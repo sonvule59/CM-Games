@@ -10,18 +10,11 @@ import { href, useNavigate } from "react-router";
  */
 export default function DomesticGameStart() {
   const navigate = useNavigate();
-<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/domesticHome.jsx
   // Route specs for the two domestic categories.
   const games = /** @type {const} */([
     { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
     { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },
   ]);
-=======
-  const games = [
-    { path: "/indoor-domestic", text: "Indoor activities", color: "#10b981" },
-    { path: "/outside-domestic", text: "Around the house", color: "#6366f1" },
-  ] as const;
->>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/domesticHome.tsx
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>

@@ -38,18 +38,12 @@ export default function OutdoorsActivities() {
     energy: 100,
   };
 
-<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/outdoorsActivities.jsx
-  // Small state machine driving the narrative flow for the chosen activity.
-  const [activity, setActivity] = useState(null); // 'walk' | 'fish' | 'golf' | 'bocce' | null
-  const [step, setStep] = useState('intro'); // 'intro' | 'activityIntro' | 'activityChoice' | 'result'
-=======
   const [activity, setActivity] = useState<
     "walk" | "fish" | "golf" | "bocce" | null
   >(null);
   const [step, setStep] = useState<
     "intro" | "activityIntro" | "activityChoice" | "result"
   >("intro");
->>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/outdoorsActivities.tsx
   const [resultText, setResultText] = useState('');
   const [stats, setStats] = useState(initialStats);
 

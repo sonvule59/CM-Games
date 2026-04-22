@@ -275,12 +275,7 @@ export default function OutsideDomestic() {
   >(null);
   const [resultText, setResultText] = useState('');
 
-<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/outsideDomestic.jsx
-  // Single place to apply deltas so all branches behave the same way.
-  const applyDelta = (delta) => {
-=======
   const applyDelta = (delta: StatDelta) => {
->>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/outsideDomestic.tsx
     setStats((prev) =>
       statsUpdate(prev, {
         energy: delta.energy ?? 0,
