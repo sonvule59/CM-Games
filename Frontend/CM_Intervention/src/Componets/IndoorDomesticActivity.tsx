@@ -5,41 +5,24 @@ import ActivityImage from "./ActivityImage";
 import { StatDeltaViewer, Stats, statsUpdate, StatsViewer } from "./StatsPanel";
 
 // House overview background (local asset)
-// @ts-ignore
 import imgIndoorDomesticBgs from "../images/walkingHome.png";
 
 // Indoor domestic activity images (local assets in src/images/)
-// @ts-ignore
 import imgWhatToClean from "../images/whatToClean.png";
-// @ts-ignore
 import imgVacuuming from "../images/vacFloor.png";
-// @ts-ignore
 import imgSweeping from "../images/sweepingFloor.png";
-// @ts-ignore
 import imgDusting from "../images/dusting.png";
-// @ts-ignore
 import imgMopping from "../images/moppingFloor.png";
-// @ts-ignore
 import imgDirtyDishes from "../images/dirtyDishes.png";
-// @ts-ignore
 import imgPuttingInDishes from "../images/puttingInDishes.png";
-// @ts-ignore
 import imgPuttingAwayDishes from "../images/puttingAwayDishes.png";
-// @ts-ignore
 import imgDirtyClothesPile from "../images/dirtyClothesPile.png";
-// @ts-ignore
 import imgDirtyClothesWasher from "../images/dirtyClothesWasher.png";
-// @ts-ignore
 import imgWasherToDryer from "../images/washerToDryer.png";
-// @ts-ignore
 import imgFoldingClothes from "../images/foldingClothes.png";
-// @ts-ignore
 import imgMakingTheBed from "../images/makingTheBed.png";
-// @ts-ignore
 import imgWhatToMake from "../images/whatToMake.png";
-// @ts-ignore
 import imgMakingDinner from "../images/makingDinner.png";
-// @ts-ignore
 import imgEatingDinner from "../images/eatingDinner.png";
 
 import {

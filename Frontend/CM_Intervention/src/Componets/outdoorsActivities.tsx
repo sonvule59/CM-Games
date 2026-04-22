@@ -400,7 +400,7 @@ export default function OutdoorsActivities() {
             gives you a slightly different way to enjoy the day.
           </HeaderSubtitle>
         </HeaderLeft>
-        <BackButton onClick={() => navigate(href("/"))}>Back to Home</BackButton>
+        <BackButton onClick={() => navigate(href("/leisure"))} />
       </Header>
 
       <ActivityImage src={OUTDOOR_IMAGES[imageKey]} />

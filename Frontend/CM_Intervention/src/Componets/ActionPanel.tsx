@@ -11,6 +11,17 @@ type ButtonEventListeners = {
         `on${Capitalize<string>}`]-?: NonNullable<ButtonProps[K]>;
 };
 
+/**
+ * The type of an action item within a list passed to `ActionPanel`.
+ * 
+ * Properties:
+ * @property {React.Key} id (or key) An identifier, unique within the list, for the action. This is usually a string, but can be JSX.
+ * @property {React.ReactNode} label (or name) The displayed name of the action. This is usually a string, but can be JSX.
+ * @property {React.ReactNode} icon The displayed icon of the action. This is usually an emoji, but can be any text or JSX.
+ * @property {React.ReactNode} desc The description text displayed beside the name. This is usually a string, but can be JSX.
+ * @property {boolean} [isPrimary=true] Whether or not the action button should be given special highlighting or emphasis.
+ * @property {() => void} callback (or action or onClick): A callback invoked when the action button is clicked.
+ */
 export type ActionSpec = ({ id: string } | { key: React.Key }) &
     ({ label: React.ReactNode } | { name: React.ReactNode }) & {
         icon?: React.ReactNode;
@@ -21,6 +32,14 @@ export type ActionSpec = ({ id: string } | { key: React.Key }) &
     ) &
     Partial<ButtonEventListeners>;
 
+/**
+ * `ActionSpec` is intentionally permissive in its property names to facilitate use by multiple programmers.
+ * Therefore, this function exists to parse a list of `ActionSpec` to a more standardized internal format.
+ * It also emits warnings to the browser console for malformed `ActionSpec` objects.
+ * 
+ * @param actions The list (iterable) of user-provided `ActionSpec` objects.
+ * @returns An iterable of internal action objects.
+ */
 function* parseActionSpecs(actions: Iterable<ActionSpec>) {
     const seenActionKeys: Set<React.Key> = new Set();
     for (const actionSpec of actions) {
@@ -94,6 +113,11 @@ function* parseActionSpecs(actions: Iterable<ActionSpec>) {
 }
 
 const _buttonStyleSettingListeners = new Set<() => void>();
+/**
+ * Get or set the current button style setting, which applies throughout the entire application, and is stored in the browser's local storage.
+ * 
+ * @returns The current button style setting, and a function to change the button style setting.
+ */
 function useButtonStyleSetting() {
     const COOKIE_NAME = "cm_intervention_buttonStyle";
 
@@ -134,6 +158,11 @@ function useButtonStyleSetting() {
     return [buttonStyleSetting, setButtonStyleSetting] as const;
 }
 
+/**
+ * A React component that lets the user switch the button style setting.
+ * 
+ * @returns The React component.
+ */
 export function ActionPanelButtonStyleToggle() {
     const [buttonStyleSetting, setButtonStyleSetting] = useButtonStyleSetting();
     function onClick() {
@@ -158,6 +187,17 @@ export function ActionPanelButtonStyleToggle() {
     );
 }
 
+/**
+ * A React component to display a list of action buttons.
+ * 
+ * See the documentation of the `ActionSpec` type for how to specify the action buttons.
+ * 
+ * @param {Object} props The React component's props. In addition to the ones explicitly documented, generic HTML properties, such as `className`, are also supported.
+ * @param props.title An optional title text to display above the actions.
+ * @param props.actions The list of actions.
+ * @param props.buttonStyle An optional override of the button style. Normally, the button style is consistent throughout the application.
+ * @returns The React component.
+ */
 export function ActionPanel({
     title,
     actions,
@@ -261,6 +301,18 @@ export function ActionPanel({
     }
 }
 
+/**
+ * A React component to display a list of action buttons.
+ * 
+ * Unlike `ActionPanel`, `SecondaryActionPanel` is usually used for response buttons, such as "Continue" or "Go Back".
+ * 
+ * See the documentation of the `ActionSpec` type for how to specify the action buttons.
+ * 
+ * @param {Object} props The React component's props. In addition to the ones explicitly documented, generic HTML properties, such as `className`, are also supported.
+ * @param props.title An optional title text to display above the actions.
+ * @param props.actions The list of actions.
+ * @returns The React component.
+ */
 export function SecondaryActionPanel({
     title,
     actions,

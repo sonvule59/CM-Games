@@ -19,6 +19,7 @@ import {
   Paragraph,
   PrimaryButton,
   ResetButton,
+  BackButton,
   ScenePill,
   Section,
   Title,
@@ -338,7 +339,8 @@ export default function TransportGame2() {
           </ScenePill>
         </HeaderLeft>
         <HeaderRight>
-          <ResetButton onClick={resetGame} />
+          <BackButton onClick={() => navigate(href("/transport-home"))} />
+          {/* <ResetButton onClick={resetGame} /> */}
         </HeaderRight>
       </Header>
 
