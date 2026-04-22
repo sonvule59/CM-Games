@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "react-router build",
-    "start": "react-router-serve ./build/server/index.js",
     "lint": "eslint .",
     "typecheck": "react-router typegen && tsc",
     "preview": "vite preview"
