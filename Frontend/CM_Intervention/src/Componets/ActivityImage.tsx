@@ -8,6 +8,18 @@ type ActivityImageProps = {
     subtitle?: React.ReactNode;
 } & ({ src: string; alt?: string } | { children: React.ReactNode });
 
+/**
+ * A React component to display an image for an activity.
+ * 
+ * @param {Object} props The React component's props.
+ * @param props.id The optional HTML ID of the element.
+ * @param props.key The optional key of the component, for assisting React diffing.
+ * @param props.src The URL of the displayed image.
+ * @param props.alt Optional alt text for the displayed image. Only available if `props.src` is given.
+ * @param props.children The JSX elements to be displayed in place of an image. Mutually exclusive with `props.src`.
+ * @param props.subtitle An optional subtitle displayed below the image. This is usually a string, but can be JSX.
+ * @returns The React component.
+ */
 export default function ActivityImage(props: ActivityImageProps) {
     let image: React.ReactNode;
     if ("children" in props) {

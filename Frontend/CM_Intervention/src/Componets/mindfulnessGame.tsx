@@ -26,35 +26,20 @@ import {
 import ActivityImage from "./ActivityImage.tsx";
 
 // Mindfulness phrase images (src/images — filenames match each prompt theme)
-// @ts-ignore
 import imgBodyKindness from "../images/bodyKindness.png";
-// @ts-ignore
 import imgBreathingCalm from "../images/breathingCalm.png";
-// @ts-ignore
 import imgCalmerMoving from "../images/calmerMoving.png";
-// @ts-ignore
 import imgCuriousToTryNew from "../images/curiousToTryNew.png";
-// @ts-ignore
 import imgEnergyFlowsThrough from "../images/energyFlowsThrough.png";
-// @ts-ignore
 import imgFocusOnFeel from "../images/focusOnFeel.png";
-// @ts-ignore
 import imgGratefulWhatCanDo from "../images/gratefulWhatCanDo.png";
-// @ts-ignore
 import imgHeartShowsStrength from "../images/heartShowsStrength.png";
-// @ts-ignore
 import imgLightAndFree from "../images/lightandFree.png";
-// @ts-ignore
 import imgOkayToGoSlow from "../images/okayToGoSlow.png";
-// @ts-ignore
 import imgProudShowingUp from "../images/proudShowingUp.png";
-// @ts-ignore
 import imgRelaxedAfterStretch from "../images/relaxedAfterStretch.png";
-// @ts-ignore
 import imgSelfCareGood from "../images/selfCareGood.png";
-// @ts-ignore
 import imgSmallSteps from "../images/smallSteps.png";
-// @ts-ignore
 import imgWarmthThroughBody from "../images/warmthThroughBody.png";
 
 const INITIAL_STATS = {
@@ -64,6 +49,13 @@ const INITIAL_STATS = {
     energy: 50,
 };
 
+/**
+ * @property id The ID.
+ * @property label The displayed label or name, a short phrase.
+ * @property label A detailed explanation of why this activity helps.
+ * @property label The effect on stats.
+ * @property label The URL of the displayed image.
+ */
 type PhraseSpec = {
     id: string;
     label: React.ReactNode;
@@ -196,9 +188,20 @@ const PHRASES: PhraseSpec[] = [
     },
 ];
 
+/**
+ * A React component for the mindfulness activity page.
+ * 
+ * @returns The React component.
+ */
 export default function MindfulnessGame() {
     const navigate = useNavigate();
+    /**
+     * The statistics of the user.
+     */
     const [stats, setStats] = useState(INITIAL_STATS);
+    /**
+     * The current phrase. When this is not undefined, a feedback screen is shown to the user.
+     */
     const [currentPhrase, setCurrentPhrase] = useState<PhraseSpec | undefined>(
         undefined,
     );

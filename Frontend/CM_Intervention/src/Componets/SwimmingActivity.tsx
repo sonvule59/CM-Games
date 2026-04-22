@@ -1,11 +1,8 @@
 import { useState } from "react";
 import ActivityImage from "./ActivityImage";
 
-// @ts-ignore
 import imgSwimBreak from "../images/swimBreak.png";
-// @ts-ignore
 import imgSwimLap from "../images/swimLap.png";
-// @ts-ignore
 import imgSwimTread from "../images/swimTread.png";
 import imgSwimChoice from "../images/swimchoice.png";
 import imgPoolWalking from "../images/poolwalking.png";
@@ -41,7 +38,10 @@ const STARTING_STATS: Stats = Object.freeze({
     health: 50,
 });
 
-// Undefined means image is unavailable and a placeholder will be shown.
+/**
+ * A mapping of image IDs to image URLs.
+ * Undefined means the image is unavailable and a placeholder will be shown.
+ */
 const IMAGE_ID_TO_SRC = {
     break: imgSwimBreak,
     lap: imgSwimLap,
@@ -53,9 +53,20 @@ const IMAGE_ID_TO_SRC = {
 } satisfies Record<string, string | undefined>;
 
 type SwimmingActivityProps = {};
+
+/**
+ * A React component for the swimming activity page.
+ * 
+ * @param {Object} props The React component's props.
+ * @returns The React component.
+ */
 export default function SwimmingActivity({}: SwimmingActivityProps) {
     const navigate = useNavigate();
-    
+
+    /**
+     * If not undefined, a feedback screen will be shown.
+     * Set back to undefined when the user dismisses.
+     */
     const [feedback, setFeedback] = useState<string | undefined>(undefined);
 
     function givePositiveFeedback(message: string) {
@@ -74,8 +85,10 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
     let actionPrompt: string;
     let imageId: keyof typeof IMAGE_ID_TO_SRC | undefined;
 
-    // Represents the state of the entire component.
-    // Goal is to make invalid states unrepresentable using the type system.
+    /**
+     * Represents the state of the entire component.
+     * The goal is to make invalid states unrepresentable using the type system.
+     */
     type ScreenState = {
         screen: "game";
         activity: "lapSwim";
