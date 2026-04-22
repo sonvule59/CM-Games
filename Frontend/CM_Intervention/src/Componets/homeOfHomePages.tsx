@@ -4,11 +4,12 @@ import {
   Container,
   Header,
   HeaderLeft,
+  HeaderRight,
   HeaderSubtitle,
   MainTitle,
   Section,
 } from "./Layout";
-import { ActionPanel } from "./ActionPanel";
+import { ActionPanel, ActionPanelButtonStyleToggle } from "./ActionPanel";
 
 /**
  * HomeOfHomePages: top-level hub that routes into the major "worlds" of the app.
@@ -28,6 +29,9 @@ export default function HomeOfHomePages() {
             mindfulness phrase game.
           </HeaderSubtitle>
         </HeaderLeft>
+        <HeaderRight>
+          <ActionPanelButtonStyleToggle />
+        </HeaderRight>
       </Header>
 
       <Section>

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { href, useNavigate } from 'react-router';
 import { ActionPanel, SecondaryActionPanel } from "./ActionPanel.tsx";
-import { statsUpdate, StatsPanel } from './StatsPanel.tsx';
+import { statsUpdate, StatsPanel, StatDelta } from "./StatsPanel.tsx";
 
 import outdoorDomesticHubImg from '../images/walkingHome.png';
 import groceryShoppingImg from '../images/groceryShopping.png';
@@ -240,7 +240,7 @@ const ACTIVITIES = [
       },
     ],
   },
-];
+] as const;
 
 const SCENE_PILLS = {
   intro: 'Outside domestic',
@@ -264,13 +264,23 @@ export default function OutsideDomestic() {
   );
 
   const [stats, setStats] = useState(initialStats);
-  const [step, setStep] = useState('intro'); // 'intro' | 'activityIntro' | 'activityChoice' | 'result'
-  const [activityId, setActivityId] = useState(null);
-  const [lastChoiceId, setLastChoiceId] = useState(null);
+  const [step, setStep] = useState<
+    "intro" | "activityIntro" | "activityChoice" | "result"
+  >("intro");
+  const [activityId, setActivityId] = useState<
+    (typeof ACTIVITIES)[number]["id"] | null
+  >(null);
+  const [lastChoiceId, setLastChoiceId] = useState<
+    (typeof ACTIVITIES)[number]["choices"][number]["id"] | null
+  >(null);
   const [resultText, setResultText] = useState('');
 
+<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/outsideDomestic.jsx
   // Single place to apply deltas so all branches behave the same way.
   const applyDelta = (delta) => {
+=======
+  const applyDelta = (delta: StatDelta) => {
+>>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/outsideDomestic.tsx
     setStats((prev) =>
       statsUpdate(prev, {
         energy: delta.energy ?? 0,
@@ -286,8 +296,12 @@ export default function OutsideDomestic() {
   // Picks the most relevant scene image: hub → activity image → (optional) choice-specific image.
   const sceneImageSrc = useMemo(() => {
     if (!activity) return outdoorDomesticHubImg;
-    if (step === 'result' && lastChoiceId && activity.choiceImages?.[lastChoiceId]) {
-      return activity.choiceImages[lastChoiceId];
+    if (
+      step === "result" &&
+      lastChoiceId &&
+      (activity.choiceImages as { [_: string]: string })?.[lastChoiceId]
+    ) {
+      return (activity.choiceImages as { [_: string]: string })[lastChoiceId];
     }
     return activity.image;
   }, [activity, step, lastChoiceId]);
@@ -307,21 +321,23 @@ export default function OutsideDomestic() {
     setResultText('');
   };
 
-  const startActivity = (id) => {
+  const startActivity = (id: (typeof ACTIVITIES)[number]["id"]) => {
     setActivityId(id);
-    setStep('activityIntro');
+    setStep("activityIntro");
     setLastChoiceId(null);
-    setResultText('');
+    setResultText("");
   };
 
-  const chooseActivityOption = (choiceId) => {
+  const chooseActivityOption = (
+    choiceId: (typeof ACTIVITIES)[number]["choices"][number]["id"],
+  ) => {
     if (!activity) return;
     const choice = activity.choices.find((c) => c.id === choiceId);
     if (!choice) return;
     applyDelta(choice.delta);
     setLastChoiceId(choiceId);
     setResultText(choice.result);
-    setStep('result');
+    setStep("result");
   };
 
   return (

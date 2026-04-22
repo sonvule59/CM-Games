@@ -20,7 +20,7 @@ import {
   Title,
   TopRow,
 } from "./Layout";
-import { StatDeltaViewer, StatsPanel } from "./StatsPanel";
+import { StatDelta, StatDeltaViewer, StatsPanel } from "./StatsPanel";
 import ActivityImage from "./ActivityImage";
 import { ActionPanel } from "./ActionPanel";
 
@@ -34,7 +34,7 @@ export default function ParkingLot() {
   };
 
   const [stats, setStats] = useState(initialStats);
-  const [scene, setScene] = useState("parking");
+  const [scene, setScene] = useState<"walking" | "parking">("parking");
   const [step, setStep] = useState(0); 
   const [resultText, setResultText] = useState("");
   const [lastDelta, setLastDelta] = useState({ energy: 0, confidence: 0, mood: 0, health: 0 });
@@ -43,14 +43,14 @@ export default function ParkingLot() {
   // @Kelly added navigate 
   const navigate = useNavigate();
 
-  const clamp = (v) => Math.max(0, Math.min(100, v));
+  const clamp = (v: number) => Math.max(0, Math.min(100, v));
 
-  const applyDelta = (delta) => {
+  const applyDelta = (delta: StatDelta) => {
     setStats((prev) => ({
       energy: clamp(prev.energy + (delta.energy || 0)),
       confidence: clamp(prev.confidence + (delta.confidence || 0)),
       mood: clamp(prev.mood + (delta.mood || 0)),
-      health: clamp(prev.health + (delta.health || 0))
+      health: clamp(prev.health + (delta.health || 0)),
     }));
     setLastDelta({
       energy: delta.energy || 0,
@@ -69,37 +69,37 @@ export default function ParkingLot() {
     setCurrentImage(parkingLotImg);
   };
 
-  const handleParkingChoice = (choice) => {
+  const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
       applyDelta({ energy: -3, confidence: +1, mood: +3, health: +1 });
       setResultText(
-        "You found a parking spot close to the building. It saved your energy, but you missed a chance to stretch your legs."
+        "You found a parking spot close to the building. It saved your energy, but you missed a chance to stretch your legs.",
       );
-      setCurrentImage(parkedCloseImg); 
-      setStep(2); 
+      setCurrentImage(parkedCloseImg);
+      setStep(2);
     } else if (choice === "far") {
-      applyDelta({ energy: -7, confidnece: +6, mood: +5, health: +6 });
-      setCurrentImage(parkedImg); 
+      applyDelta({ energy: -7, confidence: +6, mood: +5, health: +6 });
+      setCurrentImage(parkedImg);
       setScene("walking");
-      setStep(1); 
+      setStep(1);
     }
   };
 
-  const handleWalkingChoice = (choice) => {
+  const handleWalkingChoice = (choice: "normal" | "fast") => {
     if (choice === "normal") {
       applyDelta({ energy: -5, confidence: +4, mood: +3, health: +4 });
       setResultText(
-        "You walked toward the building at a relaxed pace. The short walk helped you settle into the day."
+        "You walked toward the building at a relaxed pace. The short walk helped you settle into the day.",
       );
-      setCurrentImage(walkingImg); 
+      setCurrentImage(walkingImg);
     } else if (choice === "fast") {
       applyDelta({ energy: -10, mood: +5, health: +8, confidence: +8 });
       setResultText(
-        "You decided to walk faster. Your body feels more awake and energized before entering the building."
+        "You decided to walk faster. Your body feels more awake and energized before entering the building.",
       );
-      setCurrentImage(fastWalkImg); 
+      setCurrentImage(fastWalkImg);
     }
-    setStep(2); 
+    setStep(2);
   };
 
   const renderSceneContent = () => {
