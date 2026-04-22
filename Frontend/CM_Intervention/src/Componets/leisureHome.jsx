@@ -1,8 +1,15 @@
 import { s } from "../Static/officestyles.js";
 import { href, useNavigate } from "react-router";
+
+/**
+ * LeisureHome: hub card for leisure-focused mini-games (outdoors, walking, swim, etc.).
+ * Like other "home" screens, this stays mostly presentational and routes users
+ * into the interactive components that manage their own state.
+ */
 export default function leisureHome() {
   const navigate = useNavigate();
 
+  // Route specs for the leisure games shown as CTA buttons.
   const games = /** @type {const} */([
     { path: "/rock", text: "Rock Climbing 🧗", color: "#ef4444" },
     { path: "/outdoors", text: "Outdoors Activities (Lake) 🚣‍♂️", color: "#3b82f6" },

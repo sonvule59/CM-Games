@@ -35,6 +35,14 @@ import {
 } from "./Layout.tsx";
 import ActivityImage from "./ActivityImage.tsx";
 
+/**
+ * OutsideDomestic: "around the house" activity selector with light branching.
+ *
+ * Structure:
+ * - A data-driven `ACTIVITIES` list (copy + stat deltas + optional choice images)
+ * - A tiny step-based flow (intro → activity intro → activity choice → result)
+ * - Stats updates are centralized through `statsUpdate` for consistent clamping/merging
+ */
 const ACTIVITIES = [
   {
     id: "grocery",
@@ -244,6 +252,7 @@ const SCENE_PILLS = {
 export default function OutsideDomestic() {
   const navigate = useNavigate();
 
+  // Baseline stats are memoized so reset() can reliably restore the same object shape.
   const initialStats = useMemo(
     () => ({
       energy: 50,
@@ -260,6 +269,7 @@ export default function OutsideDomestic() {
   const [lastChoiceId, setLastChoiceId] = useState(null);
   const [resultText, setResultText] = useState('');
 
+  // Single place to apply deltas so all branches behave the same way.
   const applyDelta = (delta) => {
     setStats((prev) =>
       statsUpdate(prev, {
@@ -273,6 +283,7 @@ export default function OutsideDomestic() {
 
   const activity = ACTIVITIES.find((a) => a.id === activityId) || null;
 
+  // Picks the most relevant scene image: hub → activity image → (optional) choice-specific image.
   const sceneImageSrc = useMemo(() => {
     if (!activity) return outdoorDomesticHubImg;
     if (step === 'result' && lastChoiceId && activity.choiceImages?.[lastChoiceId]) {

@@ -10,6 +10,11 @@ import {
 } from "./Layout";
 import { ActionPanel } from "./ActionPanel";
 
+/**
+ * HomeOfHomePages: top-level hub that routes into the major "worlds" of the app.
+ * This intentionally stays data-light: just labels + routes, letting each world
+ * own its own internal flow and state.
+ */
 export default function HomeOfHomePages() {
   const navigate = useNavigate();
 

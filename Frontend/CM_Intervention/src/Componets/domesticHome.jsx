@@ -1,8 +1,16 @@
 import { s } from "../Static/officestyles.js";
 import { href, useNavigate } from "react-router";
 
+/**
+ * DomesticGameStart: entry card for "home activities".
+ *
+ * This screen is primarily a styled CTA hub that routes into the indoor vs
+ * outside domestic activity flows. The layout here is intentionally presentational
+ * (hero image + copy + buttons) with no game state.
+ */
 export default function DomesticGameStart() {
   const navigate = useNavigate();
+  // Route specs for the two domestic categories.
   const games = /** @type {const} */([
     { path: "/indoor-domestic", text: "Indoor activities",  color: "#10b981" },
     { path: "/outside-domestic",   text: "Around the house",   color: "#6366f1" },

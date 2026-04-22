@@ -15,6 +15,10 @@ import {
     Title,
 } from "./Layout.tsx";
 
+/**
+ * MindfulnessHome: lightweight landing page for the mindfulness mini-game.
+ * Kept intentionally simple so it reads like a calm "start here" screen.
+ */
 export default function MindfulnessHome() {
     const navigate = useNavigate();
 
