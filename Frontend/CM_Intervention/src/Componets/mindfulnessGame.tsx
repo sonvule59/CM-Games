@@ -26,35 +26,20 @@ import {
 import ActivityImage from "./ActivityImage.tsx";
 
 // Mindfulness phrase images (src/images — filenames match each prompt theme)
-// @ts-ignore
 import imgBodyKindness from "../images/bodyKindness.png";
-// @ts-ignore
 import imgBreathingCalm from "../images/breathingCalm.png";
-// @ts-ignore
 import imgCalmerMoving from "../images/calmerMoving.png";
-// @ts-ignore
 import imgCuriousToTryNew from "../images/curiousToTryNew.png";
-// @ts-ignore
 import imgEnergyFlowsThrough from "../images/energyFlowsThrough.png";
-// @ts-ignore
 import imgFocusOnFeel from "../images/focusOnFeel.png";
-// @ts-ignore
 import imgGratefulWhatCanDo from "../images/gratefulWhatCanDo.png";
-// @ts-ignore
 import imgHeartShowsStrength from "../images/heartShowsStrength.png";
-// @ts-ignore
 import imgLightAndFree from "../images/lightandFree.png";
-// @ts-ignore
 import imgOkayToGoSlow from "../images/okayToGoSlow.png";
-// @ts-ignore
 import imgProudShowingUp from "../images/proudShowingUp.png";
-// @ts-ignore
 import imgRelaxedAfterStretch from "../images/relaxedAfterStretch.png";
-// @ts-ignore
 import imgSelfCareGood from "../images/selfCareGood.png";
-// @ts-ignore
 import imgSmallSteps from "../images/smallSteps.png";
-// @ts-ignore
 import imgWarmthThroughBody from "../images/warmthThroughBody.png";
 
 const INITIAL_STATS = {

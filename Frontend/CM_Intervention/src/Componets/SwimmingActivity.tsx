@@ -1,11 +1,8 @@
 import { useState } from "react";
 import ActivityImage from "./ActivityImage";
 
-// @ts-ignore
 import imgSwimBreak from "../images/swimBreak.png";
-// @ts-ignore
 import imgSwimLap from "../images/swimLap.png";
-// @ts-ignore
 import imgSwimTread from "../images/swimTread.png";
 import imgSwimChoice from "../images/swimchoice.png";
 import imgPoolWalking from "../images/poolwalking.png";
