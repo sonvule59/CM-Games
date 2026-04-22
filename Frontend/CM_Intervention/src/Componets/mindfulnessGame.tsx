@@ -219,10 +219,10 @@ export default function MindfulnessGame() {
         [],
     );
 
-    const reset = () => {
-        setStats(INITIAL_STATS);
-        setCurrentPhrase(undefined);
-    };
+    // const reset = () => {
+    //     setStats(INITIAL_STATS);
+    //     setCurrentPhrase(undefined);           commented out as the reset button was removed.
+    // };
 
     return (
         <Container>
@@ -236,10 +236,8 @@ export default function MindfulnessGame() {
                     <ScenePill>Gentle practice</ScenePill>
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton
-                        onClick={() => navigate(href("/mindfulness-home"))}
-                    />
-                    <ResetButton onClick={reset} />
+                    <BackButton onClick={() => navigate(href("/mindfulness-home"))} />
+                    {/* <ResetButton onClick={reset} /> */}
                 </HeaderRight>
             </Header>
 

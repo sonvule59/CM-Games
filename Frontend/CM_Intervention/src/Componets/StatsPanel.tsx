@@ -146,7 +146,7 @@ function StatsViewer(props: StatsViewerProps) {
                 label="Confidence"
                 value={stats.confidence}
                 color={"#ef4444"}
-                isPrimary={false}
+                isPrimary={true}
             />
             <StatsBar
                 id="stat-bar-mood"

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {s} from "../Static/officestyles.js"
+import { href, useNavigate } from "react-router";
 import {
   Container,
   Header,
@@ -10,6 +11,7 @@ import {
   ParagraphItalic,
   PrimaryButton,
   ResetButton,
+  BackButton,
   ScenePill,
   SecondaryButton,
   Section,
@@ -157,6 +159,7 @@ const TASKS = [
 ] as const;
 
 export default function OfficeGame() {
+  const navigate = useNavigate();
   const [stats, setStats]           = useState(INITIAL_STATS);
   const [scene, setScene] = useState<keyof typeof SCENE_LABELS>("office");
   const [step, setStep]             = useState(0);
@@ -234,10 +237,10 @@ export default function OfficeGame() {
     setWalkOption(null);
   };
 
-  const resetGame = () => {
-    setStats(INITIAL_STATS);
-    backToOffice();
-  };
+  // const resetGame = () => {
+  //   setStats(INITIAL_STATS);      commented out as the reset button was removed.
+  //   backToOffice();
+  // };
 
   const renderScene = () => {
 
@@ -392,7 +395,8 @@ export default function OfficeGame() {
           </HeaderSubtitle>
           <ScenePill>{SCENE_LABELS[scene]}</ScenePill>
         </HeaderLeft>
-        <ResetButton onClick={resetGame} />
+        <BackButton onClick={() => navigate(href("/office"))} />
+        {/* <ResetButton onClick={resetGame} /> */}
       </Header>
 
       {/* Stats */}

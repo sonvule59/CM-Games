@@ -8,9 +8,9 @@ build_and_deploy:
   script:
     - cd Frontend/CM_Intervention
     - npm install --include=dev
-    - ./node_modules/.bin/vite build
+    - npm run build
     - pm2 delete cm-app || true
-    - pm2 serve dist 8080 --spa --name cm-app --time
+    - pm2 serve build/client 8080 --spa --name cm-app --time
     - pm2 save
   only:
     - master

@@ -110,16 +110,16 @@ export default function RockClimbing() {
   };
 
   // Hard reset back to the entrance with baseline stats.
-  const resetGame = () => {
-    setStats(initialStats);
-    setScene("entrance");
-    setStep(0);
-    setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });
-    setResultText("");
-    setStretchChoice(null);
-    setWatchChoice(null);
-    setWallChoice(null);
-  };
+  // const resetGame = () => {
+  //   setStats(initialStats);
+  //   setScene("entrance");
+  //   setStep(0);
+  //   setLastDelta({ confidence: 0, mood: 0, health: 0, energy: 0 });        commented out as the reset button was removed.
+  //   setResultText("");
+  //   setStretchChoice(null);
+  //   setWatchChoice(null);
+  //   setWallChoice(null);
+  // };
 
   // Soft reset used by "Back to Entrance" buttons after a branch.
   const backToEntrance = () => {
@@ -503,8 +503,8 @@ export default function RockClimbing() {
           <ScenePill>{SCENE_LABELS[scene]}</ScenePill>
         </HeaderLeft>
         <HeaderRight>
-          <BackButton onClick={() => navigate(href("/"))}>Back to Home</BackButton>
-          <ResetButton onClick={resetGame}>Reset Game</ResetButton>
+          <BackButton onClick={() => navigate(href("/leisure"))} />
+          {/* <ResetButton onClick={resetGame}>Reset Game</ResetButton> */}
         </HeaderRight>
       </Header>
 
