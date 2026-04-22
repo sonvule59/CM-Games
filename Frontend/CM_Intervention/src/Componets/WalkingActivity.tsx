@@ -55,7 +55,10 @@ const STARTING_STATS: Stats = Object.freeze({
     health: 50,
 });
 
-// Undefined means image is not available yet and a placeholder will be shown.
+/**
+ * A mapping of image IDs to image URLs.
+ * Undefined means the image is unavailable and a placeholder will be shown.
+ */
 const IMAGE_ID_TO_SRC = {
     bikeNeighborhood: imgWalkingBikeNeighborhood,
     bikePark: imgWalkingBikePark,
@@ -71,8 +74,12 @@ const IMAGE_ID_TO_SRC = {
     chooseWalkingCycling: imgCycleOrWalk,
 } satisfies Record<string, string | undefined>;
 
-// TODO: make feedback phrases longer.
-
+/**
+ * A React component for the swimming activity page.
+ * 
+ * @param {Object} props The React component's props.
+ * @returns The React component.
+ */
 function WalkingActivity({}: WalkingActivityProps) {
     const navigate = useNavigate();
 
@@ -94,8 +101,10 @@ function WalkingActivity({}: WalkingActivityProps) {
         setFeedback(message);
     }
 
-    // Represents the state of the entire component.
-    // Goal is to make invalid states unrepresentable using the type system.
+    /**
+     * Represents the state of the entire component, except feedback.
+     * The goal is to make invalid states unrepresentable using the type system.
+     */
     type ScreenState =
         | { screen: "chooseActivity" }
         | { screen: "chooseLocation"; activity: "walk" | "bike" }
@@ -107,12 +116,16 @@ function WalkingActivity({}: WalkingActivityProps) {
               lastStats: Stats | undefined;
               lastAction: "break" | "stretch" | "lightExercise" | undefined;
           };
-
-    const [feedback, setFeedback] = useState<string | undefined>(undefined);
     const [screenState, setScreenState] = useState<ScreenState>({
         screen: "chooseActivity",
     });
     let newScreenState: ScreenState = screenState;
+
+    /**
+     * If not undefined, a feedback screen will be shown.
+     * Set back to undefined when the user dismisses.
+     */
+    const [feedback, setFeedback] = useState<string | undefined>(undefined);
 
     let tasks: Array<ActionSpec>;
     let tasksPrompt: string;

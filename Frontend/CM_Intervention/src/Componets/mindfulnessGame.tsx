@@ -49,6 +49,13 @@ const INITIAL_STATS = {
     energy: 50,
 };
 
+/**
+ * @property id The ID.
+ * @property label The displayed label or name, a short phrase.
+ * @property label A detailed explanation of why this activity helps.
+ * @property label The effect on stats.
+ * @property label The URL of the displayed image.
+ */
 type PhraseSpec = {
     id: string;
     label: React.ReactNode;
@@ -181,9 +188,20 @@ const PHRASES: PhraseSpec[] = [
     },
 ];
 
+/**
+ * A React component for the mindfulness activity page.
+ * 
+ * @returns The React component.
+ */
 export default function MindfulnessGame() {
     const navigate = useNavigate();
+    /**
+     * The statistics of the user.
+     */
     const [stats, setStats] = useState(INITIAL_STATS);
+    /**
+     * The current phrase. When this is not undefined, a feedback screen is shown to the user.
+     */
     const [currentPhrase, setCurrentPhrase] = useState<PhraseSpec | undefined>(
         undefined,
     );
@@ -218,7 +236,9 @@ export default function MindfulnessGame() {
                     <ScenePill>Gentle practice</ScenePill>
                 </HeaderLeft>
                 <HeaderRight>
-                    <BackButton onClick={() => navigate(href("/mindfulness-home"))} />
+                    <BackButton
+                        onClick={() => navigate(href("/mindfulness-home"))}
+                    />
                     <ResetButton onClick={reset} />
                 </HeaderRight>
             </Header>
