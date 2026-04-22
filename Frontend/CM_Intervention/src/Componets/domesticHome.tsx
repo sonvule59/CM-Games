@@ -1,5 +1,6 @@
 import { s } from "../Static/officestyles.js";
 import { href, useNavigate } from "react-router";
+import { BackButton } from "./Layout.js";
 
 export default function DomesticGameStart() {
   const navigate = useNavigate();
@@ -10,6 +11,18 @@ export default function DomesticGameStart() {
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
+
+      <BackButton onClick={() => navigate(href("/"))}
+        style={{
+          position:"absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 10,
+          margin: 0
+        }}
+        >
+        Back to hub
+      </BackButton>
 
       {/* Hero image */}
       <div style={{ position: "relative", width: "100%", height: 340 }}>

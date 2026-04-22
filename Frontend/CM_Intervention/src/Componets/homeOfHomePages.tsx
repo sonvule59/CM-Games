@@ -18,9 +18,9 @@ export default function HomeOfHomePages() {
     <Container>
       <Header>
         <HeaderLeft>
-          <MainTitle>Activity hub</MainTitle>
+          <MainTitle>Activity Hub</MainTitle>
           <HeaderSubtitle>
-            Choose a world: leisure, home, office wellness, or a short
+            Choose a world: leisure, home, office wellness, transport, or a short
             mindfulness phrase game.
           </HeaderSubtitle>
         </HeaderLeft>

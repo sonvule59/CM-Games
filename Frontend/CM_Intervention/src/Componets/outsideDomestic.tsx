@@ -246,7 +246,7 @@ export default function OutsideDomestic() {
 
   const initialStats = useMemo(
     () => ({
-      energy: 50,
+      energy: 100,
       confidence: 50,
       mood: 50,
       health: 50,
@@ -291,13 +291,13 @@ export default function OutsideDomestic() {
     return activity.image;
   }, [activity, step, lastChoiceId]);
 
-  const reset = () => {
-    setStats(initialStats);
-    setStep('intro');
-    setActivityId(null);
-    setLastChoiceId(null);
-    setResultText('');
-  };
+  // const reset = () => {
+  //   setStats(initialStats);
+  //   setStep('intro');
+  //   setActivityId(null);              commented out as the reset button was removed.
+  //   setLastChoiceId(null);
+  //   setResultText('');
+  // };
 
   const backToActivities = () => {
     setStep('intro');
@@ -338,11 +338,10 @@ export default function OutsideDomestic() {
         </HeaderLeft>
 
         <HeaderRight>
-          <BackButton onClick={() => navigate(href("/"))}>Main Menu</BackButton>
           <BackButton onClick={() => navigate(href("/domestic-home"))}>
             Back
           </BackButton>
-          <ResetButton onClick={reset}>Reset</ResetButton>
+          {/* <ResetButton onClick={reset}>Reset</ResetButton> */}
         </HeaderRight>
       </Header>
 

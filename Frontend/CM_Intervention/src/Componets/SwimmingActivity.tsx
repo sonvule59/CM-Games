@@ -35,7 +35,7 @@ import { negativeFeedback, positiveFeedback } from "./Feedback";
 import { href, useNavigate } from "react-router";
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 50,
+    energy: 100,
     mood: 50,
     confidence: 50,
     health: 50,
