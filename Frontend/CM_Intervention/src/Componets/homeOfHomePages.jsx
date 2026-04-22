@@ -4,15 +4,14 @@ import {
   Container,
   Header,
   HeaderLeft,
-  HeaderRight,
   HeaderSubtitle,
   MainTitle,
   Section,
 } from "./Layout";
-import { ActionPanel, ActionPanelButtonStyleToggle } from "./ActionPanel";
+import { ActionPanel } from "./ActionPanel";
 
 /**
- * HomeOfHomePages: top-level hub that routes into the major "worlds" of the app.
+ * HomeOfHomePages: top-level hub that routes into our 5 different activities of the app.
  * This intentionally stays data-light: just labels + routes, letting each world
  * own its own internal flow and state.
  */
@@ -23,15 +22,12 @@ export default function HomeOfHomePages() {
     <Container>
       <Header>
         <HeaderLeft>
-          <MainTitle>Activity Hub</MainTitle>
+          <MainTitle>Activity hub</MainTitle>
           <HeaderSubtitle>
-            Choose a world: leisure, home, office wellness, transport, or a short
+            Choose a world: leisure, home, office wellness, or a short
             mindfulness phrase game.
           </HeaderSubtitle>
         </HeaderLeft>
-        <HeaderRight>
-          <ActionPanelButtonStyleToggle />
-        </HeaderRight>
       </Header>
 
       <Section>

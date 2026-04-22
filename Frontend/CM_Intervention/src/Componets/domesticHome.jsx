@@ -1,13 +1,12 @@
 import { s } from "../Static/officestyles.js";
 import { href, useNavigate } from "react-router";
-import { BackButton } from "./Layout.js";
 
 /**
  * DomesticGameStart: entry card for "home activities".
  *
- * This screen is primarily a styled CTA hub that routes into the indoor vs
+ * This screen is hub that routes into the indoor vs
  * outside domestic activity flows. The layout here is intentionally presentational
- * (hero image + copy + buttons) with no game state.
+ * with no game state.
  */
 export default function DomesticGameStart() {
   const navigate = useNavigate();
@@ -19,18 +18,6 @@ export default function DomesticGameStart() {
 
   return (
     <div className={s.container} style={{ padding: 0, overflow: "hidden", position: "relative" }}>
-
-      <BackButton onClick={() => navigate(href("/"))}
-        style={{
-          position:"absolute",
-          top: "20px",
-          right: "20px",
-          zIndex: 10,
-          margin: 0
-        }}
-        >
-        Back to hub
-      </BackButton>
 
       {/* Hero image */}
       <div style={{ position: "relative", width: "100%", height: 340 }}>

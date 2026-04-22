@@ -25,6 +25,16 @@ import {
 } from "./Layout.tsx";
 import ActivityImage from "./ActivityImage.tsx";
 
+/**
+ * MindfulnessGame: a low-pressure "tap a phrase" experience.
+ *
+ * Each phrase has:
+ * - a short affirmation (button label)
+ * - a brief explanation (shown after selection)
+ * - a stat delta to reflect the emotional/physical tone of the phrase
+ *
+ * The UI flips between the phrase list and a single selected phrase panel.
+ */
 // Mindfulness phrase images (src/images — filenames match each prompt theme)
 import imgBodyKindness from "../images/bodyKindness.png";
 import imgBreathingCalm from "../images/breathingCalm.png";

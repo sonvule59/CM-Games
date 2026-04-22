@@ -30,6 +30,7 @@ import ActivityImage from "./ActivityImage.tsx";
 export default function OutdoorsActivities() {
   const navigate = useNavigate();
 
+  // Baseline stats for a "fresh run" of the lake scenario.
   const initialStats = {
     confidence: 50,
     mood: 50,
@@ -46,6 +47,7 @@ export default function OutdoorsActivities() {
   const [resultText, setResultText] = useState('');
   const [stats, setStats] = useState(initialStats);
 
+  // Image assets used by the shared `ActivityImage` component.
   const OUTDOOR_IMAGES = {
     lake: pullingUpLakeImg,
     walk: walkingLakeImg,
@@ -155,6 +157,7 @@ export default function OutdoorsActivities() {
     setStep("result");
   };
 
+  // Render helpers for each step; kept separate to keep the main return readable.
   const renderIntro = () => (
     <Section>
       <Title>Pulling Up to the Lake</Title>
@@ -371,7 +374,12 @@ export default function OutdoorsActivities() {
     </Section>
   );
 
+<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/outdoorsActivities.jsx
+  // Map current step/activity to a single image key for the top illustration.
+  let imageKey = 'lake';
+=======
   let imageKey: keyof typeof OUTDOOR_IMAGES = "lake";
+>>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/outdoorsActivities.tsx
   if (activity === 'walk') {
     imageKey = 'walk';
   } else if (activity === 'fish') {

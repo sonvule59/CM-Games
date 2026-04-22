@@ -1,6 +1,12 @@
 import { s } from "../Static/officestyles.js";
 import { href, useNavigate } from "react-router";
 import { BackButton } from "./Layout.js";
+
+/**
+ * LeisureHome: hub card for leisure-focused mini-games (outdoors, walking, swim, etc.).
+ * Like other "home" screens, this stays mostly presentational and routes users
+ * into the interactive components that manage their own state.
+ */
 export default function leisureHome() {
   const navigate = useNavigate();
 
