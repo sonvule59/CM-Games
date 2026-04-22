@@ -15,11 +15,12 @@ import {
   Paragraph,
   PrimaryButton,
   ResetButton,
+  BackButton,
   ScenePill,
   Section,
   Title,
   TopRow,
-} from "./Layout";
+} from "./Layout.tsx";
 import { StatDelta, StatDeltaViewer, StatsPanel } from "./StatsPanel";
 import ActivityImage from "./ActivityImage";
 import { ActionPanel } from "./ActionPanel";
@@ -60,14 +61,14 @@ export default function ParkingLot() {
     });
   };
 
-  const resetGame = () => {
-    setStats(initialStats);
-    setScene("parking");
-    setStep(0);
-    setResultText("");
-    setLastDelta({ energy: 0, confidence: 0, mood: 0, health: 0 });
-    setCurrentImage(parkingLotImg);
-  };
+  // const resetGame = () => {
+  //   setStats(initialStats);
+  //   setScene("parking");
+  //   setStep(0);
+  //   setResultText("");
+  //   setLastDelta({ energy: 0, confidence: 0, mood: 0, health: 0 });            commented out as the reset button was removed.
+  //   setCurrentImage(parkingLotImg);
+  // };
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
@@ -195,7 +196,8 @@ export default function ParkingLot() {
           </ScenePill>
         </HeaderLeft>
         <HeaderRight>
-          <ResetButton onClick={resetGame} />
+          <BackButton onClick={() => navigate(href("/office"))} />
+          {/* <ResetButton onClick={resetGame} /> */}
         </HeaderRight>
       </Header>
 
