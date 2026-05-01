@@ -78,7 +78,7 @@ const IMAGE_ID_TO_SRC = {
 } satisfies Record<string, string | undefined>;
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 100,
+    energy: 50,
     mood: 50,
     confidence: 50,
     health: 50,
@@ -395,7 +395,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     });
                     setStats(
                         statsUpdate(stats, {
-                            energy: -10,
+                            energy: +10,
                             mood: +5,
                             confidence: +5,
                         }),
@@ -528,7 +528,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -562,7 +562,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             desc: "Pick up the clean dishes from the dishwasher.",
                             action() {
                                 setDidDishes(true);
-                                setStats(statsUpdate(stats, { energy: -5 }));
+                                setStats(statsUpdate(stats, { energy: +2 }));
                                 setFeedbackSequence(
                                     {
                                         imageId: "getDishesOutOfDishwasher",
@@ -628,7 +628,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -663,7 +663,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -699,7 +699,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -735,7 +735,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -10,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -773,7 +773,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                                 setDidLaundry(true);
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -10,
+                                        energy: +2,
                                         mood: +50,
                                         health: +10,
                                         confidence: +20,
@@ -840,7 +840,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         label: name,
                         icon: icon,
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setStats(statsUpdate(stats, { energy: +2 }));
                             setActivityState({ ...activityState, sequence: 1 });
                             setFeedback({
                                 imageId: "cookDinner",

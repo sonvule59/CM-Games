@@ -49,7 +49,7 @@ import { href, useNavigate } from "react-router";
 type WalkingActivityProps = {};
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 100,
+    energy: 50,
     mood: 50,
     confidence: 50,
     health: 50,
@@ -313,7 +313,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                 action() {
                     if (screenState.stats.energy <= 10) {
                         applyStatDelta({
-                            energy: -10,
+                            energy: +10,
                             health: +20,
                         });
                         giveNeutralFeedback(
@@ -321,7 +321,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                         );
                     } else {
                         applyStatDelta({
-                            energy: -10,
+                            energy: +5,
                             health: +50,
                             mood: +10,
                         });
@@ -342,7 +342,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                 action() {
                     if (screenState.stats.energy <= 20) {
                         applyStatDelta({
-                            energy: -20,
+                            energy: +4,
                             health: +10,
                             confidence: +10,
                         });
@@ -366,7 +366,7 @@ function WalkingActivity({}: WalkingActivityProps) {
                                 break;
                         }
                         applyStatDelta({
-                            energy: -20,
+                            energy: +10,
                             health: +10,
                             confidence: +50,
                             mood: +10,

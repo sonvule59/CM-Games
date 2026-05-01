@@ -68,7 +68,7 @@ export default function RockClimbing() {
     confidence: 50,
     mood: 50,
     health: 50,
-    energy: 100,
+    energy: 50,
   };
 
   const [stats, setStats] = useState(initialStats);
@@ -135,13 +135,13 @@ export default function RockClimbing() {
   // Handle the very first choice from the entrance and move into a branch.
   const handleEntranceChoice = (choice: "wall" | "watch" | "stretch") => {
     if (choice === "wall") {
-      applyDelta({ confidence: +8, mood: +5, health: +5, energy: -10 });
+      applyDelta({ confidence: +8, mood: +5, health: +5, energy: +2 });
       setScene("wall");
     } else if (choice === "watch") {
-      applyDelta({ confidence: +4, mood: +6, health: 0, energy: -2 });
+      applyDelta({ confidence: +4, mood: +6, health: 0, energy: +0});
       setScene("watch");
     } else if (choice === "stretch") {
-      applyDelta({ confidence: +3, mood: +5, health: +10, energy: -3 });
+      applyDelta({ confidence: +3, mood: +5, health: +10, energy: +2});
       setScene("stretch");
     }
     setStep(1);
@@ -152,12 +152,12 @@ export default function RockClimbing() {
   const handleWallFollowup = (choice: "easy" | "hard") => {
     setWallChoice(choice);
     if (choice === "easy") {
-      applyDelta({ confidence: +6, mood: +4, health: +3, energy: -5 });
+      applyDelta({ confidence: +6, mood: +4, health: +3, energy: +2});
       setResultText(
         "You pick a friendlier route, focusing on smooth movement and breathing. Each hold feels more approachable, and you notice small wins stacking up.",
       );
     } else if (choice === "hard") {
-      applyDelta({ confidence: +10, mood: +3, health: +2, energy: -12 });
+      applyDelta({ confidence: +10, mood: +3, health: +2, energy: +4});
       setResultText(
         "You step onto the harder route, taking your time and honoring where your body is today. Every attempt is valid effort, and you celebrate the courage it took to try.",
       );
@@ -169,12 +169,12 @@ export default function RockClimbing() {
   const handleWatchFollowup = (choice: "cheer" | "ask") => {
     setWatchChoice(choice);
     if (choice === "cheer") {
-      applyDelta({ confidence: +5, mood: +8, health: 0, energy: -1 });
+      applyDelta({ confidence: +5, mood: +8, health: 0, energy: +1});
       setResultText(
         "You cheer for another climber, noticing how their effort inspires you. The room feels warmer and more connected, and you feel proud of the support you offered.",
       );
     } else if (choice === "ask") {
-      applyDelta({ confidence: +7, mood: +4, health: +2, energy: -2 });
+      applyDelta({ confidence: +7, mood: +4, health: +2, energy: +1});
       setResultText(
         "You talk with staff about beginner routes, getting clear, kind guidance. Knowing there are options that meet you where you are makes the wall feel less intimidating.",
       );
@@ -186,12 +186,12 @@ export default function RockClimbing() {
   const handleStretchFollowup = (choice: "health" | "easyHolds") => {
     setStretchChoice(choice);
     if (choice === "health") {
-      applyDelta({ confidence: +4, mood: +6, health: +12, energy: -3 });
+      applyDelta({ confidence: +4, mood: +6, health: +12, energy: +2 });
       setResultText(
         "You move gently through your joints, paying attention to what feels good. Each stretch is a small act of care, reminding you that comfort matters as much as challenge.",
       );
     } else if (choice === "easyHolds") {
-      applyDelta({ confidence: +7, mood: +7, health: +8, energy: -6 });
+      applyDelta({ confidence: +7, mood: +7, health: +8, energy: +1 });
       setResultText(
         "You warm up on easier holds, letting your body find its rhythm. The movements stay light and playful, and you notice tension slowly drifting away.",
       );

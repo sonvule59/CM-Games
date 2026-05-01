@@ -35,7 +35,7 @@ export default function OutdoorsActivities() {
     confidence: 50,
     mood: 50,
     health: 50,
-    energy: 100,
+    energy: 50,
   };
 
   const [activity, setActivity] = useState<
@@ -64,13 +64,13 @@ export default function OutdoorsActivities() {
     setStep("activityIntro");
     setResultText("");
     if (nextActivity === "walk") {
-      applyDelta({ confidence: +2, mood: +3, health: +4, energy: -2 });
+      applyDelta({ confidence: +2, mood: +3, health: +4, energy: +2 });
     } else if (nextActivity === "fish") {
-      applyDelta({ confidence: +2, mood: +4, health: +1, energy: -1 });
+      applyDelta({ confidence: +2, mood: +4, health: +1, energy: +1 });
     } else if (nextActivity === "golf") {
-      applyDelta({ confidence: +4, mood: +2, health: +2, energy: -3 });
+      applyDelta({ confidence: +4, mood: +2, health: +2, energy: +2 });
     } else if (nextActivity === "bocce") {
-      applyDelta({ confidence: +3, mood: +5, health: +2, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, health: +2, energy: +22 });
     }
   };
 
@@ -98,7 +98,7 @@ export default function OutdoorsActivities() {
 
   const handleFishingChoice = (choice: "catch" | "back") => {
     if (choice === "catch") {
-      applyDelta({ confidence: +8, mood: +5, health: +2, energy: -5 });
+      applyDelta({ confidence: +8, mood: +5, health: +2, energy: +2});
       setResultText(
         "You cast your line and feel a steady tug. After a quiet moment of waiting, you reel in a fish and take a second to enjoy the view before deciding what comes next.",
       );
@@ -114,12 +114,12 @@ export default function OutdoorsActivities() {
   // You can adjust these later if you want different situations.
   const handleWalkChoice = (choice: "short" | "long") => {
     if (choice === "short") {
-      applyDelta({ confidence: +3, mood: +5, health: +4, energy: -2 });
+      applyDelta({ confidence: +3, mood: +5, health: +4, energy: +2 });
       setResultText(
         "You choose a shorter loop along the water, noticing birds, trees, and the way the light hits the lake. It feels like just enough movement to clear your head.",
       );
     } else if (choice === "long") {
-      applyDelta({ confidence: +5, mood: +6, health: +8, energy: -6 });
+      applyDelta({ confidence: +5, mood: +6, health: +8, energy: +4 });
       setResultText(
         "You follow a longer trail that winds through the trees. You take your time, stop for a few photos, and return feeling refreshed and grounded.",
       );
@@ -129,12 +129,12 @@ export default function OutdoorsActivities() {
 
   const handleGolfChoice = (choice: "drives" | "shortGame") => {
     if (choice === "drives") {
-      applyDelta({ confidence: +6, mood: +3, health: +2, energy: -5 });
+      applyDelta({ confidence: +6, mood: +3, health: +2, energy: +4 });
       setResultText(
         "You focus on easy, smooth swings at the driving range. Instead of chasing perfection, you enjoy the rhythm of each shot and the wide‑open sky.",
       );
     } else if (choice === "shortGame") {
-      applyDelta({ confidence: +4, mood: +4, health: +1, energy: -3 });
+      applyDelta({ confidence: +4, mood: +4, health: +1, energy: +2});
       setResultText(
         "You practice gentle putts and chips on the green. The slower pace lets you notice small improvements and enjoy being outside.",
       );
@@ -144,12 +144,12 @@ export default function OutdoorsActivities() {
 
   const handleBocceChoice = (choice: "casual" | "tournament") => {
     if (choice === "casual") {
-      applyDelta({ confidence: +4, mood: +7, health: +2, energy: -2 });
+      applyDelta({ confidence: +4, mood: +7, health: +2, energy: +2});
       setResultText(
         "You play a relaxed round of bocce with friends, laughing at wild throws and cheering for close shots. The game becomes more about connection than keeping score.",
       );
     } else if (choice === "tournament") {
-      applyDelta({ confidence: +6, mood: +6, health: +3, energy: -4 });
+      applyDelta({ confidence: +6, mood: +6, health: +3, energy: +4});
       setResultText(
         "You set up a friendly mini‑tournament, taking turns and celebrating each win with high‑fives. The light competition adds excitement without pressure.",
       );
@@ -374,12 +374,8 @@ export default function OutdoorsActivities() {
     </Section>
   );
 
-<<<<<<< HEAD:Frontend/CM_Intervention/src/Componets/outdoorsActivities.jsx
-  // Map current step/activity to a single image key for the top illustration.
-  let imageKey = 'lake';
-=======
+
   let imageKey: keyof typeof OUTDOOR_IMAGES = "lake";
->>>>>>> a471bbceddf6ad244641478eaac7a526a5c297e5:Frontend/CM_Intervention/src/Componets/outdoorsActivities.tsx
   if (activity === 'walk') {
     imageKey = 'walk';
   } else if (activity === 'fish') {

@@ -45,7 +45,7 @@ const SCENE_IMAGES = {
 };
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const INITIAL_STATS = { confidence: 50, mood: 50, health: 50, energy: 100 };
+const INITIAL_STATS = { confidence: 50, mood: 50, health: 50, energy: 50 };
 const STAT_KEYS = ["confidence", "mood", "health", "energy"];
 
 const SCENE_LABELS = {
@@ -106,15 +106,15 @@ export default function TransportGame() {
   const handleModeChoice = (mode: "walk" | "bike" | "transit") => {
     setCommuteMode(mode);
     if (mode === "walk") {
-      applyDelta({ energy: -8, mood: +12, confidence: +10, health: +15 });
+      applyDelta({ energy: +2, mood: +12, confidence: +10, health: +15 });
       setScene("walk");
       setStep(1);
     } else if (mode === "bike") {
-      applyDelta({ energy: -10, mood: +15, confidence: +12, health: +18 });
+      applyDelta({ energy: +4, mood: +15, confidence: +12, health: +18 });
       setScene("bike");
       setStep(1);
     } else if (mode === "transit") {
-      applyDelta({ energy: -3, mood: +6, confidence: +5, health: +5 });
+      applyDelta({ energy: +2, mood: +6, confidence: +5, health: +5 });
       setScene("transit");
       setStep(1);
     }
@@ -124,14 +124,14 @@ export default function TransportGame() {
   const handleStairsChoice = (choice: "stairs" | "escalator") => {
     setTransitChoice(choice);
     if (choice === "stairs") {
-      applyDelta({ energy: -5, mood: +8, confidence: +8, health: +12 });
+      applyDelta({ energy: +2, mood: +8, confidence: +8, health: +12 });
       setScene("stairs");
       setStep(3); // → stairs result → then wait choice
       setResultText(
         "You take the stairs at your own pace, one step at a time. Your legs wake up and your heart rate lifts just enough to feel good.",
       );
     } else {
-      applyDelta({ energy: -1, mood: +4, confidence: +3, health: +2 });
+      applyDelta({ energy: +1, mood: +4, confidence: +3, health: +2 });
       setScene("transit");
       setStep(3);
       setResultText(
@@ -144,7 +144,7 @@ export default function TransportGame() {
   const handleWaitChoice = (choice: "walk" | "stand") => {
     setWaitChoice(choice);
     if (choice === "walk") {
-      applyDelta({ energy: -3, mood: +10, confidence: +6, health: +8 });
+      applyDelta({ energy: +3, mood: +10, confidence: +6, health: +8 });
       setScene("subwaywait");
       setStep(5);
       setResultText(
