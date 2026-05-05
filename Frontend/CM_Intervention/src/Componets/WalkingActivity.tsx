@@ -286,14 +286,14 @@ function WalkingActivity({}: WalkingActivityProps) {
                 action() {
                     if (screenState.stats.energy == 100) {
                         applyStatDelta({
-                            energy: +100,
+                            energy: +2,
                         });
                         giveNeutralFeedback(
                             "You feel refreshed, but maybe it's time to start walking.",
                         );
                     } else {
                         applyStatDelta({
-                            energy: +100,
+                            energy: +2,
                             mood: +20,
                         });
                         givePositiveFeedback("You feel refreshed and ready.");

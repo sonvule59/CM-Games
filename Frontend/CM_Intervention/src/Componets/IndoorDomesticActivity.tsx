@@ -395,7 +395,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     });
                     setStats(
                         statsUpdate(stats, {
-                            energy: -10,
+                            energy: +2,
                             mood: +5,
                             confidence: +5,
                         }),
@@ -493,7 +493,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -528,7 +528,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -562,7 +562,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             desc: "Pick up the clean dishes from the dishwasher.",
                             action() {
                                 setDidDishes(true);
-                                setStats(statsUpdate(stats, { energy: -5 }));
+                                setStats(statsUpdate(stats, { energy: +2 }));
                                 setFeedbackSequence(
                                     {
                                         imageId: "getDishesOutOfDishwasher",
@@ -628,7 +628,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -663,7 +663,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -699,7 +699,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -5,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -735,7 +735,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             action() {
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -10,
+                                        energy: +2,
                                     }),
                                 );
                                 setActivityState({
@@ -773,7 +773,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                                 setDidLaundry(true);
                                 setStats(
                                     statsUpdate(stats, {
-                                        energy: -10,
+                                        energy: +2,
                                         mood: +50,
                                         health: +10,
                                         confidence: +20,
@@ -840,7 +840,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                         label: name,
                         icon: icon,
                         action() {
-                            setStats(statsUpdate(stats, { energy: -10 }));
+                            setStats(statsUpdate(stats, { energy: +2 }));
                             setActivityState({ ...activityState, sequence: 1 });
                             setFeedback({
                                 imageId: "cookDinner",
@@ -868,7 +868,7 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                             icon: "🍽️",
                             desc: "Enjoy your dinner.",
                             action() {
-                                setStats(statsUpdate(stats, { energy: +100 }));
+                                setStats(statsUpdate(stats, { energy: +2 }));
                                 setDidCooking(true);
                                 setFeedback({
                                     imageId: "eatDinner",

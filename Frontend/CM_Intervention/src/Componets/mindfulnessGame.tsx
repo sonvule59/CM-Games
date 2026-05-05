@@ -89,7 +89,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Every small step counts",
         explanation:
             "Reinforces the idea that even small actions are valuable and contribute to progress.",
-        delta: { confidence: 6, mood: 4, energy: 3 },
+        delta: { confidence: 6, mood: 4, energy: 2 },
         imageSrc: imgSmallSteps,
     },
     {
@@ -97,7 +97,7 @@ const PHRASES: PhraseSpec[] = [
         label: "It's okay to go slow",
         explanation:
             "Promotes self-compassion and reduces the pressure to perform at a certain level.",
-        delta: { mood: 7, health: 3, energy: 4 },
+        delta: { mood: 7, health: 3, energy: 2 },
         imageSrc: imgOkayToGoSlow,
     },
     {
@@ -113,7 +113,7 @@ const PHRASES: PhraseSpec[] = [
         label: "I feel calmer after moving",
         explanation:
             "Highlights the emotional benefits of movement, reinforcing a positive association.",
-        delta: { mood: 8, energy: 4, health: 3 },
+        delta: { mood: 8, energy: 2, health: 3 },
         imageSrc: imgCalmerMoving,
     },
     {
@@ -137,7 +137,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Curious to try new movements",
         explanation:
             "Inspires openness and playfulness, making physical activity more enjoyable.",
-        delta: { energy: 6, mood: 5, health: 4 },
+        delta: { energy: 2, mood: 5, health: 4 },
         imageSrc: imgCuriousToTryNew,
     },
     {
@@ -145,7 +145,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Relaxed after gentle stretching",
         explanation:
             "Connects mindful movement to feelings of ease and comfort.",
-        delta: { health: 7, mood: 6, energy: 3 },
+        delta: { health: 7, mood: 6, energy: 2 },
         imageSrc: imgRelaxedAfterStretch,
     },
     {
@@ -185,7 +185,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Energy flows through me now",
         explanation:
             "Recognizes the energizing effects of movement on both body and mind.",
-        delta: { energy: 8, mood: 4, health: 3 },
+        delta: { energy: 2, mood: 4, health: 3 },
         imageSrc: imgEnergyFlowsThrough,
     },
     {
@@ -193,7 +193,7 @@ const PHRASES: PhraseSpec[] = [
         label: "My heart shows my strength",
         explanation:
             "Reframes physical responses as signs of strength and vitality.",
-        delta: { confidence: 7, energy: 5, mood: 4 },
+        delta: { confidence: 7, energy: 2, mood: 4 },
         imageSrc: imgHeartShowsStrength,
     },
 ];
