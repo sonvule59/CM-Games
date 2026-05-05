@@ -128,7 +128,7 @@ export default function TransportGame2() {
       );
       setCurrentImage(handcompleteImg);
     } else {
-      applyDelta({ health: +2, energy: +1, mood: +3, confidence: +2 });
+      applyDelta({ health: +2, energy: +2, mood: +3, confidence: +2 });
       setResultText(
         "You used a cart. It was easy, but you missed a strength workout.",
       );
@@ -157,7 +157,7 @@ export default function TransportGame2() {
         "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs.",
       );
     } else if (choice === "far") {
-      applyDelta({ energy: 0, confidence: +5, mood: +4, health: +5 });
+      applyDelta({ energy: +2, confidence: +5, mood: +4, health: +5 });
       setResultText(
         "You parked far away and enjoyed a nice walk to the entrance.",
       );
