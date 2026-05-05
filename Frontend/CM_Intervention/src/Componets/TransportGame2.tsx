@@ -105,7 +105,7 @@ export default function TransportGame2() {
       setCurrentImage(pedometerImg);
     } else {
       setMethod("car");
-      applyDelta({ health: +1, energy: +1, mood: +2, confidence: +1 });
+      applyDelta({ health: +1, energy: 0, mood: +2, confidence: +1 });
       setScene("parking");
       setCurrentImage(parkingImg);
     }
@@ -152,12 +152,12 @@ export default function TransportGame2() {
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
-      applyDelta({ energy: +2, confidence: +1, mood: +3, health: +1 });
+      applyDelta({ energy: 0, confidence: +1, mood: +3, health: +1 });
       setResultText(
         "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs.",
       );
     } else if (choice === "far") {
-      applyDelta({ energy: +2, confidence: +5, mood: +4, health: +5 });
+      applyDelta({ energy: 0, confidence: +5, mood: +4, health: +5 });
       setResultText(
         "You parked far away and enjoyed a nice walk to the entrance.",
       );

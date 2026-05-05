@@ -105,7 +105,7 @@ const PHRASES: PhraseSpec[] = [
         label: "My body deserves kindness",
         explanation:
             "Encourages a nurturing mindset that supports engaging in physical activity.",
-        delta: { health: 6, mood: 5, confidence: 5 },
+        delta: { health: 6, mood: 5, confidence: 5, energy: 2 },
         imageSrc: imgBodyKindness,
     },
     {
@@ -121,7 +121,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Grateful for what I can do",
         explanation:
             "Cultivates appreciation for current abilities rather than focusing on limitations.",
-        delta: { confidence: 7, mood: 5, health: 2 },
+        delta: { confidence: 7, mood: 5, health: 2, energy: 2 },
         imageSrc: imgGratefulWhatCanDo,
     },
     {
@@ -153,7 +153,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Time for self-care feels good",
         explanation:
             "Frames physical activity as an act of self-love rather than a chore.",
-        delta: { mood: 7, confidence: 4, health: 3 },
+        delta: { mood: 7, confidence: 4, health: 3, energy: 2 },
         imageSrc: imgSelfCareGood,
     },
     {
@@ -161,7 +161,7 @@ const PHRASES: PhraseSpec[] = [
         label: "Warmth spreads through my body",
         explanation:
             "Encourages noticing pleasant bodily sensations without judgment.",
-        delta: { health: 5, mood: 5, confidence: 3 },
+        delta: { health: 5, mood: 5, confidence: 3, energy: 2 },
         imageSrc: imgWarmthThroughBody,
     },
     {
@@ -177,7 +177,7 @@ const PHRASES: PhraseSpec[] = [
         label: "My body feels light and free",
         explanation:
             "Links physical sensations to emotional well-being and a sense of freedom.",
-        delta: { health: 6, mood: 6, confidence: 4 },
+        delta: { health: 6, mood: 6, confidence: 4, energy: 2 },
         imageSrc: imgLightAndFree,
     },
     {
