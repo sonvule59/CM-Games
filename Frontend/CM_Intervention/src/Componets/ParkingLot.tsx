@@ -72,22 +72,14 @@ export default function ParkingLot() {
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
-<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +1, mood: +3, health: +1 });
-=======
-      applyDelta({ energy: +4, confidence: +1, mood: +3, health: +1 });
->>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You found a parking spot close to the building. It saved your energy, but you missed a chance to stretch your legs.",
       );
       setCurrentImage(parkedCloseImg);
       setStep(2);
     } else if (choice === "far") {
-<<<<<<< HEAD
       applyDelta({ energy: +4, confidence: +6, mood: +5, health: +6 });
-=======
-      applyDelta({ energy: +2, confidence: +6, mood: +5, health: +6 });
->>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setCurrentImage(parkedImg);
       setScene("walking");
       setStep(1);
