@@ -122,11 +122,7 @@ export default function TransportGame2() {
 
   const handleCarryChoice = (choice: "hand" | "cart") => {
     if (choice === "hand") {
-<<<<<<< HEAD
       applyDelta({ health: +4, energy: +2, mood: +4, confidence: +7 });
-=======
-      applyDelta({ health: +4, energy: +4, mood: +4, confidence: +7 });
->>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You carried the heavy bags to the car. Your muscles feel worked!",
       );
@@ -156,20 +152,12 @@ export default function TransportGame2() {
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
-<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +1, mood: +3, health: +1 });
-=======
-      applyDelta({ energy: +1, confidence: +1, mood: +3, health: +1 });
->>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs.",
       );
     } else if (choice === "far") {
-<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +5, mood: +4, health: +5 });
-=======
-      applyDelta({ energy: +6, confidence: +5, mood: +4, health: +5 });
->>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You parked far away and enjoyed a nice walk to the entrance.",
       );
