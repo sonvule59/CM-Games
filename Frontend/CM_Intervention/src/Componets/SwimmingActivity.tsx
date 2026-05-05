@@ -32,7 +32,7 @@ import { negativeFeedback, positiveFeedback } from "./Feedback";
 import { href, useNavigate } from "react-router";
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 100,
+    energy: 50,
     mood: 50,
     confidence: 50,
     health: 50,
@@ -116,7 +116,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: -10,
+                            energy: +4,
                             mood: +10,
                             confidence: +10,
                             health: +10,
@@ -138,7 +138,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: -5,
+                            energy: +2,
                             mood: +10,
                             confidence: +10,
                             health: +10,
@@ -158,7 +158,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: -5,
+                            energy: +2,
                             mood: +10,
                             confidence: +10,
                             health: +10,
@@ -180,7 +180,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: -10,
+                            energy: +3,
                             mood: +10,
                             confidence: +15,
                             health: +20,
@@ -202,7 +202,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: -5,
+                            energy: +4,
                             mood: +10,
                             confidence: +10,
                             health: +15,
@@ -224,7 +224,7 @@ export default function SwimmingActivity({}: SwimmingActivityProps) {
                     setScreenState({
                         ...screenState,
                         stats: statsUpdate(screenState.stats, {
-                            energy: +50,
+                            energy: +2,
                             mood: +10,
                             confidence: +0,
                             health: +0,

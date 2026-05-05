@@ -31,7 +31,7 @@ import ActivityImage from "./ActivityImage";
 
 export default function TransportGame2() {
   const initialStats = {
-    energy: 100,
+    energy: 50,
     confidence: 50,
     mood: 50,
     health: 50,
@@ -100,12 +100,12 @@ export default function TransportGame2() {
   const handleStartChoice = (choice: "walk" | "car") => {
     if (choice === "walk") {
       setMethod("walk");
-      applyDelta({ health: +5, energy: -5, mood: +5, confidence: +5 });
+      applyDelta({ health: +5, energy: +4, mood: +5, confidence: +5 });
       setScene("pedometer");
       setCurrentImage(pedometerImg);
     } else {
       setMethod("car");
-      applyDelta({ health: +1, energy: -2, mood: +2, confidence: +1 });
+      applyDelta({ health: +1, energy: +1, mood: +2, confidence: +1 });
       setScene("parking");
       setCurrentImage(parkingImg);
     }
@@ -114,7 +114,7 @@ export default function TransportGame2() {
   const handleAppChoice = (use: boolean) => {
     setUseApp(use);
     if (use) {
-      applyDelta({ health: +1, energy: -1, mood: +4, confidence: +5 });
+      applyDelta({ health: +1, energy: +1, mood: +4, confidence: +5 });
     }
     setScene("grocery");
     setCurrentImage(longorshortImg);
@@ -122,13 +122,17 @@ export default function TransportGame2() {
 
   const handleCarryChoice = (choice: "hand" | "cart") => {
     if (choice === "hand") {
+<<<<<<< HEAD
       applyDelta({ health: +4, energy: +2, mood: +4, confidence: +7 });
+=======
+      applyDelta({ health: +4, energy: +4, mood: +4, confidence: +7 });
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You carried the heavy bags to the car. Your muscles feel worked!",
       );
       setCurrentImage(handcompleteImg);
     } else {
-      applyDelta({ health: +2, energy: -2, mood: +3, confidence: +2 });
+      applyDelta({ health: +2, energy: +1, mood: +3, confidence: +2 });
       setResultText(
         "You used a cart. It was easy, but you missed a strength workout.",
       );
@@ -139,11 +143,11 @@ export default function TransportGame2() {
 
   const handleRouteChoice = (choice: "long" | "short") => {
     if (choice === "long") {
-      applyDelta({ health: +5, energy: -6, mood: +5, confidence: +6 });
+      applyDelta({ health: +5, energy: +6, mood: +5, confidence: +6 });
       setResultText("You took the scenic long route home.");
       setCurrentImage(longcompleteImg);
     } else {
-      applyDelta({ health: +3, energy: -4, mood: +4, confidence: +4 });
+      applyDelta({ health: +3, energy: +4, mood: +4, confidence: +4 });
       setResultText("You took the shortcut.");
       setCurrentImage(shortcompleteImg);
     }
@@ -152,12 +156,20 @@ export default function TransportGame2() {
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
+<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +1, mood: +3, health: +1 });
+=======
+      applyDelta({ energy: +1, confidence: +1, mood: +3, health: +1 });
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You found a parking spot close to the market. It saved your energy, but you missed a chance to stretch your legs.",
       );
     } else if (choice === "far") {
+<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +5, mood: +4, health: +5 });
+=======
+      applyDelta({ energy: +6, confidence: +5, mood: +4, health: +5 });
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You parked far away and enjoyed a nice walk to the entrance.",
       );

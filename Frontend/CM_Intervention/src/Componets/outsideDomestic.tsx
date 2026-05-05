@@ -59,14 +59,14 @@ const ACTIVITIES = [
       {
         id: "steady",
         label: "Take it steady (grab the essentials)",
-        delta: { energy: -6, confidence: +6, mood: +4, health: +2 },
+        delta: { energy: +2, confidence: +6, mood: +4, health: +2 },
         result:
           "You keep it simple and efficient. You find what you need, take a couple calm breaths in the checkout line, and leave feeling capable.",
       },
       {
         id: "extra",
         label: "Do a full restock (carry a bit more)",
-        delta: { energy: -12, confidence: +9, mood: +3, health: +4 },
+        delta: { energy: +4, confidence: +9, mood: +3, health: +4 },
         result:
           "You tackle a bigger haul. It takes more effort, but you manage it thoughtfully—lighter bags, more trips, and a little pride when you’re done.",
       },
@@ -87,14 +87,14 @@ const ACTIVITIES = [
       {
         id: "light",
         label: "Water + quick tidy",
-        delta: { energy: -4, confidence: +4, mood: +6, health: +3 },
+        delta: { energy: +2, confidence: +4, mood: +6, health: +3 },
         result:
           "You water, do a quick check, and tidy a couple spots. The fresh air helps, and the progress feels satisfying.",
       },
       {
         id: "dig",
         label: "Plant + weed for a while",
-        delta: { energy: -10, confidence: +7, mood: +6, health: +6 },
+        delta: { energy: +4, confidence: +7, mood: +6, health: +6 },
         result:
           "You settle in and do more hands‑on work—pulling weeds, planting, and moving around the yard. You finish with a “wow, I did that” kind of calm.",
       },
@@ -115,14 +115,14 @@ const ACTIVITIES = [
       {
         id: "single",
         label: "One trip (just the main bag)",
-        delta: { energy: -3, confidence: +3, mood: +2, health: +1 },
+        delta: { energy: +2, confidence: +3, mood: +2, health: +1 },
         result:
           "You handle the main bag and get it done. A small win, but a real one—and it clears mental space.",
       },
       {
         id: "double",
         label: "Two trips (bins + recycling)",
-        delta: { energy: -6, confidence: +5, mood: +3, health: +2 },
+        delta: { energy: +4, confidence: +5, mood: +3, health: +2 },
         result:
           "You finish the whole set—trash and recycling. It’s more steps, but the “all taken care of” feeling hits nicely.",
       },
@@ -143,14 +143,14 @@ const ACTIVITIES = [
       {
         id: "spot",
         label: "Spot clean the worst spots",
-        delta: { energy: -5, confidence: +4, mood: +4, health: +3 },
+        delta: { energy: +2, confidence: +4, mood: +4, health: +3 },
         result:
           "You hit the places that bug you most. The difference is immediate—cleaner light and a quick sense of control.",
       },
       {
         id: "all",
         label: "Do a full pass (inside + outside)",
-        delta: { energy: -11, confidence: +7, mood: +5, health: +5 },
+        delta: { energy: +4, confidence: +7, mood: +5, health: +5 },
         result:
           "You take your time and do a full pass. It’s effort, but the payoff is huge—everything looks crisp and new.",
       },
@@ -171,14 +171,14 @@ const ACTIVITIES = [
       {
         id: "feed",
         label: "Feed + play for a bit",
-        delta: { energy: -3, confidence: +4, mood: +8, health: +1 },
+        delta: { energy: +2, confidence: +4, mood: +8, health: +1 },
         result:
           "You feed them and play. The joy is immediate, and your mood gets a quick boost from the connection.",
       },
       {
         id: "walk",
         label: "Take a short walk together",
-        delta: { energy: -7, confidence: +5, mood: +9, health: +5 },
+        delta: { energy: +4, confidence: +5, mood: +9, health: +5 },
         result:
           "You head out for a short walk. It’s steady movement with a built‑in reason to be outside, and you come back lighter.",
       },
@@ -199,14 +199,14 @@ const ACTIVITIES = [
       {
         id: "quick",
         label: "Quick wash (outside only)",
-        delta: { energy: -8, confidence: +6, mood: +4, health: +4 },
+        delta: { energy: +2, confidence: +6, mood: +4, health: +4 },
         result:
           "You do a quick wash and wipe down. The car looks better fast, and the “done” feeling lands right away.",
       },
       {
         id: "detail",
         label: "Full clean (inside + outside)",
-        delta: { energy: -14, confidence: +9, mood: +5, health: +5 },
+        delta: { energy: +4, confidence: +9, mood: +5, health: +5 },
         result:
           "You go all in—vacuum, wipe, and wash. It takes more energy, but the results feel premium, like you reset your whole week.",
       },
@@ -227,14 +227,14 @@ const ACTIVITIES = [
       {
         id: "tiny",
         label: "Small fix (tighten/replace/patch)",
-        delta: { energy: -6, confidence: +8, mood: +3, health: +2 },
+        delta: { energy: +2, confidence: +8, mood: +3, health: +2 },
         result:
           "You complete a small fix. It’s not flashy, but it’s real competence—and your space works better because of you.",
       },
       {
         id: "project",
         label: "Mini project (paint/assemble)",
-        delta: { energy: -12, confidence: +10, mood: +4, health: +3 },
+        delta: { energy: +4, confidence: +10, mood: +4, health: +3 },
         result:
           "You take on a mini project. It’s more steps and more patience, but you finish with that “I built something” satisfaction.",
       },
@@ -255,7 +255,7 @@ export default function OutsideDomestic() {
   // Baseline stats are memoized so reset() can reliably restore the same object shape.
   const initialStats = useMemo(
     () => ({
-      energy: 100,
+      energy: 50,
       confidence: 50,
       mood: 50,
       health: 50,

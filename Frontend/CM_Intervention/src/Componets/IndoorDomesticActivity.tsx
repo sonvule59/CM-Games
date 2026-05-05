@@ -78,7 +78,7 @@ const IMAGE_ID_TO_SRC = {
 } satisfies Record<string, string | undefined>;
 
 const STARTING_STATS: Stats = Object.freeze({
-    energy: 100,
+    energy: 50,
     mood: 50,
     confidence: 50,
     health: 50,
@@ -395,7 +395,11 @@ function IndoorDomesticActivity({}: IndoorDomesticActivityProps) {
                     });
                     setStats(
                         statsUpdate(stats, {
+<<<<<<< HEAD
                             energy: +2,
+=======
+                            energy: +10,
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
                             mood: +5,
                             confidence: +5,
                         }),

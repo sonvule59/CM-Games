@@ -50,7 +50,7 @@ const SCENE_IMAGES = {
 };
 
 
-const INITIAL_STATS = { confidence: 50, mood: 50, health: 50, energy: 100 };
+const INITIAL_STATS = { confidence: 50, mood: 50, health: 50, energy: 50 };
 const STAT_KEYS = ["confidence", "mood", "health", "energy"];
 
 const SCENE_LABELS = {
@@ -69,7 +69,7 @@ const WALK_OPTIONS = [
       "You grab your phone and suggest taking the call outside. Fresh air, moving feet, still getting things done — best of both worlds.",
     result:
       "Productive and active? That's the dream combo. Your team loved it too. Let's do that again! 🚶📱",
-    delta: { energy: -6, mood: +12, confidence: +12, health: +8 },
+    delta: { energy: +2, mood: +12, confidence: +12, health: +8 },
   },
   {
     id: "waterbreak",
@@ -78,7 +78,7 @@ const WALK_OPTIONS = [
       "You grab your water bottle and take the long way to the kitchen. Hydration plus movement — your body's two favourite things.",
     result:
       "Hydrated and stretched out. That's a double win. Small detour, big payoff. 💧",
-    delta: { energy: -3, mood: +10, confidence: +5, health: +10 },
+    delta: { energy: +2, mood: +10, confidence: +5, health: +10 },
   },
   {
     id: "printer",
@@ -87,7 +87,7 @@ const WALK_OPTIONS = [
       "You send something to print and take your time getting there. Down the hall, a little loop — every step counts.",
     result:
       "Technically productive, secretly a wellness break. Nobody needs to know. 🖨️",
-    delta: { energy: -2, mood: +8, confidence: +4, health: +6 },
+    delta: { energy: +2, mood: +8, confidence: +4, health: +6 },
   },
 ] as const;
 
@@ -99,7 +99,7 @@ const DESK_EXERCISE_OPTIONS = [
       "You extend your arms wide and roll your shoulders back. Tension you didn't even know was there starts to melt away.",
     result:
       "Those stretches just undid an hour of hunching. Your shoulders are officially grateful. 💪",
-    delta: { energy: -3, mood: +8, health: +10, confidence: +5 },
+    delta: { energy: +2, mood: +8, health: +10, confidence: +5 },
   },
   {
     id: "chairsquat",
@@ -108,7 +108,7 @@ const DESK_EXERCISE_OPTIONS = [
       "You stand, lower yourself almost to the seat, then rise. Three reps in and you're already feeling it.",
     result:
       "Chair squats — who knew your desk could double as a gym? Legs activated. You did that! 🙌",
-    delta: { energy: -8, mood: +10, health: +12, confidence: +8 },
+    delta: { energy: +2, mood: +10, health: +12, confidence: +8 },
   },
   {
     id: "wrist",
@@ -117,7 +117,7 @@ const DESK_EXERCISE_OPTIONS = [
       "You lift both legs slowly under the desk, hold for a beat, then lower. Nobody has any idea.",
     result:
       "Sneaky and effective. Core engaged, legs working — all from your chair. Keep it up! ✨",
-    delta: { energy: -5, mood: +8, health: +10, confidence: +6 },
+    delta: { energy: +2, mood: +8, health: +10, confidence: +6 },
   },
 ] as const;
 
@@ -139,7 +139,7 @@ const TASKS = [
     name: "Standing Desk",
     desc: "Rise up and keep working",
     scene: "standing",
-    delta: () => ({ energy: -1, mood: +10, confidence: +10, health: +5 }),
+    delta: () => ({ energy: +1, mood: +10, confidence: +10, health: +5 }),
     intro:
       "You raise the desk with a soft whirr and shift your weight onto your feet. The posture change alone feels like a tiny reset.",
     result:

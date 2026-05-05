@@ -28,7 +28,7 @@ import { ActionPanel } from "./ActionPanel";
 
 export default function ParkingLot() {
   const initialStats = {
-    energy: 100,
+    energy: 50,
     confidence: 50,
     mood: 50,
     health: 50
@@ -72,14 +72,22 @@ export default function ParkingLot() {
 
   const handleParkingChoice = (choice: "close" | "far") => {
     if (choice === "close") {
+<<<<<<< HEAD
       applyDelta({ energy: +2, confidence: +1, mood: +3, health: +1 });
+=======
+      applyDelta({ energy: +4, confidence: +1, mood: +3, health: +1 });
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setResultText(
         "You found a parking spot close to the building. It saved your energy, but you missed a chance to stretch your legs.",
       );
       setCurrentImage(parkedCloseImg);
       setStep(2);
     } else if (choice === "far") {
+<<<<<<< HEAD
       applyDelta({ energy: +4, confidence: +6, mood: +5, health: +6 });
+=======
+      applyDelta({ energy: +2, confidence: +6, mood: +5, health: +6 });
+>>>>>>> 13627c1f469c72f4e9241d414e5036e496d5302e
       setCurrentImage(parkedImg);
       setScene("walking");
       setStep(1);
@@ -88,13 +96,13 @@ export default function ParkingLot() {
 
   const handleWalkingChoice = (choice: "normal" | "fast") => {
     if (choice === "normal") {
-      applyDelta({ energy: -5, confidence: +4, mood: +3, health: +4 });
+      applyDelta({ energy: +2, confidence: +4, mood: +3, health: +4 });
       setResultText(
         "You walked toward the building at a relaxed pace. The short walk helped you settle into the day.",
       );
       setCurrentImage(walkingImg);
     } else if (choice === "fast") {
-      applyDelta({ energy: -10, mood: +5, health: +8, confidence: +8 });
+      applyDelta({ energy: +4, mood: +5, health: +8, confidence: +8 });
       setResultText(
         "You decided to walk faster. Your body feels more awake and energized before entering the building.",
       );
