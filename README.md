@@ -26,50 +26,6 @@ Every choice in every world adjusts a shared stats object:
 
 Stats are clamped and displayed in a `StatsPanel`. After each choice, a `StatDeltaViewer` shows what changed.
 
----
-
-## **Project Structure**
-
-src/   
-├── entry.client.tsx               \# Client-side entry point for React Router Framework  
-├── root.tsx                       \# Global React tree for React Router Framework  
-├── routes.ts                      \# Route information for React Router Framework  
-├── index.css                      \# Global style sheet  
-├── images/                        \# Static images  
-├── public/assets/Images           \# Static images  
-├── Static/                        \# Static content  
-├── Componets/                     \# React components  
-    ├── homeOfHomePages.tsx        \# Top-level hub — routes to all 5 games   
-    ├── Layout.tsx                 \# Shared layout primitives (Container, Header, Section, etc.)   
-    ├── ActionPanel.tsx            \# Reusable choice button panel \\+ style toggle   
-    ├── StatsPanel.tsx             \# Stats display \\+ delta viewer \\+ statsUpdate utility   
-    ├── ActivityImage.tsx          \# Shared image renderer for activity scenes   
-    ├── Feedback.tsx               \# Feedback/result screen component   
-    │   
-    ├── leisureHome.tsx            \# Leisure home page   
-    ├── rockClimbing.tsx           \# Rock climbing activity   
-    ├── outdoorsActivities.tsx     \# Lake/outdoors activity   
-    ├── WalkingActivity.tsx        \# Walking activity   
-    ├── SwimmingActivity.tsx       \# Swimming activity   
-    │   
-    ├── domesticHome.tsx           \# Domestic home page   
-    ├── IndoorDomesticActivity.tsx \# Indoor chores (cleaning, dishes, laundry, cooking)   
-    ├── outsideDomestic.tsx        \# Outdoor domestic tasks   
-    │   
-    ├── mindfulnessHome.tsx        \# Mindfulness home page   
-    ├── mindfulnessGame.tsx        \# Phrase selection game   
-    │   
-    ├── OfficeGameStart.tsx        \# Office home page   
-    ├── OfficeGame.tsx             \# Office wellness scenarios   
-    │   
-    ├── TransportGameStart.tsx     \# Transport home page   
-    ├── TransportGame.tsx          \# Commute-to-work scenario   
-    ├── TransportGame2.tsx         \# Grocery shopping scenario   
-    └── ParkingLot.tsx             \# Parking choice sub-scene  
-package.json                       \# NPM configuration  
-package-lock.json                  \# Generated NPM configuration  
----
-
 ## **Getting Started**
 
 npm install  
